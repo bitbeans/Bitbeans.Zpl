@@ -63,7 +63,7 @@ jobs:
       # repository Bitbeans.Zpl, workflow release.yml, environment nuget).
       - name: NuGet login
         id: nuget-login
-        uses: NuGet/login@v1
+        uses: NuGet/login@8d196754b4036150537f80ac539e15c2f1028841 # v1.2.0
         with:
           user: bitbeans
 
@@ -73,7 +73,7 @@ jobs:
         run: dotnet nuget push "artifacts/packages/*.nupkg" --api-key "$NUGET_API_KEY" --source https://api.nuget.org/v3/index.json --skip-duplicate
 
       - name: GitHub release
-        uses: softprops/action-gh-release@v3
+        uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64 # v3.0.3
         with:
           files: artifacts/packages/*
           generate_release_notes: true

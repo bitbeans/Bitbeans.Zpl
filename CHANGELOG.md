@@ -138,6 +138,11 @@ First release as **Bitbeans.Zpl**, a fork of [BinaryKits.Zpl](https://github.com
 - Linux: the packages reference `SkiaSharp.NativeAssets.Linux` instead of the `NoDependencies` variant, which
   has no fontconfig support. With it the viewer found no system font on Linux and drew outline text (font `0`,
   `^A0`) blank. Linux now needs `libfontconfig1`.
+- Viewer: rotated barcodes and field blocks with an odd size were moved one dot to the left or top, because the
+  rotation center was computed with integer division.
+- Viewer: the `SKFont` of `^GS` graphic symbols is disposed.
+- CI: CodeQL runs the `security-extended` queries on the shipped code; third-party actions of the release
+  workflow are pinned to commit SHAs.
 - Viewer: an omitted format name (`^DF^FS`, `^XF^FS`) is stored and recalled as `UNKNOWN`, like on the printer.
 - Viewer: `~DG` stores the graphic as `NAME.GRF` (an omitted name as `UNKNOWN.GRF`), and `^XG` accepts a name
   without extension or without name (`^XGR:LOGO`, `^XGR:`); an invalid magnification keeps 1.

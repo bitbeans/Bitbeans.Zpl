@@ -1,0 +1,9 @@
+name: Bitbeans.Zpl CodeQL config
+
+# Security queries for the shipped code. Code quality is enforced by the build
+# (TreatWarningsAsErrors, .NET analyzers) and the 100 % coverage gate.
+queries:
+  - uses: security-extended
+
+paths-ignore:
+  - tests

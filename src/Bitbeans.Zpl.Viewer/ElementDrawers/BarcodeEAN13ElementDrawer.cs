@@ -127,7 +127,7 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
                         x += bitmapSpacing;
                         if (i == 0 || i == 6)
                         {
-                            x += moduleWidth * 4;
+                            x += moduleWidth * 4f;
                         }
                     }
 
@@ -163,7 +163,7 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
                     x += spacing;
                     if (i == 0 || i == 6)
                     {
-                        x += moduleWidth * 4;
+                        x += moduleWidth * 4f;
                     }
                 }
             }

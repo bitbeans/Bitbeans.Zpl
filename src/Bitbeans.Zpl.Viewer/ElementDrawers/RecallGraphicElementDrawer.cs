@@ -31,8 +31,8 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
                 SKPoint position = ResolvePosition(recallGraphic, currentPosition);
 
                 using SKBitmap bitmap = SKBitmap.Decode(imageData);
-                float width = bitmap.Width * recallGraphic.MagnificationFactorX;
-                float height = bitmap.Height * recallGraphic.MagnificationFactorY;
+                float width = (float)bitmap.Width * recallGraphic.MagnificationFactorX;
+                float height = (float)bitmap.Height * recallGraphic.MagnificationFactorY;
 
                 float x = JustifyX(recallGraphic, position.X, width);
                 float y = position.Y;

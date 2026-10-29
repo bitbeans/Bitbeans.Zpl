@@ -17,7 +17,7 @@ namespace Bitbeans.Zpl.Viewer.CommandAnalyzers
             string[] zplDataParts = this.SplitCommand(zplCommand, 2);
 
             string objectName = zplDataParts[0];
-            string formatDownloadedInDataField = zplDataParts[1];
+            // zplDataParts[1] is the format of the data field (b); the bytes are stored as they are
             string extensionOfStoredFile = zplDataParts[2];
             _ = int.TryParse(zplDataParts[3], out int objectDataLength);
             _ = int.TryParse(zplDataParts[4], out int totalNumberOfBytesPerRow);

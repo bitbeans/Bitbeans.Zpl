@@ -300,13 +300,13 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
                 switch (fieldOrientation)
                 {
                     case Zpl.FieldOrientation.Rotated90:
-                        matrix = SKMatrix.CreateRotationDegrees(90, x + height / 2, y + height / 2);
+                        matrix = SKMatrix.CreateRotationDegrees(90, x + height / 2f, y + height / 2f);
                         break;
                     case Zpl.FieldOrientation.Rotated180:
-                        matrix = SKMatrix.CreateRotationDegrees(180, x + width / 2, y + height / 2);
+                        matrix = SKMatrix.CreateRotationDegrees(180, x + width / 2f, y + height / 2f);
                         break;
                     case Zpl.FieldOrientation.Rotated270:
-                        matrix = SKMatrix.CreateRotationDegrees(270, x + width / 2, y + width / 2);
+                        matrix = SKMatrix.CreateRotationDegrees(270, x + width / 2f, y + width / 2f);
                         break;
                     case Zpl.FieldOrientation.Normal:
                         break;

@@ -364,10 +364,10 @@ namespace Bitbeans.Zpl.Viewer
                 layerBounds = SKRect.Intersect(
                     layerBounds,
                     new SKRect(
-                        (probeArea.Left - ReverseProbeMargin) * probeScale,
-                        (probeArea.Top - ReverseProbeMargin) * probeScale,
-                        (probeArea.Right + ReverseProbeMargin) * probeScale,
-                        (probeArea.Bottom + ReverseProbeMargin) * probeScale));
+                        (probeArea.Left - ReverseProbeMargin) * (float)probeScale,
+                        (probeArea.Top - ReverseProbeMargin) * (float)probeScale,
+                        (probeArea.Right + ReverseProbeMargin) * (float)probeScale,
+                        (probeArea.Bottom + ReverseProbeMargin) * (float)probeScale));
             }
 
             //use color inversion on an reverse draw white element

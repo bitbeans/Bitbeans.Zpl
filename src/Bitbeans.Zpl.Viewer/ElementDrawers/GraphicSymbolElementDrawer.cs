@@ -58,7 +58,7 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
 
                 SKTypeface typeface = options.FontManager.TypefaceGS;
 
-                SKFont skFont = new(typeface, fontSize * 1.25f, scaleX);
+                using SKFont skFont = new(typeface, fontSize * 1.25f, scaleX);
                 using SKPaint skPaint = new()
                 {
                     IsAntialias = options.Antialias
@@ -171,7 +171,7 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
             float renderedHeight = metrics.RenderedGlyphHeight;
             float topY = graphicSymbol.FieldTypeset == null ?
                 y :
-                y - metrics.Baseline * metrics.ExpansionY;
+                y - (float)metrics.Baseline * metrics.ExpansionY;
             FieldJustification fieldJustification;
 
             using (new SKAutoCanvasRestore(this.skCanvas))

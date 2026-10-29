@@ -160,6 +160,37 @@ namespace Bitbeans.Zpl.Viewer.Tests.Rendering
             Assert.AreEqual(new SKRectI(15, 25, 21, 29), RenderHelper.DarkBounds(bmp).Value);
         }
 
+        // ---------- rotation centers ----------
+
+        [TestMethod]
+        [DataRow("N")]
+        [DataRow("R")]
+        [DataRow("I")]
+        [DataRow("B")]
+        public void RotatedBarcodeWithOddSizeStartsAtTheFieldOrigin(string orientation)
+        {
+            // An integer rotation center moved odd sized rotated barcodes one dot to the left or top
+            using SKBitmap bmp = RenderHelper.Render($"^XA^BY1^FO100,100^BC{orientation},51,N,N,N^FD1^FS^XZ");
+
+            SKRectI bounds = RenderHelper.DarkBounds(bmp).Value;
+            Assert.AreEqual(100, bounds.Left, bounds.ToString());
+            Assert.AreEqual(100, bounds.Top, bounds.ToString());
+        }
+
+        [TestMethod]
+        [DataRow("N")]
+        [DataRow("R")]
+        [DataRow("I")]
+        [DataRow("B")]
+        public void RotatedFieldBlockWithOddWidthStaysInsideItsArea(string orientation)
+        {
+            using SKBitmap bmp = RenderHelper.Render($"^XA^FO100,100^A0{orientation},30,30^FB201,1,0,L,0^FDWWWWWWWWWWWWWWWWWWWW^FS^XZ", null, 100, 100);
+
+            SKRectI bounds = RenderHelper.DarkBounds(bmp).Value;
+            Assert.IsGreaterThanOrEqualTo(100, bounds.Left, bounds.ToString());
+            Assert.IsGreaterThanOrEqualTo(100, bounds.Top, bounds.ToString());
+        }
+
         // ---------- system fonts ----------
 
         [TestMethod]

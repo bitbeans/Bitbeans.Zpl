@@ -76,7 +76,7 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
 
                 this.JustifyOrigin(ref x, ref y, resizedImage.Width, qrcode.FieldOrigin != null, qrcode.FieldOrientation, qrcode.FieldJustification);
                 this.DrawBarcode(resizedImage, x, y + verticalQuietZone, resizedImage.Width, resizedImage.Height + 2 * verticalQuietZone, qrcode.FieldOrigin != null, qrcode.FieldOrientation);
-                return this.CalculateNextDefaultPosition(x, y, resizedImage.Width, resizedImage.Height + 2 * verticalQuietZone, qrcode.FieldOrigin != null, qrcode.FieldOrientation, currentPosition);
+                return this.CalculateNextDefaultPosition(x, y, resizedImage.Width, resizedImage.Height + 2f * verticalQuietZone, qrcode.FieldOrigin != null, qrcode.FieldOrientation, currentPosition);
             }
 
             return currentPosition;

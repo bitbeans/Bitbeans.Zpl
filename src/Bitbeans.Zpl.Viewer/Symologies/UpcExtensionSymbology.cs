@@ -56,7 +56,7 @@ namespace Bitbeans.Zpl.Viewer.Symologies
             List<bool> result = [];
             int type = content.Length;
             int[] digits = IntToDigits(value, type);
-            bool[] parities = [];
+            bool[] parities;
 
             if (type == 2)
             {

@@ -119,7 +119,7 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
                     this.skCanvas.DrawBitmap(bitmapGuardImage, x, y + barcodeHeight, SKSamplingOptions.Default);
 
                     using SKPaint paint = ZplBitmapFontRenderer.CreatePaint(false);
-                    float bitmapBaseX = x + moduleWidth * 3;
+                    float bitmapBaseX = x + moduleWidth * 3f;
                     for (int i = 0; i < interpretation.Length; i++)
                     {
                         string digit = interpretation[i].ToString();
@@ -130,7 +130,7 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
 
                         if (i == 3)
                         {
-                            bitmapBaseX += moduleWidth * 5;
+                            bitmapBaseX += moduleWidth * 5f;
                         }
                     }
 
@@ -152,7 +152,7 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
                 using SKBitmap guardImage = BoolArrayToSKBitmap(guards, (int)(margin + textBounds.Height / 2), moduleWidth);
                 this.skCanvas.DrawBitmap(guardImage, x, y + barcodeHeight, SKSamplingOptions.Default);
 
-                float baseX = x + moduleWidth * 3;
+                float baseX = x + moduleWidth * 3f;
                 for (int i = 0; i < interpretation.Length; i++)
                 {
                     string digit = interpretation[i].ToString();
@@ -169,7 +169,7 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
 
                     if (i == 3)
                     {
-                        baseX += moduleWidth * 5;
+                        baseX += moduleWidth * 5f;
                     }
                 }
             }

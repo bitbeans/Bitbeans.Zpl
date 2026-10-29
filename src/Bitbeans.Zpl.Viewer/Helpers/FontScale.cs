@@ -138,7 +138,7 @@ namespace Bitbeans.Zpl.Viewer.Helpers
                 {
                     double heightRatio = (double)fontHeight / height;
                     int intHeightRatio = (int)Math.Max(1, Math.Round(heightRatio));
-                    float emSize = height * intHeightRatio * heightScale;
+                    float emSize = (float)height * intHeightRatio * heightScale;
 
                     if (fontWidth == 0)
                     {
@@ -155,7 +155,7 @@ namespace Bitbeans.Zpl.Viewer.Helpers
                     double widthRatio = (double)fontWidth / width;
                     int intWidthRatio = (int)Math.Max(1, Math.Round(widthRatio));
 
-                    return (height * intWidthRatio * heightScale, 1.0f);
+                    return ((float)height * intWidthRatio * heightScale, 1.0f);
                 }
                 else
                 {

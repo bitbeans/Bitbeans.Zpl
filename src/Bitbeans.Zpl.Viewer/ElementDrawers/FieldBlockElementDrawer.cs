@@ -116,10 +116,10 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
                                 matrix = SKMatrix.CreateRotationDegrees(90, positionX + totalHeight / 2, positionY + totalHeight / 2);
                                 break;
                             case FieldOrientation.Rotated180:
-                                matrix = SKMatrix.CreateRotationDegrees(180, positionX + fieldBlock.Width / 2, positionY + totalHeight / 2);
+                                matrix = SKMatrix.CreateRotationDegrees(180, positionX + fieldBlock.Width / 2f, positionY + totalHeight / 2f);
                                 break;
                             case FieldOrientation.Rotated270:
-                                matrix = SKMatrix.CreateRotationDegrees(270, positionX + fieldBlock.Width / 2, positionY + fieldBlock.Width / 2);
+                                matrix = SKMatrix.CreateRotationDegrees(270, positionX + fieldBlock.Width / 2f, positionY + fieldBlock.Width / 2f);
                                 break;
                             case FieldOrientation.Normal:
                                 break;
@@ -248,7 +248,7 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
 
             if (fieldBlock.FieldTypeset != null)
             {
-                topY -= (maxLineCount - 1) * metrics.LineHeight + metrics.Baseline * metrics.ExpansionY;
+                topY -= (maxLineCount - 1f) * metrics.LineHeight + (float)metrics.Baseline * metrics.ExpansionY;
             }
 
             using (new SKAutoCanvasRestore(this.skCanvas))
@@ -279,7 +279,7 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
                     int lineWidth = ZplBitmapFontRenderer.MeasureTextWidth(textLine, metrics);
                     float indent = lineIndex == 0 ? 0 : Math.Max(fieldBlock.HangingIndent, 0);
                     float lineX = x + indent;
-                    float lineY = topY + visibleLineIndex * metrics.LineHeight;
+                    float lineY = topY + (float)visibleLineIndex * metrics.LineHeight;
                     float diff = fieldBlock.Width - indent - lineWidth;
 
                     switch (fieldBlock.TextJustification)
@@ -332,9 +332,9 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
                     case FieldOrientation.Rotated90:
                         return SKMatrix.CreateRotationDegrees(90, fieldBlock.PositionX + totalHeight / 2, fieldBlock.PositionY + totalHeight / 2);
                     case FieldOrientation.Rotated180:
-                        return SKMatrix.CreateRotationDegrees(180, fieldBlock.PositionX + fieldBlock.Width / 2, fieldBlock.PositionY + totalHeight / 2);
+                        return SKMatrix.CreateRotationDegrees(180, fieldBlock.PositionX + fieldBlock.Width / 2f, fieldBlock.PositionY + totalHeight / 2f);
                     case FieldOrientation.Rotated270:
-                        return SKMatrix.CreateRotationDegrees(270, fieldBlock.PositionX + fieldBlock.Width / 2, fieldBlock.PositionY + fieldBlock.Width / 2);
+                        return SKMatrix.CreateRotationDegrees(270, fieldBlock.PositionX + fieldBlock.Width / 2f, fieldBlock.PositionY + fieldBlock.Width / 2f);
                     case FieldOrientation.Normal:
                     default:
                         return SKMatrix.Empty;

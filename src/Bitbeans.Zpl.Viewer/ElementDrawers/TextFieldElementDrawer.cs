@@ -211,7 +211,7 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
             float renderedHeight = metrics.RenderedGlyphHeight;
             float topY = textField.FieldTypeset == null ?
                 y :
-                y - metrics.Baseline * metrics.ExpansionY;
+                y - (float)metrics.Baseline * metrics.ExpansionY;
             FieldJustification fieldJustification;
 
             using (new SKAutoCanvasRestore(this.skCanvas))

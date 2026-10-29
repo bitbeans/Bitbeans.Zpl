@@ -139,11 +139,11 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
 
                         if (i == 0 || i == 10)
                         {
-                            x += moduleWidth * 11;
+                            x += moduleWidth * 11f;
                         }
                         else if (i == 5)
                         {
-                            x += moduleWidth * 4;
+                            x += moduleWidth * 4f;
                         }
                     }
 
@@ -180,11 +180,11 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
 
                     if (i == 0 || i == 10)
                     {
-                        x += moduleWidth * 11;
+                        x += moduleWidth * 11f;
                     }
                     else if (i == 5)
                     {
-                        x += moduleWidth * 4;
+                        x += moduleWidth * 4f;
                     }
                 }
             }
