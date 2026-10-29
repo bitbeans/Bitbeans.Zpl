@@ -21,9 +21,6 @@ namespace Bitbeans.Zpl.Elements
         /// <summary>Print the field in reverse (<c>^FR</c>), inverting the underlying image.</summary>
         public bool ReversePrint { get; protected set; }
 
-        /// <summary>The field justification of the position command (<c>^FO</c>/<c>^FT</c> parameter <c>z</c>); <see cref="FieldJustification.None"/> if none was given.</summary>
-        public FieldJustification FieldJustification => FieldOrigin?.FieldJustification ?? FieldTypeset.FieldJustification;
-
         /// <summary>Initializes the element.</summary>
         /// <param name="content">The data to encode, written to the <c>^FD</c> field data command.</param>
         /// <param name="positionX">X position of the field in dots, relative to the label home (<c>^LH</c>); scaled by <see cref="ZplRenderOptions.ScaleFactor"/> when rendered.</param>
