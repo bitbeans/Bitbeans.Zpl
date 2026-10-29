@@ -4,33 +4,33 @@ using System.Linq;
 
 namespace Bitbeans.Zpl.Elements
 {
-    /// <summary>
-    /// Ansi Codabar Barcode
-    /// </summary>
+    /// <summary>ANSI Codabar bar code (<c>^BK</c>), rendered together with <c>^BY</c> and the field position.</summary>
     public class ZplBarcodeAnsiCodabar : ZplBarcode
     {
+        /// <summary>Calculate and print a check digit (<c>e</c> parameter of <c>^BK</c>).</summary>
         public bool CheckDigit { get; private set; }
+        /// <summary>Start character (<c>k</c> parameter of <c>^BK</c>): <c>A</c>, <c>B</c>, <c>C</c> or <c>D</c>.</summary>
         public char StartCharacter { get; private set; }
+        /// <summary>Stop character (<c>l</c> parameter of <c>^BK</c>): <c>A</c>, <c>B</c>, <c>C</c> or <c>D</c>.</summary>
         public char StopCharacter { get; private set; }
 
-        /// <summary>
-        /// Ansi Codabar Barcode
-        /// </summary>
-        /// <param name="content"></param>
-        /// <param name="startCharacter">A,B,C,D</param>
-        /// <param name="stopCharacter">A,B,C,D</param>
-        /// <param name="positionX"></param>
-        /// <param name="positionY"></param>
-        /// <param name="height"></param>
-        /// <param name="moduleWidth"></param>
-        /// <param name="wideBarToNarrowBarWidthRatio"></param>
-        /// <param name="fieldOrientation"></param>
-        /// <param name="hexadecimalIndicator"></param>
-        /// <param name="printInterpretationLine"></param>
-        /// <param name="printInterpretationLineAboveCode"></param>
-        /// <param name="checkDigit"></param>
-        /// <param name="bottomToTop"></param>
-        /// <param name="useDefaultPosition"></param>
+        /// <summary>Creates an ANSI Codabar bar code.</summary>
+        /// <param name="content">The data to encode, written to the <c>^FD</c> field data command.</param>
+        /// <param name="startCharacter">Start character, one of <c>A</c>, <c>B</c>, <c>C</c>, <c>D</c> (case-insensitive, rendered upper case).</param>
+        /// <param name="stopCharacter">Stop character, one of <c>A</c>, <c>B</c>, <c>C</c>, <c>D</c> (case-insensitive, rendered upper case).</param>
+        /// <param name="positionX">X position of the field in dots, relative to the label home (<c>^LH</c>); scaled by <see cref="ZplRenderOptions.ScaleFactor"/> when rendered.</param>
+        /// <param name="positionY">Y position of the field in dots, relative to the label home (<c>^LH</c>); scaled by <see cref="ZplRenderOptions.ScaleFactor"/> when rendered.</param>
+        /// <param name="height">Bar code height in dots; scaled by <see cref="ZplRenderOptions.ScaleFactor"/> when rendered.</param>
+        /// <param name="moduleWidth">Module width in dots, the width of the narrowest bar (<c>^BY</c> parameter <c>w</c>, 1 to 10).</param>
+        /// <param name="wideBarToNarrowBarWidthRatio">Ratio of wide bar to narrow bar width (<c>^BY</c> parameter <c>r</c>), 2.0 to 3.0 in steps of 0.1. Only evaluated by variable-ratio symbologies such as Code 39.</param>
+        /// <param name="fieldOrientation">Field orientation: normal (<c>N</c>), rotated 90 degrees (<c>R</c>), inverted 180 degrees (<c>I</c>) or read from bottom up (<c>B</c>).</param>
+        /// <param name="hexadecimalIndicator">Hexadecimal escape character for <c>^FH</c>, or <see langword="null"/> to not emit <c>^FH</c>. The default indicator <c>_</c> is rendered as a plain <c>^FH</c>.</param>
+        /// <param name="printInterpretationLine"><see langword="true"/> to print the human-readable interpretation line (<c>Y</c>), <see langword="false"/> to suppress it (<c>N</c>).</param>
+        /// <param name="printInterpretationLineAboveCode"><see langword="true"/> to print the interpretation line above the bar code instead of below it.</param>
+        /// <param name="checkDigit">Calculate and print a check digit; default <see langword="false"/>.</param>
+        /// <param name="bottomToTop"><see langword="true"/> to position the field with <c>^FT</c> (<see cref="ZplFieldTypeset"/>) instead of <c>^FO</c> (<see cref="ZplFieldOrigin"/>).</param>
+        /// <param name="useDefaultPosition">Only evaluated together with <paramref name="bottomToTop"/>: <see langword="true"/> renders <c>^FT</c> without coordinates so the printer continues at its default position. Ignored for <c>^FO</c>.</param>
+        /// <exception cref="InvalidOperationException"><paramref name="startCharacter"/> or <paramref name="stopCharacter"/> is not one of A, B, C, D.</exception>
         public ZplBarcodeAnsiCodabar(
             string content,
             char startCharacter,

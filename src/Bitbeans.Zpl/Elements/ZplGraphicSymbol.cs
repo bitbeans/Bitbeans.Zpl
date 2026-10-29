@@ -2,14 +2,31 @@ using System.Collections.Generic;
 
 namespace Bitbeans.Zpl.Elements
 {
+    /// <summary>Graphic symbol (<c>^GS</c>): a registered trade mark, copyright, trade mark, UL or CSA symbol.</summary>
+    /// <remarks>
+    /// Format: <c>^GSo,h,w</c> followed by the symbol character as field data.
+    /// </remarks>
     public class ZplGraphicSymbol : ZplPositionedElementBase
     {
+        /// <summary>Orientation of the symbol.</summary>
         public FieldOrientation FieldOrientation { get; private set; }
+        /// <summary>Character width in dots (<c>w</c> parameter); scaled by <see cref="ZplRenderOptions.ScaleFactor"/> when rendered.</summary>
         public int Width { get; private set; }
+        /// <summary>Character height in dots (<c>h</c> parameter); scaled by <see cref="ZplRenderOptions.ScaleFactor"/> when rendered.</summary>
         public int Height { get; private set; }
 
+        /// <summary>The symbol, or <see langword="null"/> for empty field data.</summary>
         public GraphicSymbolCharacter? Character { get; private set; }
 
+        /// <summary>Creates a graphic symbol from a character.</summary>
+        /// <param name="text">String whose first character (<c>A</c> to <c>E</c>, see <see cref="GraphicSymbolCharacter"/>) selects the symbol; the value is not validated. <see langword="null"/> or empty renders no symbol.</param>
+        /// <param name="positionX">X position of the field in dots, relative to the label home (<c>^LH</c>); scaled by <see cref="ZplRenderOptions.ScaleFactor"/> when rendered.</param>
+        /// <param name="positionY">Y position of the field in dots, relative to the label home (<c>^LH</c>); scaled by <see cref="ZplRenderOptions.ScaleFactor"/> when rendered.</param>
+        /// <param name="width">Character width in dots.</param>
+        /// <param name="height">Character height in dots.</param>
+        /// <param name="fieldOrientation">Field orientation: normal (<c>N</c>), rotated 90 degrees (<c>R</c>), inverted 180 degrees (<c>I</c>) or read from bottom up (<c>B</c>).</param>
+        /// <param name="bottomToTop"><see langword="true"/> to position the field with <c>^FT</c> (<see cref="ZplFieldTypeset"/>) instead of <c>^FO</c> (<see cref="ZplFieldOrigin"/>).</param>
+        /// <param name="useDefaultPosition">Only evaluated together with <paramref name="bottomToTop"/>: <see langword="true"/> renders <c>^FT</c> without coordinates so the printer continues at its default position. Ignored for <c>^FO</c>.</param>
         public ZplGraphicSymbol(
             string text,
             int positionX,
@@ -33,6 +50,15 @@ namespace Bitbeans.Zpl.Elements
             Height = height;
         }
 
+        /// <summary>Creates a graphic symbol.</summary>
+        /// <param name="character">The symbol, or <see langword="null"/> for none.</param>
+        /// <param name="positionX">X position of the field in dots, relative to the label home (<c>^LH</c>); scaled by <see cref="ZplRenderOptions.ScaleFactor"/> when rendered.</param>
+        /// <param name="positionY">Y position of the field in dots, relative to the label home (<c>^LH</c>); scaled by <see cref="ZplRenderOptions.ScaleFactor"/> when rendered.</param>
+        /// <param name="width">Character width in dots.</param>
+        /// <param name="height">Character height in dots.</param>
+        /// <param name="fieldOrientation">Field orientation: normal (<c>N</c>), rotated 90 degrees (<c>R</c>), inverted 180 degrees (<c>I</c>) or read from bottom up (<c>B</c>).</param>
+        /// <param name="bottomToTop"><see langword="true"/> to position the field with <c>^FT</c> (<see cref="ZplFieldTypeset"/>) instead of <c>^FO</c> (<see cref="ZplFieldOrigin"/>).</param>
+        /// <param name="useDefaultPosition">Only evaluated together with <paramref name="bottomToTop"/>: <see langword="true"/> renders <c>^FT</c> without coordinates so the printer continues at its default position. Ignored for <c>^FO</c>.</param>
         public ZplGraphicSymbol(
             GraphicSymbolCharacter? character,
             int positionX,
@@ -50,7 +76,9 @@ namespace Bitbeans.Zpl.Elements
             Height = height;
         }
 
-        ///<inheritdoc/>
+        /// <summary>Renders the position and <c>^GSo,h,w^FDc^FS</c>.</summary>
+        /// <param name="context">Render options (scaling).</param>
+        /// <returns>The ZPL lines of the symbol.</returns>
         public override IEnumerable<string> Render(ZplRenderOptions context)
         {
             //^GSo,h,w

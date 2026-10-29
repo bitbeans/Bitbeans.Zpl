@@ -21,21 +21,23 @@ namespace Bitbeans.Zpl.Elements
     /// </remarks>
     public class ZplDownloadGraphics : ZplDownload
     {
+        /// <summary>Name of the image on the printer, at most 8 characters; the extension is always <c>.GRF</c>.</summary>
         public string ImageName { get; private set; }
         private string _extension { get; set; }
+        /// <summary>The encoded source image (PNG, JPEG, BMP, ...).</summary>
         public byte[] ImageData { get; private set; }
 
         private readonly IImageConverter _imageConverter;
         readonly ZplCompressionScheme _compressionScheme;
 
-        /// <summary>
-        /// Zpl Download Graphics
-        /// </summary>
-        /// <param name="storageDevice">Storage device (R, E, B, A)</param>
-        /// <param name="imageName">Image name, maximum 8 characters</param>
-        /// <param name="imageData">Encoded image data (PNG, JPEG, BMP, ...)</param>
-        /// <param name="imageConverter">Converter used to create the bitonal image, e.g. Bitbeans.Zpl.SkiaSharp.SkiaImageConverter</param>
-        /// <param name="compressionScheme">Compression of the graphic data</param>
+        /// <summary>Creates a graphic download.</summary>
+        /// <param name="storageDevice">Storage device (<c>R</c>, <c>E</c>, <c>B</c>, <c>A</c>).</param>
+        /// <param name="imageName">Image name, maximum 8 characters.</param>
+        /// <param name="imageData">Encoded image data (PNG, JPEG, BMP, ...).</param>
+        /// <param name="imageConverter">Converter used to create the bitonal image, e.g. <c>Bitbeans.Zpl.SkiaSharp.SkiaImageConverter</c>.</param>
+        /// <param name="compressionScheme">Compression of the graphic data; default <see cref="ZplCompressionScheme.ACS"/>.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="imageName"/>, <paramref name="imageData"/> or <paramref name="imageConverter"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentException"><paramref name="imageName"/> is longer than 8 characters.</exception>
         public ZplDownloadGraphics(
             char storageDevice,
             string imageName,
@@ -61,7 +63,9 @@ namespace Bitbeans.Zpl.Elements
             _compressionScheme = compressionScheme;
         }
 
-        ///<inheritdoc/>
+        /// <summary>Converts the image to a bitonal image (scaled by <see cref="ZplRenderOptions.ScaleFactor"/> first if it is not 1), compresses it and renders <c>~DGd:o.GRF,t,w,</c> and the data as two lines.</summary>
+        /// <param name="context">Render options (scaling).</param>
+        /// <returns>The <c>~DG</c> command line and the data line.</returns>
         public override IEnumerable<string> Render(ZplRenderOptions context)
         {
             byte[] objectData = context.ScaleFactor != 1

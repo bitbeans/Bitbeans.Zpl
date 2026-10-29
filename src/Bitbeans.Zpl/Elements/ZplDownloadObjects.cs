@@ -25,18 +25,19 @@ namespace Bitbeans.Zpl.Elements
     /// </remarks>
     public class ZplDownloadObjects : ZplDownload
     {
+        /// <summary>Name of the object on the printer.</summary>
         public string ObjectName { get; private set; }
+        /// <summary>The encoded source image (PNG, JPEG, BMP, ...).</summary>
         public byte[] ImageData { get; private set; }
 
         private readonly IImageConverter _imageConverter;
 
-        /// <summary>
-        /// Zpl Download Objects
-        /// </summary>
-        /// <param name="storageDevice">Storage device (R, E, B, A)</param>
-        /// <param name="imageName">Object name</param>
-        /// <param name="imageData">Encoded image data (PNG, JPEG, BMP, ...)</param>
-        /// <param name="imageConverter">Converter used to create the PNG, e.g. Bitbeans.Zpl.SkiaSharp.SkiaImageConverter</param>
+        /// <summary>Creates an object download.</summary>
+        /// <param name="storageDevice">Storage device (<c>R</c>, <c>E</c>, <c>B</c>, <c>A</c>).</param>
+        /// <param name="imageName">Object name.</param>
+        /// <param name="imageData">Encoded image data (PNG, JPEG, BMP, ...).</param>
+        /// <param name="imageConverter">Converter used to create the PNG, e.g. <c>Bitbeans.Zpl.SkiaSharp.SkiaImageConverter</c>.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="imageName"/>, <paramref name="imageData"/> or <paramref name="imageConverter"/> is <see langword="null"/>.</exception>
         public ZplDownloadObjects(char storageDevice, string imageName, byte[] imageData, IImageConverter imageConverter)
             : base(storageDevice)
         {
@@ -49,7 +50,9 @@ namespace Bitbeans.Zpl.Elements
             _imageConverter = imageConverter;
         }
 
-        ///<inheritdoc/>
+        /// <summary>Converts the image to a PNG (scaled by <see cref="ZplRenderOptions.ScaleFactor"/>) and renders it as hexadecimal data of a <c>~DY</c> command (format and extension <c>P</c>).</summary>
+        /// <param name="context">Render options (scaling).</param>
+        /// <returns>The <c>~DY</c> command line.</returns>
         public override IEnumerable<string> Render(ZplRenderOptions context)
         {
             byte[] objectData = _imageConverter.ConvertToPng(ImageData, context.ScaleFactor);

@@ -40,12 +40,10 @@ namespace Bitbeans.Zpl.Helpers
             return Enumerable.Range(0, str.Length / chunkSize).Select(i => str.Substring(i * chunkSize, chunkSize));
         }
 
-        /// <summary>
-        /// Compress hex
-        /// </summary>
-        /// <param name="hexData">Clean hex data 000000\nFFFFFF</param>
-        /// <param name="bytesPerRow"></param>
-        /// <returns></returns>
+        /// <summary>Compresses hexadecimal graphic data with the Alternative Data Compression Scheme (ACS).</summary>
+        /// <param name="hexData">Hexadecimal data (two digits per byte) of the whole image; line breaks are ignored.</param>
+        /// <param name="bytesPerRow">Number of bytes per image row; defines the line length.</param>
+        /// <returns>The ACS compressed data, to be used as the data of <c>~DG</c>.</returns>
         public static string Compress(string hexData, int bytesPerRow)
         {
             var chunkSize = bytesPerRow * 2;
@@ -111,12 +109,10 @@ namespace Bitbeans.Zpl.Helpers
             return compressedLines.ToString();
         }
 
-        /// <summary>
-        /// Uncompress data
-        /// </summary>
-        /// <param name="compressedHexData"></param>
-        /// <param name="bytesPerRow"></param>
-        /// <returns></returns>
+        /// <summary>Decompresses ACS compressed data back to hexadecimal data.</summary>
+        /// <param name="compressedHexData">ACS compressed data.</param>
+        /// <param name="bytesPerRow">Number of bytes per image row; defines the line length.</param>
+        /// <returns>Hexadecimal data with one line (terminated by a line feed) per image row.</returns>
         public static string Uncompress(string compressedHexData, int bytesPerRow)
         {
             var hexData = new StringBuilder();
@@ -179,6 +175,9 @@ namespace Bitbeans.Zpl.Helpers
             return hexData.ToString();
         }
 
+        /// <summary>Gets the ACS repeat count characters (<c>G</c>-<c>Y</c>, <c>g</c>-<c>z</c>) for a run of identical characters.</summary>
+        /// <param name="charRepeatCount">Number of consecutive identical characters.</param>
+        /// <returns>The repeat count characters, or an empty string if the count is 1.</returns>
         public static string GetZebraCharCount(int charRepeatCount)
         {
             //only append if the repeated character is than 1 otherwise the compression scheme uses 2 characters to represent 1

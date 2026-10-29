@@ -3,47 +3,48 @@ using System.Collections.Generic;
 
 namespace Bitbeans.Zpl.Elements
 {
+    /// <summary>Base class of all ZPL elements. An element renders itself to one or more lines of ZPL II code.</summary>
     public abstract class ZplElementBase
     {
+        /// <summary>Comments describing the element. They are rendered as <c>^FX</c> comment by <see cref="ZplEngine"/> when <see cref="ZplRenderOptions.DisplayComments"/> is set.</summary>
         public List<string> Comments { get; protected set; }
 
-        /// <summary>
-        /// Indicate the rendering process whether this element can be skipped
-        /// </summary>
+        /// <summary>Indicates to the rendering process whether this element is rendered. Disabled elements are skipped by <see cref="ZplEngine"/>. Default: <see langword="true"/>.</summary>
         public bool IsEnabled { get; set; }
 
-        /// <summary>
-        /// Optionally identify the element for future lookup/manipulation
-        /// </summary>
+        /// <summary>Optionally identifies the element for later lookup or manipulation. Not rendered.</summary>
         public string Id { get; set; }
 
+        /// <summary>Initializes the element: no comments, <see cref="IsEnabled"/> is <see langword="true"/>.</summary>
         public ZplElementBase()
         {
             Comments = new List<string>();
             IsEnabled = true;
         }
 
-        /// <summary>
-        /// Render Zpl data
-        /// </summary>
-        /// <returns></returns>
+        /// <summary>Renders the element with default <see cref="ZplRenderOptions"/>.</summary>
+        /// <returns>The ZPL lines of the element.</returns>
         public IEnumerable<string> Render()
         {
             return Render(new ZplRenderOptions());
         }
 
+        /// <summary>Renders the element with default <see cref="ZplRenderOptions"/> and joins the lines with a space.</summary>
+        /// <returns>The ZPL code on a single line.</returns>
         public string RenderToString()
         {
             return string.Join(" ", Render());
         }
 
-        /// <summary>
-        /// Render Zpl data
-        /// </summary>
-        /// <param name="context"></param>
-        /// <returns></returns>
+        /// <summary>Renders the element to ZPL lines.</summary>
+        /// <param name="context">Render options; positions and sizes are scaled with <see cref="ZplRenderOptions.ScaleFactor"/>.</param>
+        /// <returns>The ZPL lines of the element.</returns>
         public abstract IEnumerable<string> Render(ZplRenderOptions context);
 
+        /// <summary>Converts a field orientation to its ZPL letter.</summary>
+        /// <param name="fieldOrientation">The orientation.</param>
+        /// <returns><c>N</c>, <c>R</c>, <c>I</c> or <c>B</c>.</returns>
+        /// <exception cref="NotImplementedException"><paramref name="fieldOrientation"/> is not a defined value.</exception>
         public string RenderFieldOrientation(FieldOrientation fieldOrientation)
         {
             switch (fieldOrientation)
@@ -61,6 +62,10 @@ namespace Bitbeans.Zpl.Elements
             throw new NotImplementedException("Unknown Field Orientation");
         }
 
+        /// <summary>Converts a Data Matrix quality level to its ZPL value.</summary>
+        /// <param name="qualityLevel">The quality level.</param>
+        /// <returns><c>0</c>, <c>50</c>, <c>80</c>, <c>100</c>, <c>140</c> or <c>200</c>.</returns>
+        /// <exception cref="NotImplementedException"><paramref name="qualityLevel"/> is not a defined value.</exception>
         public string RenderQualityLevel(QualityLevel qualityLevel)
         {
             switch (qualityLevel)
@@ -82,6 +87,10 @@ namespace Bitbeans.Zpl.Elements
             throw new NotImplementedException("Unknown Quality Level");
         }
 
+        /// <summary>Converts a field justification to its ZPL value.</summary>
+        /// <param name="fieldJustification">The justification.</param>
+        /// <returns><c>0</c> (left), <c>1</c> (right), <c>2</c> (auto) or an empty string for <see cref="FieldJustification.None"/>.</returns>
+        /// <exception cref="NotImplementedException"><paramref name="fieldJustification"/> is not a defined value.</exception>
         public string RenderFieldJustification(FieldJustification fieldJustification)
         {
             switch (fieldJustification)
@@ -99,6 +108,10 @@ namespace Bitbeans.Zpl.Elements
             throw new NotImplementedException("Unknown Field Justification");
         }
 
+        /// <summary>Converts a line color to its ZPL letter.</summary>
+        /// <param name="lineColor">The line color.</param>
+        /// <returns><c>B</c> or <c>W</c>.</returns>
+        /// <exception cref="NotImplementedException"><paramref name="lineColor"/> is not a defined value.</exception>
         public string RenderLineColor(LineColor lineColor)
         {
             switch (lineColor)
@@ -112,6 +125,10 @@ namespace Bitbeans.Zpl.Elements
             throw new NotImplementedException("Unknown Line Color");
         }
 
+        /// <summary>Converts a QR Code error correction level to its ZPL letter.</summary>
+        /// <param name="errorCorrectionLevel">The error correction level.</param>
+        /// <returns><c>H</c>, <c>Q</c>, <c>M</c> or <c>L</c>.</returns>
+        /// <exception cref="NotImplementedException"><paramref name="errorCorrectionLevel"/> is not a defined value.</exception>
         public string RenderErrorCorrectionLevel(ErrorCorrectionLevel errorCorrectionLevel)
         {
             switch (errorCorrectionLevel)
@@ -129,21 +146,24 @@ namespace Bitbeans.Zpl.Elements
             throw new NotImplementedException("Unknown Error Correction Level");
         }
 
-        /// <summary>
-        /// Render Zpl char for boolean
-        /// </summary>
-        /// <param name="value"></param>
-        /// <returns></returns>
+        /// <summary>Converts a boolean to the ZPL yes/no letter.</summary>
+        /// <param name="value">The value.</param>
+        /// <returns><c>Y</c> for <see langword="true"/>, otherwise <c>N</c>.</returns>
         public string RenderBoolean(bool value)
         {
             return value ? "Y" : "N";
         }
 
+        /// <summary>Renders the element with default <see cref="ZplRenderOptions"/> and joins the lines with line feeds.</summary>
+        /// <returns>The ZPL code, lines separated by <c>\n</c>.</returns>
         public string ToZplString()
         {
             return ToZplString(new ZplRenderOptions());
         }
 
+        /// <summary>Renders the element and joins the lines with line feeds.</summary>
+        /// <param name="context">Render options.</param>
+        /// <returns>The ZPL code, lines separated by <c>\n</c>.</returns>
         public string ToZplString(ZplRenderOptions context)
         {
             return string.Join("\n", Render(context));

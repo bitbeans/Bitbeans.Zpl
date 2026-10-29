@@ -1,25 +1,15 @@
 ﻿namespace Bitbeans.Zpl
 {
-    /// <summary>
-    /// Text Alignment
-    /// </summary>
+    /// <summary>Field justification, the optional third parameter of the field position commands <c>^FO</c>, <c>^FT</c> and <c>^FW</c>. Not to be confused with <see cref="TextJustification"/> of <c>^FB</c>.</summary>
     public enum FieldJustification
     {
-        /// <summary>
-        /// None
-        /// </summary>
+        /// <summary>Justification is not specified; the parameter is omitted and the printer default applies.</summary>
         None,
-        /// <summary>
-        /// Left
-        /// </summary>
+        /// <summary>Left-justified field (<c>0</c>).</summary>
         Left,
-        /// <summary>
-        /// Right
-        /// </summary>
+        /// <summary>Right-justified field (<c>1</c>).</summary>
         Right,
-        /// <summary>
-        /// Auto (script dependent)
-        /// </summary>
+        /// <summary>Auto justification, depending on the script direction of the text (<c>2</c>).</summary>
         Auto
     }
 }

@@ -2,26 +2,23 @@
 
 namespace Bitbeans.Zpl.Elements
 {
-    /// <summary>
-    /// Field Origin<br/>
-    /// The ^FO command sets a field origin, relative to the label home (^LH) position.
-    /// ^FO sets the upper-left corner of the field area by defining points along the x-axis and y-axis independent of the rotation.
-    /// </summary>
+    /// <summary>Field origin (<c>^FO</c>). Sets the upper-left corner of the following field area, relative to the label home (<c>^LH</c>), independent of the field rotation.</summary>
     /// <remarks>
-    /// Format:^FOx,y
+    /// Format: <c>^FOx,y,z</c>
     /// </remarks>
     public class ZplFieldOrigin : ZplElementBase
     {
+        /// <summary>X position in dots (0 to 32000), relative to the label home. Scaled by <see cref="ZplRenderOptions.ScaleFactor"/> when rendered.</summary>
         public int PositionX { get; protected set; }
+        /// <summary>Y position in dots (0 to 32000), relative to the label home. Scaled by <see cref="ZplRenderOptions.ScaleFactor"/> when rendered.</summary>
         public int PositionY { get; protected set; }
+        /// <summary>Field justification (<c>z</c> parameter of <c>^FO</c>); <see cref="FieldJustification.None"/> omits it.</summary>
         public FieldJustification FieldJustification { get; protected set; }
 
-        /// <summary>
-        /// Field Origin
-        /// </summary>
-        /// <param name="positionX">X Position (0-32000)</param>
-        /// <param name="positionY">Y Position (0-32000)</param>
-        /// <param name="fieldJustification"></param>
+        /// <summary>Creates a field origin.</summary>
+        /// <param name="positionX">X position in dots (0-32000).</param>
+        /// <param name="positionY">Y position in dots (0-32000).</param>
+        /// <param name="fieldJustification">Field justification rendered as the third parameter of <c>^FO</c>/<c>^FT</c>; <see cref="FieldJustification.None"/> omits it.</param>
         public ZplFieldOrigin(int positionX, int positionY, FieldJustification fieldJustification = FieldJustification.None)
         {
             this.PositionX = positionX;
@@ -36,12 +33,10 @@ namespace Bitbeans.Zpl.Elements
             return new string[] { $"^FO{context.Scale(this.PositionX)},{context.Scale(this.PositionY)},{RenderFieldJustification(this.FieldJustification)}".TrimEnd(',') };
         }
 
-        /// <summary>
-        /// Return a new instance with offset applied
-        /// </summary>
-        /// <param name="offsetX">Offset on x</param>
-        /// <param name="offsetY">Offset on y</param>
-        /// <returns></returns>
+        /// <summary>Returns a new instance moved by the given offset.</summary>
+        /// <param name="offsetX">Offset on the x axis in dots.</param>
+        /// <param name="offsetY">Offset on the y axis in dots.</param>
+        /// <returns>A new <see cref="ZplFieldOrigin"/>; this instance is not changed.</returns>
         public ZplFieldOrigin Offset(int offsetX, int offsetY)
         {
             return new ZplFieldOrigin(this.PositionX + offsetX, this.PositionY + offsetY, this.FieldJustification);
