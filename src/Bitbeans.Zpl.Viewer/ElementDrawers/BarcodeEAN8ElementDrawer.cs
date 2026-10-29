@@ -55,19 +55,13 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
                 content = content.PadLeft(7, '0').Substring(0, 7);
                 string interpretation = content;
 
-                int checksum = 0;
-                for (int i = 0; i < 7; i++)
-                {
-                    checksum += (content[i] - 48) * (i % 2 * 2 + 3);
-                }
-
-                interpretation = string.Format("{0}{1}", interpretation, checksum % 10);
+                interpretation = string.Format("{0}{1}", interpretation, CalculateGs1CheckDigit(content));
 
                 EAN8Writer writer = new();
                 bool[] result = writer.encode(content);
                 using SKBitmap resizedImage = BoolArrayToSKBitmap(result, barcode.Height, barcode.ModuleWidth);
-                byte[] png = resizedImage.Encode(SKEncodedImageFormat.Png, 100).ToArray();
-                this.DrawBarcode(png, x, y, resizedImage.Width, resizedImage.Height, barcode.FieldOrigin != null, barcode.FieldOrientation);
+                this.JustifyOrigin(ref x, ref y, resizedImage.Width, barcode.FieldOrigin != null, barcode.FieldOrientation, barcode.FieldJustification);
+                this.DrawBarcode(resizedImage, x, y, resizedImage.Width, resizedImage.Height, barcode.FieldOrigin != null, barcode.FieldOrientation);
 
                 if (barcode.PrintInterpretationLine)
                 {
@@ -114,10 +108,6 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
                 if (!useFieldOrigin)
                 {
                     y -= barcodeHeight;
-                    if (y < 0)
-                    {
-                        y = 0;
-                    }
                 }
 
                 if (this.TryGetBitmapInterpretationLineFont(options, internationalFont, printDensityDpmm, moduleWidth, out ZplBitmapFontData fontData, out ZplBitmapFontMetrics metrics))
@@ -126,8 +116,7 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
                     int bitmapSpacing = moduleWidth * 7;
 
                     using SKBitmap bitmapGuardImage = BoolArrayToSKBitmap(guards, (int)(bitmapMargin + metrics.RenderedGlyphHeight / 2f), moduleWidth);
-                    byte[] bitmapGuardPng = bitmapGuardImage.Encode(SKEncodedImageFormat.Png, 100).ToArray();
-                    this.skCanvas.DrawBitmap(SKBitmap.Decode(bitmapGuardPng), x, y + barcodeHeight, SKSamplingOptions.Default);
+                    this.skCanvas.DrawBitmap(bitmapGuardImage, x, y + barcodeHeight, SKSamplingOptions.Default);
 
                     using SKPaint paint = ZplBitmapFontRenderer.CreatePaint(false);
                     float bitmapBaseX = x + moduleWidth * 3;
@@ -161,8 +150,7 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
                 int spacing = moduleWidth * 7;
 
                 using SKBitmap guardImage = BoolArrayToSKBitmap(guards, (int)(margin + textBounds.Height / 2), moduleWidth);
-                byte[] guardPng = guardImage.Encode(SKEncodedImageFormat.Png, 100).ToArray();
-                this.skCanvas.DrawBitmap(SKBitmap.Decode(guardPng), x, y + barcodeHeight, SKSamplingOptions.Default);
+                this.skCanvas.DrawBitmap(guardImage, x, y + barcodeHeight, SKSamplingOptions.Default);
 
                 float baseX = x + moduleWidth * 3;
                 for (int i = 0; i < interpretation.Length; i++)

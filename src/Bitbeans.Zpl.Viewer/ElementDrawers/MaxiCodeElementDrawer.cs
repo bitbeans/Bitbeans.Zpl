@@ -44,8 +44,8 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
                 bool[] data = MaxiCodeSymbology.Encode(content, maxiCode.Mode);
 
                 using SKBitmap image = DrawMaxiCode(data, printDensityDpmm);
-                byte[] png = image.Encode(SKEncodedImageFormat.Png, 100).ToArray();
-                this.DrawBarcode(png, x, y, image.Width, image.Height, maxiCode.FieldOrigin != null, maxiCode.FieldOrientation);
+                this.JustifyOrigin(ref x, ref y, image.Width, maxiCode.FieldOrigin != null, maxiCode.FieldOrientation, maxiCode.FieldJustification);
+                this.DrawBarcode(image, x, y, image.Width, image.Height, maxiCode.FieldOrigin != null, maxiCode.FieldOrientation);
                 return this.CalculateNextDefaultPosition(x, y, image.Width, image.Height, maxiCode.FieldOrigin != null, maxiCode.FieldOrientation, currentPosition);
             }
 

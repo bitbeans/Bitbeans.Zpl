@@ -74,8 +74,8 @@ public class BarcodeMsiElementDrawer : BarcodeDrawerBase
         int wide = (int)Math.Floor(msi.WideBarToNarrowBarWidthRatio * narrow);
         result = AdjustWidths(result, wide, narrow);
         using SKBitmap resizedImage = BoolArrayToSKBitmap(result, msi.Height);
-        byte[] png = resizedImage.Encode(SKEncodedImageFormat.Png, 100).ToArray();
-        this.DrawBarcode(png, x, y, resizedImage.Width, resizedImage.Height, msi.FieldOrigin != null, msi.FieldOrientation);
+        this.JustifyOrigin(ref x, ref y, resizedImage.Width, msi.FieldOrigin != null, msi.FieldOrientation, msi.FieldJustification);
+        this.DrawBarcode(resizedImage, x, y, resizedImage.Width, resizedImage.Height, msi.FieldOrigin != null, msi.FieldOrientation);
 
         if (msi.PrintInterpretationLine)
         {

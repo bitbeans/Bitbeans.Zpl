@@ -26,6 +26,8 @@ namespace Bitbeans.Zpl.Elements
         /// <param name="hexadecimalIndicator">Hexadecimal escape character for <c>^FH</c>, or <see langword="null"/> to emit <c>^FH</c> only when the content contains <c>^</c> or <c>~</c>. When set, the indicator character in the content is escaped too. Must be a printable ASCII character other than <c>^</c> and <c>~</c> (otherwise <see cref="System.ArgumentException"/>). The default indicator <c>_</c> is rendered as a plain <c>^FH</c>.</param>
         /// <param name="bottomToTop"><see langword="true"/> to position the field with <c>^FT</c> (<see cref="ZplFieldTypeset"/>) instead of <c>^FO</c> (<see cref="ZplFieldOrigin"/>).</param>
         /// <param name="useDefaultPosition">Only evaluated together with <paramref name="bottomToTop"/>: <see langword="true"/> renders <c>^FT</c> without coordinates so the printer continues at its default position. Ignored for <c>^FO</c>.</param>
+        /// <param name="reversePrint"><see langword="true"/> to emit <c>^FR</c> so the field is printed in reverse (bars/modules and interpretation line invert the underlying image).</param>
+        /// <param name="fieldJustification">Field justification rendered as the third parameter of <c>^FO</c>/<c>^FT</c> (<c>0</c> left, <c>1</c> right, <c>2</c> auto); <see cref="FieldJustification.None"/> omits it. A right justified field ends at the position.</param>
         public ZplMaxiCode(
             string content,
             int positionX,
@@ -35,8 +37,10 @@ namespace Bitbeans.Zpl.Elements
             int total = 1,
             char? hexadecimalIndicator = null,
             bool bottomToTop = false,
-            bool useDefaultPosition = false)
-            : base(content, positionX, positionY, FieldOrientation.Normal, hexadecimalIndicator, bottomToTop, useDefaultPosition)
+            bool useDefaultPosition = false,
+            bool reversePrint = false,
+            FieldJustification fieldJustification = FieldJustification.None)
+            : base(content, positionX, positionY, FieldOrientation.Normal, hexadecimalIndicator, bottomToTop, useDefaultPosition, reversePrint, fieldJustification)
         {
             Mode = mode;
             Position = position;

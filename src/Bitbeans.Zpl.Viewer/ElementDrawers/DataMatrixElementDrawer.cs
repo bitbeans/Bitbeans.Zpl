@@ -79,8 +79,8 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
 
                 using SKBitmap resizedImage = BitMatrixToSKBitmap(result, dataMatrix.Height);
                 {
-                    byte[] png = resizedImage.Encode(SKEncodedImageFormat.Png, 100).ToArray();
-                    this.DrawBarcode(png, x, y, resizedImage.Width, resizedImage.Height, dataMatrix.FieldOrigin != null, dataMatrix.FieldOrientation);
+                    this.JustifyOrigin(ref x, ref y, resizedImage.Width, dataMatrix.FieldOrigin != null, dataMatrix.FieldOrientation, dataMatrix.FieldJustification);
+                    this.DrawBarcode(resizedImage, x, y, resizedImage.Width, resizedImage.Height, dataMatrix.FieldOrigin != null, dataMatrix.FieldOrientation);
                 }
 
                 return this.CalculateNextDefaultPosition(x, y, resizedImage.Width, resizedImage.Height, dataMatrix.FieldOrigin != null, dataMatrix.FieldOrientation, currentPosition);

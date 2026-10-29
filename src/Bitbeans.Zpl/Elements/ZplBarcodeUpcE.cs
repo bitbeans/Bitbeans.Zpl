@@ -23,6 +23,8 @@ namespace Bitbeans.Zpl.Elements
         /// <param name="printCheckDigit">Print the check digit; default <see langword="true"/>.</param>
         /// <param name="bottomToTop"><see langword="true"/> to position the field with <c>^FT</c> (<see cref="ZplFieldTypeset"/>) instead of <c>^FO</c> (<see cref="ZplFieldOrigin"/>).</param>
         /// <param name="useDefaultPosition">Only evaluated together with <paramref name="bottomToTop"/>: <see langword="true"/> renders <c>^FT</c> without coordinates so the printer continues at its default position. Ignored for <c>^FO</c>.</param>
+        /// <param name="reversePrint"><see langword="true"/> to emit <c>^FR</c> so the field is printed in reverse (bars/modules and interpretation line invert the underlying image).</param>
+        /// <param name="fieldJustification">Field justification rendered as the third parameter of <c>^FO</c>/<c>^FT</c> (<c>0</c> left, <c>1</c> right, <c>2</c> auto); <see cref="FieldJustification.None"/> omits it. A right justified field ends at the position.</param>
         public ZplBarcodeUpcE(
             string content,
             int positionX,
@@ -36,7 +38,9 @@ namespace Bitbeans.Zpl.Elements
             bool printInterpretationLineAboveCode = false,
             bool printCheckDigit = true,
             bool bottomToTop = false,
-            bool useDefaultPosition = false)
+            bool useDefaultPosition = false,
+            bool reversePrint = false,
+            FieldJustification fieldJustification = FieldJustification.None)
             : base(content,
                   positionX,
                   positionY,
@@ -48,7 +52,7 @@ namespace Bitbeans.Zpl.Elements
                   printInterpretationLine,
                   printInterpretationLineAboveCode,
                   bottomToTop,
-                  useDefaultPosition)
+                  useDefaultPosition, reversePrint, fieldJustification)
         {
             this.PrintCheckDigit = printCheckDigit;
         }

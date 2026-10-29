@@ -81,6 +81,12 @@ First release as **Bitbeans.Zpl**, a fork of [BinaryKits.Zpl](https://github.com
 - Viewer: `^FW` overwrote an explicit `^A` orientation of the pending field.
 - Viewer: `^FT` with an omitted y coordinate used y 0; it keeps the y of the last positioned field.
 - Viewer: non-finite `^BY` ratios are ignored and `^FB` values are clamped to the documented ranges.
+- Viewer: the EAN-8 interpretation line printed a wrong check digit; EAN-8, EAN-13, UPC-A and UPC-E share one GS1 calculation.
+- Viewer: `^FR` and `^LR` were ignored for bar codes; bars, modules and the interpretation line are now reversed. The bar code elements
+  have optional `reversePrint` and `fieldJustification` parameters and `ZplFieldDataElementBase.ReversePrint`/`FieldJustification`.
+- Viewer: bar codes are drawn from the bitmap without a PNG round trip and no longer leak bitmaps; `BarcodeDrawerBase.DrawBarcode` takes an `SKBitmap`.
+- Viewer: a bar code anchored with `^FT` above the label top was shifted down; it is clipped instead.
+- Viewer: the justification of `^FO`/`^FT` (`z`) was ignored for bar codes; right justified bar codes end at the origin.
 - `ZplDownloadGraphics` always halved the image instead of scaling by the dpi factor
   ([upstream #346](https://github.com/BinaryKits/BinaryKits.Zpl/issues/346)).
 - `ZplDownloadGraphics` did not throw for image names longer than 8 characters.

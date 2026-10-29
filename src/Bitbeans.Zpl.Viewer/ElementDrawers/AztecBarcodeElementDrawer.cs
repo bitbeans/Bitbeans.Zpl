@@ -66,8 +66,8 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
                 BitMatrix result = writer.encode(content, ZXing.BarcodeFormat.AZTEC, 0, 0, encodingOptions.Hints);
 
                 using SKBitmap resizedImage = BitMatrixToSKBitmap(result, aztecBarcode.MagnificationFactor);
-                byte[] png = resizedImage.Encode(SKEncodedImageFormat.Png, 100).ToArray();
-                this.DrawBarcode(png, x, y, resizedImage.Width, resizedImage.Height, aztecBarcode.FieldOrigin != null, aztecBarcode.FieldOrientation);
+                this.JustifyOrigin(ref x, ref y, resizedImage.Width, aztecBarcode.FieldOrigin != null, aztecBarcode.FieldOrientation, aztecBarcode.FieldJustification);
+                this.DrawBarcode(resizedImage, x, y, resizedImage.Width, resizedImage.Height, aztecBarcode.FieldOrigin != null, aztecBarcode.FieldOrientation);
                 return this.CalculateNextDefaultPosition(x, y, resizedImage.Width, resizedImage.Height, aztecBarcode.FieldOrigin != null, aztecBarcode.FieldOrientation, currentPosition);
             }
 
