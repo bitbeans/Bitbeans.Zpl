@@ -5,7 +5,8 @@ on:
     tags: ['v[0-9]+.[0-9]+.[0-9]+*']
 
 permissions:
-  contents: write
+  contents: write  # GitHub release
+  id-token: write  # NuGet trusted publishing (OIDC)
 
 env:
   DOTNET_NOLOGO: true
@@ -53,9 +54,18 @@ jobs:
           VERSION: ${{ steps.version.outputs.version }}
         run: dotnet pack Bitbeans.Zpl.slnx --configuration Release --no-build --output artifacts/packages "-p:Version=$VERSION"
 
+      # Trusted publishing: nuget.org exchanges the GitHub OIDC token for a short-lived API key,
+      # no long-lived secret is stored. Policy: nuget.org > Trusted Publishing (owner bitbeans,
+      # repository Bitbeans.Zpl, workflow release.yml, environment nuget).
+      - name: NuGet login
+        id: nuget-login
+        uses: NuGet/login@v1
+        with:
+          user: bitbeans
+
       - name: Publish to NuGet
         env:
-          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+          NUGET_API_KEY: ${{ steps.nuget-login.outputs.NUGET_API_KEY }}
         run: dotnet nuget push "artifacts/packages/*.nupkg" --api-key "$NUGET_API_KEY" --source https://api.nuget.org/v3/index.json --skip-duplicate
 
       - name: GitHub release

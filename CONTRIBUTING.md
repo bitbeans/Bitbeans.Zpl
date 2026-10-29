@@ -22,6 +22,13 @@ dotnet tool restore
 pwsh ./eng/coverage.ps1
 ```
 
+Package audit: vulnerable or deprecated packages and licenses other than MIT, Apache-2.0, BSD or MS-PL fail
+the check (the CI runs it on every push and once a week):
+
+```shell
+pwsh ./eng/check-packages.ps1
+```
+
 The HTML report is written to `artifacts/coverage/index.html`.
 
 ## Repository layout
@@ -58,4 +65,7 @@ shared build settings live in [`Directory.Build.props`](Directory.Build.props).
 
 ## Releases
 
-Maintainers create a tag `vX.Y.Z`; the release workflow builds, tests and publishes the packages to NuGet.
+Maintainers push a tag `vX.Y.Z` (or `vX.Y.Z-preview.N`). The release workflow builds and tests the code, then
+publishes the packages to NuGet and creates a GitHub release. Publishing uses
+[NuGet trusted publishing](https://learn.microsoft.com/nuget/nuget-org/trusted-publishing), so no API key is
+stored in the repository. The `nuget` environment can require a manual approval.

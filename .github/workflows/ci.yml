@@ -6,6 +6,8 @@ on:
   pull_request:
     branches: [main]
   workflow_dispatch:
+  schedule:
+    - cron: '0 5 * * 1'  # weekly: new advisories and deprecations without code changes
 
 permissions:
   contents: read
@@ -78,3 +80,18 @@ jobs:
         with:
           name: packages
           path: artifacts/packages/
+
+  packages:
+    name: Package audit
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-dotnet@v5
+        with:
+          global-json-file: global.json
+
+      - name: Check vulnerabilities, deprecations and licenses
+        shell: pwsh
+        run: ./eng/check-packages.ps1
