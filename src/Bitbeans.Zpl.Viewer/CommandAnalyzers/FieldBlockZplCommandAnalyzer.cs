@@ -2,6 +2,8 @@
 using Bitbeans.Zpl.Elements;
 using Bitbeans.Zpl.Viewer.Models;
 
+using System;
+
 namespace Bitbeans.Zpl.Viewer.CommandAnalyzers
 {
     public class FieldBlockZplCommandAnalyzer : ZplCommandAnalyzerBase
@@ -22,17 +24,17 @@ namespace Bitbeans.Zpl.Viewer.CommandAnalyzers
 
             if (int.TryParse(zplDataParts[0], out tmpint))
             {
-                widthOfTextBlockLine = tmpint;
+                widthOfTextBlockLine = Math.Clamp(tmpint, 0, 32000);
             }
 
             if (zplDataParts.Length > 1 && int.TryParse(zplDataParts[1], out tmpint))
             {
-                maximumNumberOfLinesInTextBlock = tmpint;
+                maximumNumberOfLinesInTextBlock = Math.Clamp(tmpint, 1, 9999);
             }
 
             if (zplDataParts.Length > 2 && int.TryParse(zplDataParts[2], out tmpint))
             {
-                addOrDeleteSpaceBetweenLines = tmpint;
+                addOrDeleteSpaceBetweenLines = Math.Clamp(tmpint, -9999, 9999);
             }
 
             if (zplDataParts.Length > 3)
@@ -53,7 +55,7 @@ namespace Bitbeans.Zpl.Viewer.CommandAnalyzers
 
             if (zplDataParts.Length > 4 && int.TryParse(zplDataParts[4], out tmpint))
             {
-                hangingIndentOfTheSecondAndRemainingLines = tmpint;
+                hangingIndentOfTheSecondAndRemainingLines = Math.Clamp(tmpint, 0, 9999);
             }
 
             virtualPrinter.SetNextElementFieldBlock(new FieldBlock

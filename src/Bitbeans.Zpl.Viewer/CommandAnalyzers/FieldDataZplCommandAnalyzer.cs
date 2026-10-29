@@ -16,7 +16,18 @@ namespace Bitbeans.Zpl.Viewer.CommandAnalyzers
             int? fieldNumber = virtualPrinter.NextFieldNumber;
             if (fieldNumber != null)
             {
-                virtualPrinter.ClearNextFieldNumber(); // Prevents consumption by field separator analyzer
+                if (virtualPrinter.HasNextElementPosition)
+                {
+                    // ^FO/^FT, ^FN and ^FD in the same field: the field is defined and receives its data (and the
+                    // data is also provided to all other fields with this number). The field separator finalizes it.
+                    virtualPrinter.SetNextElementFieldDataContent(text);
+                }
+                else
+                {
+                    // Data only (recall of a format): prevents consumption by field separator analyzer
+                    virtualPrinter.ClearNextFieldNumber();
+                }
+
                 return new ZplRecallFieldNumber(fieldNumber.Value, text);
             }
 

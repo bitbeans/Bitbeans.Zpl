@@ -78,6 +78,26 @@ CODABLOCK (`^BB`), TLC39 (`^BT`), Micro PDF417 (`^BF`), Micro QR.
 | `^XF` | Recall format |
 | `^FN` | Field number |
 
+## Behavior notes and limitations
+
+- Stored formats (`^DF`/`^XF`) are keyed by storage device and name: the device defaults to `R:`, the name is
+  case-insensitive and the extension is ignored. A later `^DF` (and `~DG`/`~DY`) with the same key replaces the
+  earlier one. Recalling a format that was not stored is reported in `AnalyzeInfo.Errors`; the label keeps its own elements.
+- `^FN` with `^FD` in a field that has a position (`^FO`/`^FT`) defines the field and provides the data for all
+  fields with this number. Without a position (as in a `^XF` label) it only provides data. The optional
+  quoted prompt (`^FN1"Name"`) is ignored. Data in a `^DF` format does not become a default value.
+- The escape character of a Data Matrix field (`^BX` parameter g, default `~`) is not treated as the start of a
+  command inside the `^FD`/`^FV` of that field.
+- Carriage returns and line feeds are ignored everywhere in the ZPL stream, also inside `^FD`. Use `\&` in
+  `^FB` fields (or `^FH` escapes) for line breaks.
+- `^FH` indicators that are invalid (space, `^`, `~`, control and non-ASCII characters) fall back to `_`.
+- `^CF` keeps the last height and width if a value is omitted. `^FW` only applies to `^A` fonts without an
+  explicit orientation, also when it follows `^A` in the same field.
+- `^FT` with an omitted y coordinate cannot continue at the end of the previous text field (the drawers only support
+  the complete default position). The y coordinate of the last positioned field is used and the x coordinate is kept.
+- Out of range values are clamped (`^BY` module width 1 - 10, ratio 2.0 - 3.0; `^FB` width 0 - 32000, lines
+  1 - 9999, line spacing -9999 - 9999, indent 0 - 9999); a non-finite `^BY` ratio is ignored.
+
 ## Not supported
 
 - Font download commands (`~DB`, `~DS`, `~DT`, `~DU`, `^DY` fonts) - map fonts with `FontManager`, see [Viewer](viewer.md)

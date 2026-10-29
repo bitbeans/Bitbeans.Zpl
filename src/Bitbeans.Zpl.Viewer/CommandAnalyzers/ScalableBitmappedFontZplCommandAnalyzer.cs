@@ -33,7 +33,10 @@ namespace Bitbeans.Zpl.Viewer.CommandAnalyzers
             int fontHeight = parsedHeight ?? virtualPrinter.FontHeight;
             int fontWidth = parsedWidth ?? virtualPrinter.FontWidth;
 
-            virtualPrinter.SetNextFont(fontName, fieldOrientation, fontWidth, fontHeight);
+            // Without an explicit orientation the font follows the default orientation (^FW), even if ^FW comes later
+            bool orientationIsExplicit = zplDataParts[0] is "N" or "R" or "I" or "B";
+
+            virtualPrinter.SetNextFont(fontName, fieldOrientation, fontWidth, fontHeight, orientationIsExplicit);
 
             return null;
         }

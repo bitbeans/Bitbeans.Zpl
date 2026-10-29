@@ -49,6 +49,12 @@ First release as **Bitbeans.Zpl**, a fork of [BinaryKits.Zpl](https://github.com
 - B64/Z64 `Uncompress` verifies the CRC and the complete format and throws `FormatException` on mismatch.
 - The protected `ZplBarcode.RenderModuleWidth()` takes the `ZplRenderOptions`.
 - Viewer: QR magnification is clamped to 1 to 10 and invalid `^FH` indicators fall back to `_`.
+- Viewer: `IFormatMerger.MergeFormats(List<LabelInfo>, ICollection<string>)` reports errors instead of throwing
+  (default interface method, so existing implementations keep compiling; `ZplAnalyzer` uses it).
+  `FormatMerger.MergeFormats(List<LabelInfo>)` still throws `InvalidOperationException` for unknown formats.
+  `LabelInfo.DownloadFormatName` now contains the storage device (`R:NAME`) when `^DF` has one.
+  `VirtualPrinter.SetNextFont` has an optional `orientationIsExplicit` parameter; new `VirtualPrinter` members
+  `HasNextElementPosition` and `LastElementPositionY`. `PrinterStorage.AddFile` replaces existing files.
 
 ### Fixed
 
@@ -61,6 +67,17 @@ First release as **Bitbeans.Zpl**, a fork of [BinaryKits.Zpl](https://github.com
 - `^GF` output missed `^FS`.
 - Viewer: `^CI`, empty `^XG` magnification, QR binary byte counts, format merging on Linux and templates
   that were changed by merging.
+- Viewer: recalling an unknown format (`^XF`) aborted the analysis; it is now an entry in `AnalyzeInfo.Errors`.
+- Viewer: formats on different storage devices with the same name collided; formats are keyed by device and name
+  and a later `^DF` replaces the earlier one.
+- Viewer: the Data Matrix escape character in `^FD` was split into commands.
+- Viewer: a field with `^FN` and `^FD` was dropped; it is now printed and its data applies to all fields with this number.
+- Viewer: `^FN1"Name"` (field number with prompt) was read as field number 0.
+- Viewer: a second `~DG`/`~DY` with the same name kept the old object.
+- Viewer: `^CF` without height or width reset the previous dimensions.
+- Viewer: `^FW` overwrote an explicit `^A` orientation of the pending field.
+- Viewer: `^FT` with an omitted y coordinate used y 0; it keeps the y of the last positioned field.
+- Viewer: non-finite `^BY` ratios are ignored and `^FB` values are clamped to the documented ranges.
 - `ZplDownloadGraphics` always halved the image instead of scaling by the dpi factor
   ([upstream #346](https://github.com/BinaryKits/BinaryKits.Zpl/issues/346)).
 - `ZplDownloadGraphics` did not throw for image names longer than 8 characters.

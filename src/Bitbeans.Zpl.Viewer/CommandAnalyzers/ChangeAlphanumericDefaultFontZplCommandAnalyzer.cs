@@ -12,8 +12,9 @@ namespace Bitbeans.Zpl.Viewer.CommandAnalyzers
             string[] zplDataParts = this.SplitCommand(zplCommand);
 
             int tmpint;
-            int fontHeight = 9;
-            int fontWidth = 0;
+            // Not supplied (or invalid) values keep the last ^CF dimensions; the initial default height is 9 dots
+            int fontHeight = virtualPrinter.FontHeight > 0 ? virtualPrinter.FontHeight : 9;
+            int fontWidth = virtualPrinter.FontWidth;
 
             string newFont = zplDataParts[0];
             if (!string.IsNullOrEmpty(newFont))

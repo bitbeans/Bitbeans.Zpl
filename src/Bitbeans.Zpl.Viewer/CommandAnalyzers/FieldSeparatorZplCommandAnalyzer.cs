@@ -27,7 +27,12 @@ namespace Bitbeans.Zpl.Viewer.CommandAnalyzers
             if (fieldNumber.HasValue)
             {
                 virtualPrinter.ClearNextFieldNumber();
-                fieldDataAnalyzer.Analyze(zplCommand, virtualPrinter, printerStorage);
+                if (virtualPrinter.NextElementFieldData?.Content == null)
+                {
+                    // Field without data: stored as empty template field
+                    fieldDataAnalyzer.Analyze(zplCommand, virtualPrinter, printerStorage);
+                }
+
                 ZplElementBase dataElement = this.FinalizeField(zplCommand, virtualPrinter, printerStorage);
                 element = new ZplFieldNumber(fieldNumber.Value, dataElement);
             }

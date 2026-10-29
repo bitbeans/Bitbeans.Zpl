@@ -9,6 +9,17 @@ namespace Bitbeans.Zpl.Viewer
     {
         public LabelHome LabelHomePosition { get; private set; }
         public LabelPosition NextElementPosition { get; private set; }
+
+        /// <summary>
+        /// <see langword="true"/> if <c>^FO</c> or <c>^FT</c> was processed for the pending field.
+        /// </summary>
+        public bool HasNextElementPosition { get; private set; }
+
+        /// <summary>
+        /// Y position (including the label home) of the last field that was positioned with explicit
+        /// coordinates. Used when the y coordinate of <c>^FT</c> is omitted.
+        /// </summary>
+        public int LastElementPositionY { get; private set; }
         public FieldDataBase NextElementFieldData { get; private set; }
         public FieldBlock NextElementFieldBlock { get; private set; }
         public FieldOrientation FieldOrientation { get; private set; } = FieldOrientation.Normal;
@@ -32,6 +43,8 @@ namespace Bitbeans.Zpl.Viewer
         public string NextDownloadFormatName { get; private set; }
         public int? NextFieldNumber { get; private set; }
 
+        private bool nextFontOrientationIsExplicit;
+
         public VirtualPrinter()
         {
             this.BarcodeInfo = new BarcodeInfo();
@@ -41,11 +54,17 @@ namespace Bitbeans.Zpl.Viewer
         public void SetNextElementPosition(int x, int y, bool calculateFromBottom = false, bool useDefaultPosition = false)
         {
             this.NextElementPosition = new LabelPosition(x, y, calculateFromBottom, useDefaultPosition);
+            this.HasNextElementPosition = true;
+            if (!useDefaultPosition)
+            {
+                this.LastElementPositionY = y;
+            }
         }
 
         public void ClearNextElementPosition()
         {
             this.NextElementPosition = new LabelPosition(0, 0, false, false);
+            this.HasNextElementPosition = false;
         }
 
         public void SetNextElementFieldData(FieldDataBase fieldData)
@@ -78,18 +97,30 @@ namespace Bitbeans.Zpl.Viewer
             this.NextElementFieldBlock = null;
         }
 
+        /// <summary>
+        /// Overrides the font for the next element only.
+        /// </summary>
+        /// <param name="fontName">Font name</param>
+        /// <param name="fieldOrientation">Field orientation</param>
+        /// <param name="fontWidth">Font width</param>
+        /// <param name="fontHeight">Font height</param>
+        /// <param name="orientationIsExplicit"><see langword="true"/> if <c>^A</c> specified the orientation, so a later
+        /// <c>^FW</c> in the same field does not change it</param>
         public void SetNextFont(
             string fontName,
             FieldOrientation fieldOrientation,
             int fontWidth,
-            int fontHeight)
+            int fontHeight,
+            bool orientationIsExplicit = false)
         {
             this.NextFont = new FontInfo(fontName, fieldOrientation, fontWidth, fontHeight);
+            this.nextFontOrientationIsExplicit = orientationIsExplicit;
         }
 
         public void ClearNextFont()
         {
             this.NextFont = null;
+            this.nextFontOrientationIsExplicit = false;
         }
 
         public void SetNextElementFieldReverse()
@@ -130,7 +161,7 @@ namespace Bitbeans.Zpl.Viewer
         public void SetFieldOrientation(FieldOrientation fieldOrientation)
         {
             this.FieldOrientation = fieldOrientation;
-            if (this.NextFont != null)
+            if (this.NextFont != null && !this.nextFontOrientationIsExplicit)
             {
                 this.SetNextFont(this.NextFont.FontName, fieldOrientation, this.NextFont.FontWidth, this.NextFont.FontHeight);
             }

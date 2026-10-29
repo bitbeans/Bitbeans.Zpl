@@ -64,7 +64,7 @@ namespace Bitbeans.Zpl.Viewer.Tests.Analyzers
         [TestMethod]
         public void TextField_ScalableFontOrientationFollowsLaterFw()
         {
-            ZplTextField text = AnalyzerTestHelper.Single<ZplTextField>("^FO10,20^A0N,20,20^FWI^FDhello^FS");
+            ZplTextField text = AnalyzerTestHelper.Single<ZplTextField>("^FO10,20^A0,20,20^FWI^FDhello^FS");
 
             Assert.AreEqual(FieldOrientation.Rotated180, text.Font.FieldOrientation);
         }
