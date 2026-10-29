@@ -268,7 +268,7 @@ namespace Bitbeans.Zpl.Viewer.Tests.Analyzers
             Assert.AreEqual(8, field.BinaryByteCount);
             Assert.AreEqual(8, field.GraphicFieldCount);
             Assert.AreEqual(1, field.BytesPerRow);
-            StringAssert.StartsWith(field.Data, PngSignatureHex);
+            Assert.AreEqual(Box8x8, field.Data);
         }
 
         [TestMethod]
@@ -278,7 +278,7 @@ namespace Bitbeans.Zpl.Viewer.Tests.Analyzers
 
             ZplGraphicField field = AnalyzerTestHelper.Single<ZplGraphicField>("^FO0,0^GFA,8,8,1," + z64);
 
-            StringAssert.StartsWith(field.Data, PngSignatureHex);
+            Assert.AreEqual(z64, field.Data);
         }
 
         [TestMethod]
@@ -288,7 +288,7 @@ namespace Bitbeans.Zpl.Viewer.Tests.Analyzers
 
             ZplGraphicField field = AnalyzerTestHelper.Single<ZplGraphicField>("^FO0,0^GFA,8,8,1," + b64);
 
-            StringAssert.StartsWith(field.Data, PngSignatureHex);
+            Assert.AreEqual(b64, field.Data);
         }
 
         [TestMethod]
@@ -298,7 +298,7 @@ namespace Bitbeans.Zpl.Viewer.Tests.Analyzers
 
             ZplGraphicField field = AnalyzerTestHelper.Single<ZplGraphicField>("^FO0,0^GFA,8,8,1," + acs);
 
-            StringAssert.StartsWith(field.Data, PngSignatureHex);
+            Assert.AreEqual(acs, field.Data);
         }
 
         [TestMethod]

@@ -3,6 +3,8 @@ using Bitbeans.Zpl.Elements;
 
 using SkiaSharp;
 
+using System;
+
 namespace Bitbeans.Zpl.Viewer.ElementDrawers
 {
     /// <summary>Draws graphic diagonal line (<c>^GD</c>) elements.</summary>
@@ -45,24 +47,18 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
                 int width = graphicLine.Width;
                 int height = graphicLine.Height;
 
-                float x = graphicLine.PositionX;
-                float y = graphicLine.PositionY;
-
-                if (graphicLine.UseDefaultPosition)
-                {
-                    x = currentPosition.X;
-                    y = currentPosition.Y;
-                }
+                SKPoint position = ResolvePosition(graphicLine, currentPosition);
+                float x = JustifyX(graphicLine, position.X, width);
+                float y = position.Y;
 
                 if (graphicLine.FieldTypeset != null)
                 {
+                    // the position is the bottom left corner; a line above the label is clipped, not moved
                     y -= height;
-                    if (y < 0)
-                    {
-                        y = 0;
-                    }
                 }
 
+                // the line must stay within width x height: the thickness is part of the width
+                float thickness = Math.Min(border, width);
                 SKPoint skPointLL = new(x, y + height);
                 SKPoint skPointUL = new(x, y);
 
@@ -87,17 +83,17 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
                 if (graphicLine.RightLeaningDiagonal)
                 {
                     pathBuilder.MoveTo(skPointLL);
-                    pathBuilder.RLineTo(border, 0);
-                    pathBuilder.RLineTo(width, -height);
-                    pathBuilder.RLineTo(-border, 0);
+                    pathBuilder.RLineTo(thickness, 0);
+                    pathBuilder.RLineTo(width - thickness, -height);
+                    pathBuilder.RLineTo(-thickness, 0);
                     pathBuilder.Close();
                 }
                 else
                 {
                     pathBuilder.MoveTo(skPointUL);
-                    pathBuilder.RLineTo(border, 0);
-                    pathBuilder.RLineTo(width, height);
-                    pathBuilder.RLineTo(-border, 0);
+                    pathBuilder.RLineTo(thickness, 0);
+                    pathBuilder.RLineTo(width - thickness, height);
+                    pathBuilder.RLineTo(-thickness, 0);
                     pathBuilder.Close();
                 }
 

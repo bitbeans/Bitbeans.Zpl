@@ -38,15 +38,10 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
         {
             if (element is ZplTextField textField)
             {
-                float x = textField.PositionX;
-                float y = textField.PositionY;
+                SKPoint position = ResolvePosition(textField, currentPosition);
+                float x = position.X;
+                float y = position.Y;
                 FieldJustification fieldJustification = FieldJustification.None;
-
-                if (textField.UseDefaultPosition)
-                {
-                    x = currentPosition.X;
-                    y = currentPosition.Y;
-                }
 
                 ZplFont font = textField.Font;
 
@@ -75,7 +70,7 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
                 string typefaceFontName = IsFont0Compatible(font.FontName) ? "0" : font.FontName;
                 SKTypeface typeface = options.FontManager.FontLoader(typefaceFontName);
 
-                SKFont skFont = new(typeface, fontSize, scaleX);
+                using SKFont skFont = new(typeface, fontSize, scaleX);
                 using SKPaint skPaint = new()
                 {
                     IsAntialias = options.Antialias
@@ -166,10 +161,7 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
                     }
                     else if (fieldJustification == FieldJustification.Auto)
                     {
-                        HarfBuzzSharp.Buffer buffer = new();
-                        buffer.AddUtf16(displayText);
-                        buffer.GuessSegmentProperties();
-                        if (buffer.Direction == HarfBuzzSharp.Direction.RightToLeft)
+                        if (IsRightToLeft(displayText))
                         {
                             textAlign = SKTextAlign.Right;
                         }
@@ -371,7 +363,7 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
 
         private static bool IsRightToLeft(string text)
         {
-            HarfBuzzSharp.Buffer buffer = new();
+            using HarfBuzzSharp.Buffer buffer = new();
             buffer.AddUtf16(text);
             buffer.GuessSegmentProperties();
             return buffer.Direction == HarfBuzzSharp.Direction.RightToLeft;

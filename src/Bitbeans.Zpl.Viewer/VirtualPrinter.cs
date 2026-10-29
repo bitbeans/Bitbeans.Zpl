@@ -75,11 +75,12 @@ namespace Bitbeans.Zpl.Viewer
         /// <param name="y">The Y position in dots, including the label home.</param>
         /// <param name="calculateFromBottom"><see langword="true"/> for <c>^FT</c> (bottom-left origin).</param>
         /// <param name="useDefaultPosition"><see langword="true"/> to continue at the default position.</param>
-        public void SetNextElementPosition(int x, int y, bool calculateFromBottom = false, bool useDefaultPosition = false)
+        /// <param name="useDefaultPositionX"><see langword="true"/> if only the x coordinate was omitted (<c>^FT,y</c>); the y position is explicit and remembered. <paramref name="useDefaultPosition"/> should be set as well.</param>
+        public void SetNextElementPosition(int x, int y, bool calculateFromBottom = false, bool useDefaultPosition = false, bool useDefaultPositionX = false)
         {
-            this.NextElementPosition = new LabelPosition(x, y, calculateFromBottom, useDefaultPosition);
+            this.NextElementPosition = new LabelPosition(x, y, calculateFromBottom, useDefaultPosition, useDefaultPositionX);
             this.HasNextElementPosition = true;
-            if (!useDefaultPosition)
+            if (!useDefaultPosition || useDefaultPositionX)
             {
                 this.LastElementPositionY = y;
             }

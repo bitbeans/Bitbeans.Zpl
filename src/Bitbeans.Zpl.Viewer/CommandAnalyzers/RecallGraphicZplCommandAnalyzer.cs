@@ -37,7 +37,7 @@ namespace Bitbeans.Zpl.Viewer.CommandAnalyzers
                 int magnificationFactorX = ParseMagnificationFactor(commandMatch.Groups[3]);
                 int magnificationFactorY = ParseMagnificationFactor(commandMatch.Groups[4]);
 
-                return new ZplRecallGraphic(x, y, storageDevice, imageName, magnificationFactorX, magnificationFactorY, bottomToTop, useDefaultPosition);
+                return new ZplRecallGraphic(x, y, storageDevice, imageName, magnificationFactorX, magnificationFactorY, bottomToTop, useDefaultPosition, ResolveFieldJustification(virtualPrinter));
             }
 
             return null;

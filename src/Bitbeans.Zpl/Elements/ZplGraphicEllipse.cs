@@ -23,6 +23,7 @@ namespace Bitbeans.Zpl.Elements
         /// <param name="reversePrint"><see langword="true"/> to emit <c>^FR</c> so the field is printed in reverse (inverts the underlying image).</param>
         /// <param name="bottomToTop"><see langword="true"/> to position the field with <c>^FT</c> (<see cref="ZplFieldTypeset"/>) instead of <c>^FO</c> (<see cref="ZplFieldOrigin"/>).</param>
         /// <param name="useDefaultPosition">Only evaluated together with <paramref name="bottomToTop"/>: <see langword="true"/> renders <c>^FT</c> without coordinates so the printer continues at its default position. Ignored for <c>^FO</c>.</param>
+        /// <param name="fieldJustification">Field justification passed to the position command (<c>^FO</c>/<c>^FT</c>, third parameter); <see cref="FieldJustification.None"/> omits it. <see cref="FieldJustification.Right"/> makes the position the right edge of the element.</param>
         public ZplGraphicEllipse(
             int positionX,
             int positionY,
@@ -32,8 +33,9 @@ namespace Bitbeans.Zpl.Elements
             LineColor lineColor = LineColor.Black,
             bool reversePrint = false,
             bool bottomToTop = false,
-            bool useDefaultPosition = false)
-            : base(positionX, positionY, borderThickness, lineColor, reversePrint, bottomToTop, useDefaultPosition)
+            bool useDefaultPosition = false,
+            FieldJustification fieldJustification = FieldJustification.None)
+            : base(positionX, positionY, borderThickness, lineColor, reversePrint, bottomToTop, useDefaultPosition, fieldJustification)
         {
             Width = width;
             Height = height;

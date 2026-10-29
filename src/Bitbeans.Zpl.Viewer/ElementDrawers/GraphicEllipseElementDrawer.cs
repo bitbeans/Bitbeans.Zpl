@@ -56,25 +56,14 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
                     border = height / 2;
                 }
 
-                float baseX = graphicEllipse.PositionX;
-                float baseY = graphicEllipse.PositionY;
-
-                float x = baseX;
-                float y = baseY;
-
-                if (graphicEllipse.UseDefaultPosition)
-                {
-                    x = currentPosition.X;
-                    y = currentPosition.Y;
-                }
+                SKPoint position = ResolvePosition(graphicEllipse, currentPosition);
+                float x = JustifyX(graphicEllipse, position.X, width);
+                float y = position.Y;
 
                 if (graphicEllipse.FieldTypeset != null)
                 {
+                    // the position is the bottom left corner; an ellipse above the label is clipped, not moved
                     y -= height;
-                    if (y < 0)
-                    {
-                        y = 0;
-                    }
                 }
 
                 float halfBorderThickness = border / 2.0f;
@@ -88,7 +77,7 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
                 {
                     IsAntialias = options.Antialias,
                     Style = SKPaintStyle.Stroke,
-                    Color = SKColors.Black,
+                    Color = graphicEllipse.LineColor == LineColor.White ? SKColors.White : SKColors.Black,
                     StrokeWidth = border
                 };
 

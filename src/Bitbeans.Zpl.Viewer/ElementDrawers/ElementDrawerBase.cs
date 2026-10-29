@@ -59,6 +59,30 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
             return this.Draw(element, options, currentPosition, internationalFont);
         }
 
+        /// <summary>Gets the position at which a positioned element is drawn: the position of the element, or, for <c>^FT</c> without coordinates, the current default position. If only the x coordinate was omitted (<c>^FT,y</c>), the x coordinate of the current default position and the y coordinate of the element are used.</summary>
+        /// <param name="element">The element.</param>
+        /// <param name="currentPosition">The current default position.</param>
+        /// <returns>The position of the element before justification.</returns>
+        protected static SKPoint ResolvePosition(ZplPositionedElementBase element, SKPoint currentPosition)
+        {
+            if (element.UseDefaultPosition)
+            {
+                return currentPosition;
+            }
+
+            return new SKPoint(element.UseDefaultPositionX ? currentPosition.X : element.PositionX, element.PositionY);
+        }
+
+        /// <summary>Applies the field justification of <c>^FO</c>/<c>^FT</c> to the x coordinate of an element: with right justification the position is the right edge of the element.</summary>
+        /// <param name="element">The element.</param>
+        /// <param name="x">The x coordinate of the position.</param>
+        /// <param name="width">The width of the element.</param>
+        /// <returns>The x coordinate of the left edge of the element.</returns>
+        protected static float JustifyX(ZplPositionedElementBase element, float x, float width)
+        {
+            return element.FieldJustification == FieldJustification.Right ? x - width : x;
+        }
+
         /// <summary>Calculates the default position at which a following field without coordinates (<c>^FT</c>) continues, depending on the field orientation and on whether the element was positioned with <c>^FO</c> or <c>^FT</c>.</summary>
         /// <param name="x">The X position of the element.</param>
         /// <param name="y">The Y position of the element.</param>

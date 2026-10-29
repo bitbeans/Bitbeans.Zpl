@@ -85,13 +85,14 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
                     border1 = 1;
                 }
 
-                float baseX = graphicBox.PositionX;
-                float baseY = graphicBox.PositionY;
+                SKPoint position = ResolvePosition(graphicBox, currentPosition);
+                float baseX = JustifyX(graphicBox, position.X, width1);
+                float baseY = position.Y;
 
-                if (graphicBox.UseDefaultPosition)
+                if (graphicBox.FieldTypeset != null)
                 {
-                    baseX = currentPosition.X;
-                    baseY = currentPosition.Y;
+                    // the position is the bottom left corner; a box above the label is clipped, not moved
+                    baseY -= height1;
                 }
 
                 //if the border is thick, the rounding is off, so we need to build that for each increment
@@ -111,17 +112,6 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
 
                     float x = baseX + offsetX;
                     float y = baseY + offsetY;
-
-                    if (graphicBox.FieldTypeset != null)
-                    {
-                        y -= height1;
-
-                        //Fallback
-                        if (y < offsetY)
-                        {
-                            y = offsetY;
-                        }
-                    }
 
                     int width = width1 - border2;
                     int height = height1 - border2;
@@ -151,14 +141,14 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
 
                         this.skCanvas.DrawRect(x, y, width, height, skPaint);
                         // Calculate next position based on box dimensions
-                        return this.CalculateNextDefaultPosition(baseX, baseY, width1, height1, graphicBox.FieldOrigin != null, FieldOrientation.Normal, currentPosition);
+                        return this.CalculateNextDefaultPosition(baseX, position.Y, width1, height1, graphicBox.FieldOrigin != null, FieldOrientation.Normal, currentPosition);
                     }
 
                     this.skCanvas.DrawRoundRect(x, y, width, height, cornerRadius, cornerRadius, skPaint);
                 }
 
                 // Calculate next position based on box dimensions
-                return this.CalculateNextDefaultPosition(baseX, baseY, width1, height1, graphicBox.FieldOrigin != null, FieldOrientation.Normal, currentPosition);
+                return this.CalculateNextDefaultPosition(baseX, position.Y, width1, height1, graphicBox.FieldOrigin != null, FieldOrientation.Normal, currentPosition);
             }
 
             return currentPosition;

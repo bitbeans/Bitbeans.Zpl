@@ -32,7 +32,7 @@ namespace Bitbeans.Zpl.Viewer.CommandAnalyzers
 
             string objectName = zplCommandData.Substring(2);
 
-            return new ZplImageMove(x, y, storageDevice, objectName, string.Empty, bottomToTop, useDefaultPosition);
+            return new ZplImageMove(x, y, storageDevice, objectName, string.Empty, bottomToTop, useDefaultPosition, ResolveFieldJustification(virtualPrinter));
         }
     }
 }

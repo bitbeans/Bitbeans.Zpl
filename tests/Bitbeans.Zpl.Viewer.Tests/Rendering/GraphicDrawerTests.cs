@@ -150,12 +150,12 @@ namespace Bitbeans.Zpl.Viewer.Tests.Rendering
         }
 
         [TestMethod]
-        public void Box_FieldTypesetAtTopFallsBackToTopEdge()
+        public void Box_FieldTypesetAboveTheLabelIsClippedNotMoved()
         {
             using SKBitmap bmp = R("^FT50,20^GB100,60,5^FS");
             SKRectI bounds = RenderHelper.DarkBounds(bmp).Value;
             Assert.AreEqual(0, bounds.Top);
-            Assert.AreEqual(60, bounds.Bottom);
+            Assert.AreEqual(20, bounds.Bottom);
         }
 
         [TestMethod]
@@ -388,8 +388,10 @@ namespace Bitbeans.Zpl.Viewer.Tests.Rendering
             using SKBitmap bmp = R("^FT50,150^GD100,100,5,B,L^FS");
             Assert.IsTrue(RenderHelper.IsDark(bmp, 100, 100));
 
+            // the bottom stays at y=50, the upper half is above the label
             using SKBitmap fallback = R("^FT50,50^GD100,100,5,B,L^FS");
-            Assert.IsTrue(RenderHelper.IsDark(fallback, 100, 50));
+            Assert.IsTrue(RenderHelper.IsDark(fallback, 102, 0));
+            Assert.AreEqual(50, RenderHelper.DarkBounds(fallback).Value.Bottom);
         }
 
         [TestMethod]

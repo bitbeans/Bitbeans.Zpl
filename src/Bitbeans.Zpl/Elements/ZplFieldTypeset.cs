@@ -15,6 +15,8 @@ namespace Bitbeans.Zpl.Elements
         public int PositionY { get; protected set; }
         /// <summary>When <see langword="true"/> no coordinates are rendered, so the printer continues at the position that follows the previous field.</summary>
         public bool UseDefaultPosition { get; private set; }
+        /// <summary>When <see langword="true"/> only the x coordinate is omitted (<c>^FT,y</c>): the printer continues at the x position that follows the previous field and uses <see cref="PositionY"/> as baseline. <see cref="PositionX"/> is ignored in that case.</summary>
+        public bool UseDefaultPositionX { get; private set; }
         /// <summary>Field justification (<c>z</c> parameter of <c>^FT</c>); <see cref="FieldJustification.None"/> omits it.</summary>
         public FieldJustification FieldJustification { get; protected set; }
 
@@ -23,12 +25,14 @@ namespace Bitbeans.Zpl.Elements
         /// <param name="positionY">Y position in dots (0-32000).</param>
         /// <param name="fieldJustification">Field justification rendered as the third parameter of <c>^FO</c>/<c>^FT</c>; <see cref="FieldJustification.None"/> omits it.</param>
         /// <param name="useDefaultPosition"><see langword="true"/> to render <c>^FT</c> without coordinates (<c>^FT</c> or <c>^FT,,z</c>).</param>
-        public ZplFieldTypeset(int positionX, int positionY, FieldJustification fieldJustification = FieldJustification.None, bool useDefaultPosition = false)
+        /// <param name="useDefaultPositionX"><see langword="true"/> to render <c>^FT</c> without the x coordinate (<c>^FT,y</c> or <c>^FT,y,z</c>). Ignored if <paramref name="useDefaultPosition"/> is set.</param>
+        public ZplFieldTypeset(int positionX, int positionY, FieldJustification fieldJustification = FieldJustification.None, bool useDefaultPosition = false, bool useDefaultPositionX = false)
         {
             this.PositionX = positionX;
             this.PositionY = positionY;
             this.FieldJustification = fieldJustification;
             this.UseDefaultPosition = useDefaultPosition;
+            this.UseDefaultPositionX = useDefaultPositionX && !useDefaultPosition;
         }
 
         ///<inheritdoc/>
@@ -44,6 +48,12 @@ namespace Bitbeans.Zpl.Elements
                 return new string[] { "^FT" };
             }
 
+            // Only the x coordinate is omitted
+            if (UseDefaultPositionX)
+            {
+                return new string[] { $"^FT,{context.Scale(this.PositionY)},{RenderFieldJustification(this.FieldJustification)}".TrimEnd(',') };
+            }
+
             // Normal rendering with coordinates
             return new string[] { $"^FT{context.Scale(this.PositionX)},{context.Scale(this.PositionY)},{RenderFieldJustification(this.FieldJustification)}".TrimEnd(',') };
         }
@@ -54,7 +64,7 @@ namespace Bitbeans.Zpl.Elements
         /// <returns>A new <see cref="ZplFieldTypeset"/>; this instance is not changed.</returns>
         public ZplFieldTypeset Offset(int offsetX, int offsetY)
         {
-            return new ZplFieldTypeset(this.PositionX + offsetX, this.PositionY + offsetY, this.FieldJustification, this.UseDefaultPosition);
+            return new ZplFieldTypeset(this.PositionX + offsetX, this.PositionY + offsetY, this.FieldJustification, this.UseDefaultPosition, this.UseDefaultPositionX);
         }
     }
 }

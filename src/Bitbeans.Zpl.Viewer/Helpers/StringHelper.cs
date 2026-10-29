@@ -27,7 +27,8 @@ namespace Bitbeans.Zpl.Viewer.Helpers
         public static string ReplaceHexEscapes(this string text, char hexIndicator, InternationalFont internationalFont)
         {
             Encoding charset = GetCharset(internationalFont);
-            List<byte> bytes = [];
+            StringBuilder result = new();
+            List<byte> escapedBytes = [];
             for (int i = 0; i < text.Length; i++)
             {
                 char c = text[i];
@@ -36,16 +37,28 @@ namespace Bitbeans.Zpl.Viewer.Helpers
                     string digits = text.Substring(i + 1, 2);
                     if (hexDigits.IsMatch(digits))
                     {
-                        bytes.Add(byte.Parse(digits, NumberStyles.HexNumber));
+                        escapedBytes.Add(byte.Parse(digits, NumberStyles.HexNumber));
                         i += 2;
                         continue;
                     }
                 }
 
-                bytes.AddRange(charset.GetBytes(c.ToString()));
+                // only the escaped bytes are decoded, literal text (including surrogate pairs) is kept as it is
+                FlushEscapedBytes(result, escapedBytes, charset);
+                result.Append(c);
             }
 
-            return charset.GetString(bytes.ToArray());
+            FlushEscapedBytes(result, escapedBytes, charset);
+            return result.ToString();
+        }
+
+        private static void FlushEscapedBytes(StringBuilder result, List<byte> escapedBytes, Encoding charset)
+        {
+            if (escapedBytes.Count > 0)
+            {
+                result.Append(charset.GetString(escapedBytes.ToArray()));
+                escapedBytes.Clear();
+            }
         }
 
         private static Encoding GetCharset(InternationalFont internationalFont)

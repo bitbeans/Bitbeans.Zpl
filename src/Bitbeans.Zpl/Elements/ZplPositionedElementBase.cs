@@ -15,6 +15,10 @@ namespace Bitbeans.Zpl.Elements
         public ZplFieldOrigin FieldOrigin { get; private set; }
         /// <summary>The <c>^FT</c> position, or <see langword="null"/> if the element is positioned with <c>^FO</c>.</summary>
         public ZplFieldTypeset FieldTypeset { get; private set; }
+        /// <summary>When <see langword="true"/> and <c>^FT</c> is used, only the x coordinate is omitted (<c>^FT,y</c>): the element continues at the x position that follows the previous field and uses <see cref="PositionY"/> as baseline. Has no effect for <c>^FO</c> or if <see cref="UseDefaultPosition"/> is set.</summary>
+        public bool UseDefaultPositionX { get; private set; }
+        /// <summary>The justification (third parameter) of the position command, <see cref="FieldJustification.None"/> if it was not set.</summary>
+        public FieldJustification FieldJustification => FieldOrigin != null ? FieldOrigin.FieldJustification : FieldTypeset.FieldJustification;
 
         /// <summary>Initializes the element and creates its position command.</summary>
         /// <param name="positionX">X position of the field in dots, relative to the label home (<c>^LH</c>); scaled by <see cref="ZplRenderOptions.ScaleFactor"/> when rendered.</param>
@@ -22,13 +26,15 @@ namespace Bitbeans.Zpl.Elements
         /// <param name="bottomToTop"><see langword="true"/> to use <c>^FT</c> (<see cref="ZplFieldTypeset"/>), <see langword="false"/> to use <c>^FO</c> (<see cref="ZplFieldOrigin"/>).</param>
         /// <param name="useDefaultPosition">Only evaluated together with <paramref name="bottomToTop"/>: <see langword="true"/> renders <c>^FT</c> without coordinates so the printer continues at its default position. Ignored for <c>^FO</c>.</param>
         /// <param name="fieldJustification">Field justification passed to the position command.</param>
-        public ZplPositionedElementBase(int positionX, int positionY, bool bottomToTop, bool useDefaultPosition, FieldJustification fieldJustification = FieldJustification.None) : base()
+        /// <param name="useDefaultPositionX">Only evaluated together with <paramref name="bottomToTop"/>: <see langword="true"/> renders <c>^FT,y</c> without the x coordinate so the printer continues at the x position that follows the previous field. Ignored for <c>^FO</c> or if <paramref name="useDefaultPosition"/> is set.</param>
+        public ZplPositionedElementBase(int positionX, int positionY, bool bottomToTop, bool useDefaultPosition, FieldJustification fieldJustification = FieldJustification.None, bool useDefaultPositionX = false) : base()
         {
             this.UseDefaultPosition = useDefaultPosition;
             
             if (bottomToTop)
             {
-                FieldTypeset = new ZplFieldTypeset(positionX, positionY, fieldJustification, useDefaultPosition);
+                this.UseDefaultPositionX = useDefaultPositionX && !useDefaultPosition;
+                FieldTypeset = new ZplFieldTypeset(positionX, positionY, fieldJustification, useDefaultPosition, useDefaultPositionX);
                 PositionX = positionX;
                 PositionY = positionY;
                 return;

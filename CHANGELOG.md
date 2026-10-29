@@ -93,6 +93,30 @@ First release as **Bitbeans.Zpl**, a fork of [BinaryKits.Zpl](https://github.com
 - Ellipse drawer checked for the wrong element type ([upstream #342](https://github.com/BinaryKits/BinaryKits.Zpl/pull/342)).
 - Security advisories of ImageSharp (GHSA-jjfr-hcj7-qf5w, GHSA-j9gm-c75j-xc9q, GHSA-j3p4-wp97-rph4,
   [upstream #348](https://github.com/BinaryKits/BinaryKits.Zpl/issues/348)) no longer apply.
+- Viewer: native Skia resources (surfaces, snapshots, encoded data, decoded images, fonts) are disposed after drawing;
+  `FontManager` owns and caches the typefaces it creates and is `IDisposable`.
+- Viewer: one `ZplElementDrawer` can draw on several threads at the same time (the element drawers are created per draw).
+- Viewer: `^FT,y` (omitted x with explicit y) continues at the end of the previous field with baseline y for text fields and
+  field blocks.
+- Viewer: `^FT` graphics and images (`^GB`, `^GC`, `^GE`, `^GD`, `^GF`, `^IM`, `^XG`) above the label are clipped instead of moved down.
+- Viewer: the `^FO`/`^FT` justification (right) is applied to graphics, images and field blocks.
+- Viewer: `^GE` with white line color is drawn white.
+- Viewer: `ZplGraphicField.Data` is the ZPL graphic data (hex, ACS, `:B64:`, `:Z64:`) and is converted when drawing, so
+  `new ZplGraphicField(20, 20, 1, 1, 1, "FF")` draws a row; a parsed element renders valid ZPL.
+- Viewer: `^FB` hanging indent wraps the second and following lines in the remaining width instead of clipping them.
+- Viewer: `^FH` keeps surrogate pairs (emoji) in literal text; only the escapes are decoded.
+- Viewer: `^GD` stays within the specified width and height.
+- Viewer: reverse print fields use a layer limited to the field instead of a label-sized bitmap.
+- Viewer: `Draw`/`DrawSurface` validate the label size and density (`ArgumentOutOfRangeException`); elements without a
+  drawer or failing during drawer selection are logged and skipped.
+
+### Changed (viewer API)
+
+- `ZplPositionedElementBase.FieldJustification` and `UseDefaultPositionX`; optional `fieldJustification` parameter on
+  `ZplGraphicBox/Circle/Ellipse/DiagonalLine/Field`, `ZplImageMove`, `ZplRecallGraphic`, `ZplFieldBlock`; optional
+  `useDefaultPositionX` on `ZplTextField`, `ZplFieldBlock`, `ZplFieldTypeset`; `LabelPosition.UseDefaultPositionX`.
+- `ZplGraphicField.Data` holds the raw ZPL graphic data instead of a hex encoded PNG.
+- `FontManager` implements `IDisposable`.
 
 ### Removed
 

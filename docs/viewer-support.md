@@ -97,6 +97,12 @@ CODABLOCK (`^BB`), TLC39 (`^BT`), Micro PDF417 (`^BF`), Micro QR.
   explicit orientation, also when it follows `^A` in the same field.
 - `^FT` with an omitted y coordinate cannot continue at the end of the previous text field (the drawers only support
   the complete default position). The y coordinate of the last positioned field is used and the x coordinate is kept.
+  An omitted x coordinate with explicit y (`^FT,y`) is supported for text fields and field blocks; other elements
+  continue at the complete default position.
+- A right justification of `^FO`/`^FT` (third parameter) makes the position the right edge of graphics, images and
+  field blocks. `^FT` elements above the label are clipped, not moved.
+- One `ZplElementDrawer` can be used by several threads; `FontManager` is `IDisposable` (dispose it when the
+  `DrawerOptions` are no longer used).
 - Out of range values are clamped (`^BY` module width 1 - 10, ratio 2.0 - 3.0; `^FB` width 0 - 32000, lines
   1 - 9999, line spacing -9999 - 9999, indent 0 - 9999); a non-finite `^BY` ratio is ignored.
 

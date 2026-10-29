@@ -62,14 +62,11 @@ namespace Bitbeans.Zpl.Viewer.CommandAnalyzers
             char? hexadecimalIndicator = virtualPrinter.NextElementFieldHexadecimalIndicator;
             bool bottomToTop = false;
             bool useDefaultPosition = false;
+            bool useDefaultPositionX = false;
             string content = virtualPrinter.NextElementFieldData?.Content;
             bool barcodeReversePrint = virtualPrinter.NextElementFieldReverse || virtualPrinter.LabelReverse;
 
-            FieldJustification fieldJustification = virtualPrinter.NextElementFieldJustification;
-            if (fieldJustification == FieldJustification.None)
-            {
-                fieldJustification = virtualPrinter.FieldJustification;
-            }
+            FieldJustification fieldJustification = ResolveFieldJustification(virtualPrinter);
 
             if (virtualPrinter.NextElementPosition != null)
             {
@@ -78,6 +75,7 @@ namespace Bitbeans.Zpl.Viewer.CommandAnalyzers
 
                 bottomToTop = virtualPrinter.NextElementPosition.CalculateFromBottom;
                 useDefaultPosition = virtualPrinter.NextElementPosition.UseDefaultPosition;
+                useDefaultPositionX = virtualPrinter.NextElementPosition.UseDefaultPositionX;
             }
 
             if (virtualPrinter.NextElementFieldData != null)
@@ -186,10 +184,10 @@ namespace Bitbeans.Zpl.Viewer.CommandAnalyzers
                         int lineSpace = virtualPrinter.NextElementFieldBlock.AddOrDeleteSpaceBetweenLines;
                         int hangingIndent = virtualPrinter.NextElementFieldBlock.HangingIndentOfTheSecondAndRemainingLines;
 
-                        return new ZplFieldBlock(content, x, y, width, font, maxLineCount, lineSpace, textJustification, hangingIndent, hexadecimalIndicator: hexadecimalIndicator, reversePrint: reversePrint, bottomToTop: bottomToTop, useDefaultPosition: useDefaultPosition);
+                        return new ZplFieldBlock(content, x, y, width, font, maxLineCount, lineSpace, textJustification, hangingIndent, hexadecimalIndicator: hexadecimalIndicator, reversePrint: reversePrint, bottomToTop: bottomToTop, useDefaultPosition: useDefaultPosition && !useDefaultPositionX, fieldJustification: fieldJustification, useDefaultPositionX: useDefaultPositionX);
                     }
 
-                    return new ZplTextField(content, x, y, font, hexadecimalIndicator: hexadecimalIndicator, reversePrint: reversePrint, bottomToTop: bottomToTop, fieldJustification: fieldJustification, useDefaultPosition: useDefaultPosition);
+                    return new ZplTextField(content, x, y, font, hexadecimalIndicator: hexadecimalIndicator, reversePrint: reversePrint, bottomToTop: bottomToTop, fieldJustification: fieldJustification, useDefaultPosition: useDefaultPosition && !useDefaultPositionX, useDefaultPositionX: useDefaultPositionX);
                 }
             }
 

@@ -31,6 +31,7 @@ namespace Bitbeans.Zpl.Elements
         /// <param name="bottomToTop"><see langword="true"/> to position the field with <c>^FT</c> (<see cref="ZplFieldTypeset"/>) instead of <c>^FO</c> (<see cref="ZplFieldOrigin"/>).</param>
         /// <param name="useDefaultPosition">Only evaluated together with <paramref name="bottomToTop"/>: <see langword="true"/> renders <c>^FT</c> without coordinates so the printer continues at its default position. Ignored for <c>^FO</c>.</param>
         /// <param name="fieldJustification">Field justification rendered as the third parameter of <c>^FO</c>/<c>^FT</c>; <see cref="FieldJustification.None"/> omits it.</param>
+        /// <param name="useDefaultPositionX">Only evaluated together with <paramref name="bottomToTop"/>: <see langword="true"/> renders <c>^FT,y</c> without the x coordinate so the field continues at the x position that follows the previous field. Ignored for <c>^FO</c> or if <paramref name="useDefaultPosition"/> is set.</param>
         /// <exception cref="ArgumentException"><paramref name="hexadecimalIndicator"/> is <c>^</c>, <c>~</c>, a control character or not printable ASCII.</exception>
         public ZplTextField(
             string text,
@@ -42,8 +43,9 @@ namespace Bitbeans.Zpl.Elements
             bool reversePrint = false,
             bool bottomToTop = false,
             bool useDefaultPosition = false,
-            FieldJustification fieldJustification = FieldJustification.None)
-            : base(positionX, positionY, bottomToTop, useDefaultPosition, fieldJustification)
+            FieldJustification fieldJustification = FieldJustification.None,
+            bool useDefaultPositionX = false)
+            : base(positionX, positionY, bottomToTop, useDefaultPosition, fieldJustification, useDefaultPositionX)
         {
             Text = text;
             Font = font;

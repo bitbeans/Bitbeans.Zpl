@@ -69,11 +69,12 @@ namespace Bitbeans.Zpl.Viewer.Tests.Rendering
         }
 
         [TestMethod]
-        public void GraphicField_FieldTypesetClampsToTop()
+        public void GraphicField_FieldTypesetAboveTheLabelIsClipped()
         {
             using SKBitmap bmp = RenderHelper.Render("^XA^FT10,3^GFA,8,8,1," + Frame8 + "^FS^XZ");
 
-            Assert.AreEqual(new SKRectI(10, 0, 18, 8), RenderHelper.DarkBounds(bmp).Value);
+            // the bottom stays at y=3, the part above the label is clipped
+            Assert.AreEqual(new SKRectI(10, 0, 18, 3), RenderHelper.DarkBounds(bmp).Value);
         }
 
         [TestMethod]
@@ -81,8 +82,8 @@ namespace Bitbeans.Zpl.Viewer.Tests.Rendering
         {
             ZplElementBase[] elements =
             [
-                new ZplGraphicField(30, 40, 8, 8, 1, SolidPngHex(8, 8)),
-                RenderHelper.WithDefaultPosition(new ZplGraphicField(0, 0, 8, 8, 1, SolidPngHex(4, 4)))
+                new ZplGraphicField(30, 40, 8, 8, 1, "FFFFFFFFFFFFFFFF"),
+                RenderHelper.WithDefaultPosition(new ZplGraphicField(0, 0, 2, 2, 1, "FFFF"))
             ];
 
             using SKBitmap bmp = RenderHelper.RenderElements(elements);
@@ -90,15 +91,15 @@ namespace Bitbeans.Zpl.Viewer.Tests.Rendering
             Assert.IsTrue(RenderHelper.IsDark(bmp, 30, 40));
             Assert.IsTrue(RenderHelper.IsDark(bmp, 37, 47));
             // the next default position is right below-right of the first graphic: (38, 48)
-            Assert.AreEqual(new SKRectI(38, 48, 42, 52), RenderHelper.DarkBounds(bmp, 38, 48).Value);
-            Assert.AreEqual(8 * 8 + 4 * 4, RenderHelper.CountDark(bmp));
+            Assert.AreEqual(new SKRectI(38, 48, 46, 50), RenderHelper.DarkBounds(bmp, 38, 48).Value);
+            Assert.AreEqual(8 * 8 + 8 * 2, RenderHelper.CountDark(bmp));
         }
 
         [TestMethod]
         public void GraphicField_NextDefaultPositionWithoutFieldOriginKeepsY()
         {
             GraphicFieldElementDrawer drawer = new();
-            ZplGraphicField element = new(10, 60, 8, 8, 1, SolidPngHex(8, 8), bottomToTop: true);
+            ZplGraphicField element = new(10, 60, 8, 8, 1, "FFFFFFFFFFFFFFFF", bottomToTop: true);
 
             SKPoint next = DrawDirect(drawer, new PrinterStorage(), element, SKPoint.Empty);
 
@@ -163,13 +164,13 @@ namespace Bitbeans.Zpl.Viewer.Tests.Rendering
         }
 
         [TestMethod]
-        public void ImageMove_FieldTypesetClampsToTop()
+        public void ImageMove_FieldTypesetAboveTheLabelIsClipped()
         {
             ZplElementBase[] elements = [new ZplImageMove(20, 2, 'R', "LOGO.GRF", string.Empty, bottomToTop: true)];
 
             using SKBitmap bmp = RenderHelper.RenderElements(elements, storage: StorageWith(10, 6));
 
-            Assert.AreEqual(new SKRectI(20, 0, 30, 6), RenderHelper.DarkBounds(bmp).Value);
+            Assert.AreEqual(new SKRectI(20, 0, 30, 2), RenderHelper.DarkBounds(bmp).Value);
         }
 
         [TestMethod]
@@ -256,13 +257,13 @@ namespace Bitbeans.Zpl.Viewer.Tests.Rendering
         }
 
         [TestMethod]
-        public void RecallGraphic_FieldTypesetClampsToTop()
+        public void RecallGraphic_FieldTypesetAboveTheLabelIsClipped()
         {
             ZplElementBase[] elements = [new ZplRecallGraphic(20, 5, 'R', "LOGO.GRF", 2, 3, bottomToTop: true, useDefaultPosition: false)];
 
             using SKBitmap bmp = RenderHelper.RenderElements(elements, storage: StorageWith(5, 4));
 
-            Assert.AreEqual(new SKRectI(20, 0, 30, 12), RenderHelper.DarkBounds(bmp).Value);
+            Assert.AreEqual(new SKRectI(20, 0, 30, 5), RenderHelper.DarkBounds(bmp).Value);
         }
 
         [TestMethod]

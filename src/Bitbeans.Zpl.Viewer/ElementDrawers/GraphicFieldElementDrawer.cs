@@ -1,6 +1,7 @@
 ﻿using Bitbeans.Zpl;
 using Bitbeans.Zpl.Elements;
-using Bitbeans.Zpl.Helpers;
+using Bitbeans.Zpl.SkiaSharp;
+using Bitbeans.Zpl.Viewer.Helpers;
 
 using SkiaSharp;
 
@@ -22,26 +23,20 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
         {
             if (element is ZplGraphicField graphicField)
             {
-                byte[] imageData = ByteHelper.HexToBytes(graphicField.Data);
-                SKBitmap image = SKBitmap.Decode(imageData);
+                // the graphic data is converted when drawing: ASCII hexadecimal or compressed (ACS, :B64:, :Z64:)
+                byte[] grfData = ImageHelper.GetImageBytes(graphicField.Data, graphicField.BytesPerRow);
+                byte[] imageData = new SkiaImageConverter().ConvertGrfToPng(grfData, graphicField.BytesPerRow);
+                using SKBitmap image = SKBitmap.Decode(imageData);
 
-                float x = graphicField.PositionX;
-                float y = graphicField.PositionY;
-
-                if (graphicField.UseDefaultPosition)
-                {
-                    x = currentPosition.X;
-                    y = currentPosition.Y;
-                }
+                SKPoint position = ResolvePosition(graphicField, currentPosition);
+                float x = JustifyX(graphicField, position.X, image.Width);
+                float y = position.Y;
 
                 bool useFieldTypeset = graphicField.FieldTypeset != null;
                 if (useFieldTypeset)
                 {
+                    // the position is the bottom left corner; an image above the label is clipped, not moved
                     y -= image.Height;
-                    if (y < 0)
-                    {
-                        y = 0;
-                    }
                 }
 
                 this.skCanvas.DrawBitmap(image, x, y, SKSamplingOptions.Default);

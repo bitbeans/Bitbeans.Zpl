@@ -20,43 +20,43 @@ namespace Bitbeans.Zpl.Viewer.CommandAnalyzers
             int x = 0;
             int y = 0;
             bool useDefaultPosition = false;
+            bool useDefaultPositionX = false;
 
-            // Handle missing coordinates - when coordinates are missing, use default positioning
-            if (string.IsNullOrEmpty(zplDataParts[0]))
+            // A missing or invalid x coordinate is the position after the last formatted field
+            if (!string.IsNullOrEmpty(zplDataParts[0]) &&
+                decimal.TryParse(zplDataParts[0], NumberStyles.Number, CultureInfo.InvariantCulture, out tmpdec) &&
+                int.MinValue <= tmpdec && tmpdec <= int.MaxValue)
             {
-                // No coordinates specified - use default position
-                useDefaultPosition = true;
+                x = decimal.ToInt32(tmpdec);
             }
             else
             {
-                if (decimal.TryParse(zplDataParts[0], NumberStyles.Number, CultureInfo.InvariantCulture, out tmpdec) &&
-                    int.MinValue <= tmpdec && tmpdec <= int.MaxValue)
-                {
-                    x = decimal.ToInt32(tmpdec);
-                }
-                else
-                {
-                    // Empty or invalid x coordinate - use default position
-                    useDefaultPosition = true;
-                }
+                useDefaultPosition = true;
+                useDefaultPositionX = true;
             }
 
-            // An omitted y coordinate is the position after the last formatted text field. The drawers can only
-            // continue at the complete default position (x and y), so the y of the last positioned field is used.
+            // An omitted y coordinate is the position after the last formatted text field. The drawers cannot
+            // continue at y alone, so the y of the last positioned field is used.
             bool yOmitted = zplDataParts.Length < 2 || string.IsNullOrEmpty(zplDataParts[1]);
+            bool yValid = false;
             if (!yOmitted)
             {
                 if (decimal.TryParse(zplDataParts[1], NumberStyles.Number, CultureInfo.InvariantCulture, out tmpdec) &&
                     int.MinValue <= tmpdec && tmpdec <= int.MaxValue)
                 {
                     y = decimal.ToInt32(tmpdec);
+                    yValid = true;
                 }
-                else if (!useDefaultPosition)
+                else
                 {
-                    // Invalid y coordinate but x was valid - use default position
+                    // Invalid y coordinate - use default position
                     useDefaultPosition = true;
                 }
             }
+
+            // Only x omitted (^FT,y): continue at the x position of the previous field at the explicit baseline y.
+            // Without a valid y this is the complete default position.
+            useDefaultPositionX &= yValid;
 
             if (zplDataParts.Length > 2)
             {
@@ -76,7 +76,7 @@ namespace Bitbeans.Zpl.Viewer.CommandAnalyzers
                 y = virtualPrinter.LastElementPositionY;
             }
 
-            virtualPrinter.SetNextElementPosition(x, y, true, useDefaultPosition);
+            virtualPrinter.SetNextElementPosition(x, y, true, useDefaultPosition, useDefaultPositionX);
 
             return null;
         }

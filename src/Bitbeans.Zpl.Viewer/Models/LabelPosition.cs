@@ -11,18 +11,22 @@
         public bool CalculateFromBottom { get; private set; }
         /// <summary>Gets a value indicating whether the field continues at the default position (<c>^FT</c> without coordinates).</summary>
         public bool UseDefaultPosition { get; private set; }
+        /// <summary>Gets a value indicating whether only the x coordinate was omitted (<c>^FT,y</c>): <see cref="Y"/> is explicit and the field continues at the x position that follows the previous field. <see cref="UseDefaultPosition"/> is also set in this case, so elements that cannot continue at x only use the complete default position.</summary>
+        public bool UseDefaultPositionX { get; private set; }
 
         /// <summary>Initializes a new instance of the <see cref="LabelPosition"/> class.</summary>
         /// <param name="x">The X position in dots.</param>
         /// <param name="y">The Y position in dots.</param>
         /// <param name="calculateFromBottom"><see langword="true"/> for <c>^FT</c>.</param>
         /// <param name="useDefaultPosition"><see langword="true"/> to continue at the default position.</param>
-        public LabelPosition(int x, int y, bool calculateFromBottom, bool useDefaultPosition)
+        /// <param name="useDefaultPositionX"><see langword="true"/> if only the x coordinate was omitted while the y coordinate is explicit.</param>
+        public LabelPosition(int x, int y, bool calculateFromBottom, bool useDefaultPosition, bool useDefaultPositionX = false)
         {
             this.X = x;
             this.Y = y;
             this.CalculateFromBottom = calculateFromBottom;
             this.UseDefaultPosition = useDefaultPosition;
+            this.UseDefaultPositionX = useDefaultPositionX;
         }
     }
 }
