@@ -10,14 +10,14 @@ namespace Bitbeans.Zpl.Elements
     {
         /// <summary>Font (<c>^A</c>) of the text.</summary>
         public ZplFont Font { get; protected set; }
-        /// <summary>Hexadecimal escape character of <c>^FH</c>, or <see langword="null"/> to not emit <c>^FH</c>. When set, <c>_</c>, <c>^</c> and <c>~</c> in the text are written as hexadecimal escapes.</summary>
+        /// <summary>Hexadecimal escape character of <c>^FH</c>, or <see langword="null"/> to not emit <c>^FH</c>. When set, <c>_</c>, <c>^</c>, <c>~</c> and the indicator character in the text are written as hexadecimal escapes.</summary>
         public char? HexadecimalIndicator { get; protected set; }
         /// <summary>Print the field in reverse (<c>^FR</c>), inverting the underlying image.</summary>
         public bool ReversePrint { get; protected set; }
 
         /// <summary>How line feeds in <see cref="Text"/> are converted.</summary>
         public NewLineConversionMethod NewLineConversion { get; protected set; }
-        /// <summary>The text printed in the field (<c>^FD</c>). The characters <c>^</c> and <c>~</c> cannot be part of field data and are replaced by a space, or, when <see cref="HexadecimalIndicator"/> is set, written as hexadecimal escapes (as is <c>_</c>). A backslash is always replaced by a space.</summary>
+        /// <summary>The text printed in the field (<c>^FD</c>). The characters <c>^</c> and <c>~</c> cannot be part of field data and are replaced by a space, or, when <see cref="HexadecimalIndicator"/> is set, written as hexadecimal escapes (as are <c>_</c> and the indicator itself). A backslash is printed literally, except in field blocks (<see cref="ZplFieldBlock"/>) where it is written as <c>\\</c>.</summary>
         public string Text { get; protected set; }
 
         /// <summary>Creates a text field, rendered as <c>^A</c>, <c>^FO</c>/<c>^FT</c>, optional <c>^FH</c>/<c>^FR</c> and <c>^FD</c>.</summary>
@@ -31,6 +31,7 @@ namespace Bitbeans.Zpl.Elements
         /// <param name="bottomToTop"><see langword="true"/> to position the field with <c>^FT</c> (<see cref="ZplFieldTypeset"/>) instead of <c>^FO</c> (<see cref="ZplFieldOrigin"/>).</param>
         /// <param name="useDefaultPosition">Only evaluated together with <paramref name="bottomToTop"/>: <see langword="true"/> renders <c>^FT</c> without coordinates so the printer continues at its default position. Ignored for <c>^FO</c>.</param>
         /// <param name="fieldJustification">Field justification rendered as the third parameter of <c>^FO</c>/<c>^FT</c>; <see cref="FieldJustification.None"/> omits it.</param>
+        /// <exception cref="ArgumentException"><paramref name="hexadecimalIndicator"/> is <c>^</c>, <c>~</c>, a control character or not printable ASCII.</exception>
         public ZplTextField(
             string text,
             int positionX,
@@ -46,7 +47,7 @@ namespace Bitbeans.Zpl.Elements
         {
             Text = text;
             Font = font;
-            HexadecimalIndicator = hexadecimalIndicator;
+            HexadecimalIndicator = ZplHexadecimal.Validate(hexadecimalIndicator, nameof(hexadecimalIndicator));
             NewLineConversion = newLineConversion;
             ReversePrint = reversePrint;
         }
@@ -69,11 +70,7 @@ namespace Bitbeans.Zpl.Elements
             StringBuilder sb = new();
             if (HexadecimalIndicator is char hexIndicator)
             {
-                sb.Append("^FH");
-                if (hexIndicator != '_')
-                {
-                    sb.Append(hexIndicator);
-                }
+                sb.Append(ZplHexadecimal.RenderCommand(hexIndicator));
             }
             if (ReversePrint)
             {
@@ -85,7 +82,7 @@ namespace Bitbeans.Zpl.Elements
             {
                 foreach (char c in Text)
                 {
-                    sb.Append(SanitizeCharacter(c, NewLineConversion, HexadecimalIndicator));
+                    sb.Append(SanitizeCharacter(c, NewLineConversion, HexadecimalIndicator, EscapeBackslash));
                 }
             }
             sb.Append("^FS");
@@ -93,35 +90,33 @@ namespace Bitbeans.Zpl.Elements
             return sb.ToString();
         }
 
+        /// <summary>Whether a backslash is written as <c>\\</c>. <see langword="false"/> for plain text fields, where a backslash is literal field data; field blocks (<c>^FB</c>) interpret <c>\&amp;</c> and <c>\\</c> and override this.</summary>
+        protected virtual bool EscapeBackslash => false;
+
         internal static string SanitizeCharacter(
             char input,
             NewLineConversionMethod newLineConversion = NewLineConversionMethod.ToSpace,
-            char? hexadecimalIndicator = null)
+            char? hexadecimalIndicator = null,
+            bool escapeBackslash = false)
         {
-            if (hexadecimalIndicator != null)
+            if (hexadecimalIndicator is char indicator)
             {
-                //Convert to hex
-                switch (input)
+                //Convert to hex ('_' is always escaped, it is the default indicator)
+                if (input == '_' || ZplHexadecimal.MustEscape(input, indicator))
                 {
-                    case '_':
-                    case '^':
-                    case '~':
-                        return hexadecimalIndicator + Convert.ToByte(input).ToString("X2");
-                    case '\\':
-                        return " ";
+                    return ZplHexadecimal.Escape(input, indicator);
                 }
             }
-            else
+            else if (input == '^' || input == '~')
             {
                 //The field data can be any printable character except those used as command prefixes(^ and ~).
-                //Replace '^', '~'
-                switch (input)
-                {
-                    case '^':
-                    case '~':
-                    case '\\':
-                        return " ";
-                }
+                return " ";
+            }
+
+            if (input == '\\' && escapeBackslash)
+            {
+                //Inside ^FB a literal backslash is written as \\
+                return @"\\";
             }
 
             if (input == '\n')

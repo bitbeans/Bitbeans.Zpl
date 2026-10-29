@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace Bitbeans.Zpl.Elements
@@ -23,7 +24,7 @@ namespace Bitbeans.Zpl.Elements
         /// <param name="height">Box height in dots.</param>
         /// <param name="borderThickness">Border (line) thickness in dots; scaled by <see cref="ZplRenderOptions.ScaleFactor"/> when rendered.</param>
         /// <param name="lineColor">Line color, <see cref="LineColor.Black"/> (<c>B</c>) or <see cref="LineColor.White"/> (<c>W</c>).</param>
-        /// <param name="cornerRounding">Degree of corner rounding, 0-8; default 0.</param>
+        /// <param name="cornerRounding">Degree of corner rounding, 0-8; default 0. This is an index, not a dot value, so it is not scaled by the DPI.</param>
         /// <param name="reversePrint"><see langword="true"/> to emit <c>^FR</c> so the field is printed in reverse (inverts the underlying image).</param>
         /// <param name="bottomToTop"><see langword="true"/> to position the field with <c>^FT</c> (<see cref="ZplFieldTypeset"/>) instead of <c>^FO</c> (<see cref="ZplFieldOrigin"/>).</param>
         /// <param name="useDefaultPosition">Only evaluated together with <paramref name="bottomToTop"/>: <see langword="true"/> renders <c>^FT</c> without coordinates so the printer continues at its default position. Ignored for <c>^FO</c>.</param>
@@ -40,6 +41,9 @@ namespace Bitbeans.Zpl.Elements
             bool useDefaultPosition = false)
             : base(positionX, positionY, borderThickness, lineColor, reversePrint, bottomToTop, useDefaultPosition)
         {
+            ArgumentOutOfRangeException.ThrowIfLessThan(cornerRounding, 0);
+            ArgumentOutOfRangeException.ThrowIfGreaterThan(cornerRounding, 8);
+
             Width = width;
             Height = height;
 
@@ -55,7 +59,7 @@ namespace Bitbeans.Zpl.Elements
             //^ GB300,200,10 ^ FS
             var result = new List<string>();
             result.AddRange(RenderPosition(context));
-            result.Add($"{RenderReversePrint()}^GB{context.Scale(Width)},{context.Scale(Height)},{context.Scale(BorderThickness)},{RenderLineColor(LineColor)},{context.Scale(CornerRounding)}^FS");
+            result.Add($"{RenderReversePrint()}^GB{context.Scale(Width)},{context.Scale(Height)},{context.Scale(BorderThickness)},{RenderLineColor(LineColor)},{CornerRounding}^FS");
 
             return result;
         }

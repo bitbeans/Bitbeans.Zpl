@@ -9,7 +9,7 @@ namespace Bitbeans.Zpl.Elements
     {
         /// <summary>The field number (<c>^FN</c> parameter).</summary>
         public int Number { get; private set; }
-        /// <summary>The data for the field. The characters <c>^</c>, <c>~</c> and <c>\</c> are replaced by a space.</summary>
+        /// <summary>The data for the field; <see langword="null"/> is rendered as empty data. Line feeds are replaced by a space. If the text contains <c>^</c> or <c>~</c>, <c>^FH</c> is added and <c>^</c>, <c>~</c> and <c>_</c> are written as hexadecimal escapes.</summary>
         public string Text { get; private set; }
 
         /// <summary>Creates the data for a field number.</summary>
@@ -24,14 +24,21 @@ namespace Bitbeans.Zpl.Elements
         /// <summary>Renders <c>^FNn</c> and <c>^FDtext^FS</c> as two lines.</summary>
         /// <param name="context">Render options (scaling).</param>
         /// <returns>The ZPL lines.</returns>
-        /// <exception cref="System.NullReferenceException"><see cref="Text"/> is <see langword="null"/>.</exception>
         public override IEnumerable<string> Render(ZplRenderOptions context)
         {
+            string text = Text ?? string.Empty;
+            char? indicator = ZplHexadecimal.ContainsCommandPrefix(text) ? ZplHexadecimal.DefaultIndicator : null;
+
             StringBuilder sb = new StringBuilder();
-            sb.Append("^FD");
-            foreach (var c in Text)
+            if (indicator is char hexIndicator)
             {
-                sb.Append(ZplTextField.SanitizeCharacter(c));
+                sb.Append(ZplHexadecimal.RenderCommand(hexIndicator));
+            }
+
+            sb.Append("^FD");
+            foreach (var c in text)
+            {
+                sb.Append(ZplTextField.SanitizeCharacter(c, NewLineConversionMethod.ToSpace, indicator));
             }
 
             var result = new List<string>();

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Text.RegularExpressions;
 
 namespace Bitbeans.Zpl.Helpers
 {
@@ -10,8 +9,6 @@ namespace Bitbeans.Zpl.Helpers
     /// </summary>
     public static class ZebraB64CompressionHelper
     {
-        private static Regex _b64Regex = new Regex(":(B64):(\\S+):([0-9a-fA-F]+)", RegexOptions.Compiled);
-
         /// <summary>Encodes hexadecimal data in the B64 format (Base64 plus CRC).</summary>
         /// <param name="hexData">Hexadecimal data; line breaks are ignored.</param>
         /// <returns>B64 encoded data (<c>:B64:data:crc</c>).</returns>
@@ -31,22 +28,13 @@ namespace Bitbeans.Zpl.Helpers
             return ":B64:" + base64 + ":" + crc16;
         }
 
-        /// <summary>Decodes B64 encoded data. The CRC is not verified.</summary>
-        /// <param name="hexData">B64 encoded data (<c>:B64:data:crc</c>).</param>
+        /// <summary>Decodes B64 encoded data and verifies the CRC (CRC-16 over the Base64 text).</summary>
+        /// <param name="hexData">B64 encoded data (<c>:B64:data:crc</c>); the whole input must match the format.</param>
         /// <returns>Binary data.</returns>
-        /// <exception cref="FormatException">The data is not in the B64 format.</exception>
+        /// <exception cref="FormatException">The data is not completely in the B64 format, is not valid Base64, or the CRC does not match.</exception>
         public static byte[] Uncompress(string hexData)
         {
-            var match = _b64Regex.Match(hexData);
-            if (match.Success)
-            {
-                var imageBase64 = match.Groups[2].Value;
-                return imageBase64.FromBase64();
-            }
-            else
-            {
-                throw new FormatException("Hex string not in B64 format");
-            }
+            return ZebraBase64Format.ReadVerifiedBase64(hexData, "B64").FromBase64();
         }
     }
 }

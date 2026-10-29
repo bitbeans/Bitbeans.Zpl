@@ -28,7 +28,7 @@ namespace Bitbeans.Zpl.Tests
 
             Assert.AreEqual(1.5, options.ScaleFactor);
             Assert.AreEqual(150, options.Scale(100));
-            Assert.AreEqual(7, options.Scale(5)); // truncated, not rounded
+            Assert.AreEqual(8, options.Scale(5)); // 7.5 is rounded away from zero
             Assert.AreEqual(7.5, options.Scale(5.0));
         }
 

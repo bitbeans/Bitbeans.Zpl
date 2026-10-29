@@ -1,12 +1,12 @@
-﻿using System.Collections.Generic;
-using System.Text;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Bitbeans.Zpl.Elements
 {
     /// <summary>Aztec bar code (<c>^BO</c>) with the field position and field data.</summary>
     public class ZplAztecBarcode : ZplFieldDataElementBase
     {
-        /// <summary>Magnification factor (<c>b</c> parameter of <c>^BO</c>), 1 to 10; not scaled by <see cref="ZplRenderOptions.ScaleFactor"/>.</summary>
+        /// <summary>Magnification factor (<c>b</c> parameter of <c>^BO</c>), 1 to 10; scaled by <see cref="ZplRenderOptions.ScaleFactor"/> when rendered (rounded, limited to 1 to 10).</summary>
         public int MagnificationFactor { get; protected set; }
         /// <summary>Extended channel interpretation (ECI) code indicator (<c>c</c> parameter).</summary>
         public bool ExtendedChannel { get; protected set; }
@@ -23,14 +23,14 @@ namespace Bitbeans.Zpl.Elements
         /// <param name="content">The data to encode, written to the <c>^FD</c> field data command.</param>
         /// <param name="positionX">X position of the field in dots, relative to the label home (<c>^LH</c>); scaled by <see cref="ZplRenderOptions.ScaleFactor"/> when rendered.</param>
         /// <param name="positionY">Y position of the field in dots, relative to the label home (<c>^LH</c>); scaled by <see cref="ZplRenderOptions.ScaleFactor"/> when rendered.</param>
-        /// <param name="magnificationFactor">Magnification factor (symbol module size in dots), 1-10; default 2.</param>
+        /// <param name="magnificationFactor">Magnification factor (symbol module size in dots), 1-10; default 2. Scaled by <see cref="ZplRenderOptions.ScaleFactor"/> when rendered (rounded, limited to 1 to 10).</param>
         /// <param name="extendedChannel">Extended channel interpretation code indicator; default <see langword="false"/>.</param>
         /// <param name="errorControl">Error control and symbol size/type indicator; default 0.</param>
         /// <param name="menuSymbol">Menu symbol indicator; default <see langword="false"/>.</param>
         /// <param name="symbolCount">Number of symbols for structured append (1-26); default 1.</param>
         /// <param name="idField">Optional ID field for structured append; default <see langword="null"/> (empty).</param>
         /// <param name="fieldOrientation">Field orientation: normal (<c>N</c>), rotated 90 degrees (<c>R</c>), inverted 180 degrees (<c>I</c>) or read from bottom up (<c>B</c>).</param>
-        /// <param name="hexadecimalIndicator">Hexadecimal escape character for <c>^FH</c>, or <see langword="null"/> to not emit <c>^FH</c>. The default indicator <c>_</c> is rendered as a plain <c>^FH</c>.</param>
+        /// <param name="hexadecimalIndicator">Hexadecimal escape character for <c>^FH</c>, or <see langword="null"/> to emit <c>^FH</c> only when the content contains <c>^</c> or <c>~</c>. When set, the indicator character in the content is escaped too. Must be a printable ASCII character other than <c>^</c> and <c>~</c> (otherwise <see cref="System.ArgumentException"/>). The default indicator <c>_</c> is rendered as a plain <c>^FH</c>.</param>
         /// <param name="bottomToTop"><see langword="true"/> to position the field with <c>^FT</c> (<see cref="ZplFieldTypeset"/>) instead of <c>^FO</c> (<see cref="ZplFieldOrigin"/>).</param>
         /// <param name="useDefaultPosition">Only evaluated together with <paramref name="bottomToTop"/>: <see langword="true"/> renders <c>^FT</c> without coordinates so the printer continues at its default position. Ignored for <c>^FO</c>.</param>
         public ZplAztecBarcode(
@@ -49,6 +49,9 @@ namespace Bitbeans.Zpl.Elements
             bool useDefaultPosition = false)
             : base(content, positionX, positionY, fieldOrientation, hexadecimalIndicator, bottomToTop, useDefaultPosition)
         {
+            ArgumentOutOfRangeException.ThrowIfLessThan(magnificationFactor, 1);
+            ArgumentOutOfRangeException.ThrowIfGreaterThan(magnificationFactor, 10);
+
             this.MagnificationFactor = magnificationFactor;
             this.ExtendedChannel = extendedChannel;
             this.ErrorControl = errorControl;
@@ -64,7 +67,7 @@ namespace Bitbeans.Zpl.Elements
         {
             var result = new List<string>();
             result.AddRange(RenderPosition(context));
-            result.Add($"^BO{RenderFieldOrientation(this.FieldOrientation)},{this.MagnificationFactor},{RenderBoolean(this.ExtendedChannel)}," +
+            result.Add($"^BO{RenderFieldOrientation(this.FieldOrientation)},{context.ScaleModuleWidth(this.MagnificationFactor)},{RenderBoolean(this.ExtendedChannel)}," +
                 $"{this.ErrorControl},{RenderBoolean(this.MenuSymbol)},{this.SymbolCount},{this.IdField}");
             result.Add(RenderFieldDataSection());
 

@@ -24,13 +24,13 @@ namespace Bitbeans.Zpl.Elements
         /// <param name="moduleWidth">Module width in dots, the width of the narrowest bar (<c>^BY</c> parameter <c>w</c>, 1 to 10).</param>
         /// <param name="wideBarToNarrowBarWidthRatio">Ratio of wide bar to narrow bar width (<c>^BY</c> parameter <c>r</c>), 2.0 to 3.0 in steps of 0.1. Only evaluated by variable-ratio symbologies such as Code 39.</param>
         /// <param name="fieldOrientation">Field orientation: normal (<c>N</c>), rotated 90 degrees (<c>R</c>), inverted 180 degrees (<c>I</c>) or read from bottom up (<c>B</c>).</param>
-        /// <param name="hexadecimalIndicator">Hexadecimal escape character for <c>^FH</c>, or <see langword="null"/> to not emit <c>^FH</c>. The default indicator <c>_</c> is rendered as a plain <c>^FH</c>.</param>
+        /// <param name="hexadecimalIndicator">Hexadecimal escape character for <c>^FH</c>, or <see langword="null"/> to emit <c>^FH</c> only when the content contains <c>^</c> or <c>~</c>. When set, the indicator character in the content is escaped too. Must be a printable ASCII character other than <c>^</c> and <c>~</c> (otherwise <see cref="System.ArgumentException"/>). The default indicator <c>_</c> is rendered as a plain <c>^FH</c>.</param>
         /// <param name="printInterpretationLine"><see langword="true"/> to print the human-readable interpretation line (<c>Y</c>), <see langword="false"/> to suppress it (<c>N</c>).</param>
         /// <param name="printInterpretationLineAboveCode"><see langword="true"/> to print the interpretation line above the bar code instead of below it.</param>
         /// <param name="checkDigit">Calculate and print a check digit; default <see langword="false"/>.</param>
         /// <param name="bottomToTop"><see langword="true"/> to position the field with <c>^FT</c> (<see cref="ZplFieldTypeset"/>) instead of <c>^FO</c> (<see cref="ZplFieldOrigin"/>).</param>
         /// <param name="useDefaultPosition">Only evaluated together with <paramref name="bottomToTop"/>: <see langword="true"/> renders <c>^FT</c> without coordinates so the printer continues at its default position. Ignored for <c>^FO</c>.</param>
-        /// <exception cref="InvalidOperationException"><paramref name="startCharacter"/> or <paramref name="stopCharacter"/> is not one of A, B, C, D.</exception>
+        /// <exception cref="ArgumentException"><paramref name="startCharacter"/> or <paramref name="stopCharacter"/> is not one of A, B, C, D.</exception>
         public ZplBarcodeAnsiCodabar(
             string content,
             char startCharacter,
@@ -62,12 +62,12 @@ namespace Bitbeans.Zpl.Elements
         {
             if (!IsValidCharacter(startCharacter))
             {
-                throw new InvalidOperationException("ANSI Codabar start charactor must be one of A, B, C, D");
+                throw new ArgumentException("ANSI Codabar start character must be one of A, B, C, D", nameof(startCharacter));
             }
 
             if (!IsValidCharacter(stopCharacter))
             {
-                throw new InvalidOperationException("ANSI Codabar stop charactor must be one of A, B, C, D");
+                throw new ArgumentException("ANSI Codabar stop character must be one of A, B, C, D", nameof(stopCharacter));
             }
 
             CheckDigit = checkDigit;
@@ -89,7 +89,7 @@ namespace Bitbeans.Zpl.Elements
             //  ^ FD123456 ^ FS
             var result = new List<string>();
             result.AddRange(RenderPosition(context));
-            result.Add(RenderModuleWidth());
+            result.Add(RenderModuleWidth(context));
             result.Add($"^BK{RenderFieldOrientation()},{RenderBoolean(CheckDigit)},{context.Scale(Height)},{RenderPrintInterpretationLine()},{RenderPrintInterpretationLineAboveCode()},{StartCharacter},{StopCharacter}");
             result.Add(RenderFieldDataSection());
 

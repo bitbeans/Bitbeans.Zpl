@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace Bitbeans.Zpl.Elements
 {
-    /// <summary>Graphic field (<c>^GF</c>): image data sent inline with the position. The values are rendered as given and are not scaled.</summary>
+    /// <summary>Graphic field (<c>^GF</c>): image data sent inline with the position. The values and the graphic data are rendered as given: only the position is scaled by the DPI, the image itself cannot be resampled without an imaging library, so it is not DPI scaled (use <see cref="ZplDownloadGraphics"/> or <see cref="ZplDownloadObjects"/> with an <see cref="ImageConverters.IImageConverter"/> for that).</summary>
     public class ZplGraphicField : ZplPositionedElementBase
     {
         /// <summary>Compression type (<c>a</c> parameter): <c>A</c> ASCII hexadecimal, <c>B</c> binary, <c>C</c> compressed binary.</summary>

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace Bitbeans.Zpl.Elements
@@ -5,8 +6,15 @@ namespace Bitbeans.Zpl.Elements
     /// <summary>Code 128 bar code (<c>^BC</c>), rendered together with <c>^BY</c> and the field position.</summary>
     public class ZplBarcode128 : ZplBarcode
     {
-        /// <summary>Code 128 mode (<c>m</c> parameter of <c>^BC</c>): <c>N</c> (no selected mode, default), <c>U</c> (UCC case mode), <c>A</c> (automatic mode) or <c>D</c> (UCC/EAN mode). Not validated.</summary>
-        public string Mode { get; set; }
+        /// <summary>Code 128 mode (<c>m</c> parameter of <c>^BC</c>): <c>N</c> (no selected mode, default), <c>U</c> (UCC case mode), <c>A</c> (automatic mode) or <c>D</c> (UCC/EAN mode). Other values are rejected.</summary>
+        /// <exception cref="ArgumentException">The value is not <c>N</c>, <c>U</c>, <c>A</c> or <c>D</c>.</exception>
+        public string Mode
+        {
+            get => _mode;
+            set => _mode = ValidateMode(value, nameof(value));
+        }
+
+        private string _mode;
 
         /// <summary>Calculate and print the UCC check digit (<c>e</c> parameter of <c>^BC</c>, only used in mode <c>U</c>).</summary>
         public bool UccCheckDigit { get; set; }
@@ -19,7 +27,7 @@ namespace Bitbeans.Zpl.Elements
         /// <param name="moduleWidth">Module width in dots, the width of the narrowest bar (<c>^BY</c> parameter <c>w</c>, 1 to 10).</param>
         /// <param name="wideBarToNarrowBarWidthRatio">Ratio of wide bar to narrow bar width (<c>^BY</c> parameter <c>r</c>), 2.0 to 3.0 in steps of 0.1. Only evaluated by variable-ratio symbologies such as Code 39.</param>
         /// <param name="fieldOrientation">Field orientation: normal (<c>N</c>), rotated 90 degrees (<c>R</c>), inverted 180 degrees (<c>I</c>) or read from bottom up (<c>B</c>).</param>
-        /// <param name="hexadecimalIndicator">Hexadecimal escape character for <c>^FH</c>, or <see langword="null"/> to not emit <c>^FH</c>. The default indicator <c>_</c> is rendered as a plain <c>^FH</c>.</param>
+        /// <param name="hexadecimalIndicator">Hexadecimal escape character for <c>^FH</c>, or <see langword="null"/> to emit <c>^FH</c> only when the content contains <c>^</c> or <c>~</c>. When set, the indicator character in the content is escaped too. Must be a printable ASCII character other than <c>^</c> and <c>~</c> (otherwise <see cref="System.ArgumentException"/>). The default indicator <c>_</c> is rendered as a plain <c>^FH</c>.</param>
         /// <param name="printInterpretationLine"><see langword="true"/> to print the human-readable interpretation line (<c>Y</c>), <see langword="false"/> to suppress it (<c>N</c>).</param>
         /// <param name="printInterpretationLineAboveCode"><see langword="true"/> to print the interpretation line above the bar code instead of below it.</param>
         /// <param name="bottomToTop"><see langword="true"/> to position the field with <c>^FT</c> (<see cref="ZplFieldTypeset"/>) instead of <c>^FO</c> (<see cref="ZplFieldOrigin"/>).</param>
@@ -54,8 +62,18 @@ namespace Bitbeans.Zpl.Elements
                   bottomToTop,
                   useDefaultPosition)
         {
-            this.Mode = mode;
+            _mode = ValidateMode(mode, nameof(mode));
             this.UccCheckDigit = uccCheckDigit;
+        }
+
+        private static string ValidateMode(string mode, string paramName)
+        {
+            if (mode is not ("N" or "U" or "A" or "D"))
+            {
+                throw new ArgumentException("The Code 128 mode must be N, U, A or D.", paramName);
+            }
+
+            return mode;
         }
 
         /// <summary>Renders <c>^FO</c>/<c>^FT</c>, <c>^BY</c>, <c>^BCo,h,f,g[,e,m]</c> and the field data.</summary>
@@ -72,7 +90,7 @@ namespace Bitbeans.Zpl.Elements
 
             var result = new List<string>();
             result.AddRange(RenderPosition(context));
-            result.Add(RenderModuleWidth());
+            result.Add(RenderModuleWidth(context));
             result.Add(command);
             result.Add(RenderFieldDataSection());
 

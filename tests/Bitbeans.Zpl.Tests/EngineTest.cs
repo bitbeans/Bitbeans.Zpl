@@ -53,7 +53,7 @@ namespace Bitbeans.Zpl.Tests
 
             Debug.WriteLine(output);
             Assert.IsNotNull(output);
-            Assert.AreEqual("^XA\n^LH0,0\n^FO591,1034\n^GB147,147,7,B,0^FS\n^XZ", output);
+            Assert.AreEqual("^XA\n^LH0,0\n^FO591,1034\n^GB148,148,7,B,0^FS\n^XZ", output);
         }
 
         [TestMethod]

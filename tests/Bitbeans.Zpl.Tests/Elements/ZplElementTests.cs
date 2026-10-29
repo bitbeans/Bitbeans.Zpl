@@ -123,11 +123,11 @@ namespace Bitbeans.Zpl.Tests
         }
 
         [TestMethod]
-        public void RecallFormatCannotBeRendered()
+        public void RecallFormatRendersXfCommand()
         {
             var element = new ZplRecallFormat("R:FORMAT.ZPL");
             Assert.AreEqual("R:FORMAT.ZPL", element.FormatName);
-            Assert.ThrowsExactly<InvalidOperationException>(() => element.Render().ToList());
+            Assert.AreEqual("^XFR:FORMAT.ZPL^FS", element.ToZplString());
         }
 
         [TestMethod]
@@ -153,7 +153,32 @@ namespace Bitbeans.Zpl.Tests
             var element = new ZplRecallFieldNumber(2, "a^b~c\nd");
             Assert.AreEqual(2, element.Number);
             Assert.AreEqual("a^b~c\nd", element.Text);
-            Assert.AreEqual("^FN2\n^FDa b c d^FS", element.ToZplString());
+            Assert.AreEqual("^FN2\n^FH^FDa_5Eb_7Ec d^FS", element.ToZplString());
+        }
+
+        [TestMethod]
+        public void RecallFieldNumberPlainTextHasNoFieldHexadecimal()
+        {
+            Assert.AreEqual("^FN2\n^FDa_b\\c^FS", new ZplRecallFieldNumber(2, "a_b\\c").ToZplString());
+        }
+
+        [TestMethod]
+        public void RecallFieldNumberTreatsNullTextAsEmpty()
+        {
+            var element = new ZplRecallFieldNumber(3, null);
+            Assert.IsNull(element.Text);
+            Assert.AreEqual("^FN3\n^FD^FS", element.ToZplString());
+        }
+
+        [TestMethod]
+        public void FieldNumberRejectsNullAndNonFormatElements()
+        {
+            var nullElement = Assert.ThrowsExactly<ArgumentNullException>(() => new ZplFieldNumber(1, null));
+            Assert.AreEqual("formatElement", nullElement.ParamName);
+
+            var invalid = Assert.ThrowsExactly<ArgumentException>(() => new ZplFieldNumber(1, new ZplRaw("^XA")));
+            Assert.AreEqual("formatElement", invalid.ParamName);
+            Assert.Contains("IFormatElement", invalid.Message);
         }
 
         [TestMethod]
@@ -181,7 +206,17 @@ namespace Bitbeans.Zpl.Tests
             Assert.AreEqual(LineColor.White, box.LineColor);
             Assert.IsFalse(box.ReversePrint);
             Assert.AreEqual("^FO10,20\n^GB300,200,5,W,3^FS", box.ToZplString());
-            Assert.AreEqual("^FO15,30\n^GB450,300,7,W,4^FS", box.ToZplString(Scaled));
+            //the corner rounding is an index (0-8), not a dot value, and is never scaled
+            Assert.AreEqual("^FO15,30\n^GB450,300,8,W,3^FS", box.ToZplString(Scaled));
+        }
+
+        [TestMethod]
+        public void GraphicBoxValidatesCornerRounding()
+        {
+            Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => new ZplGraphicBox(0, 0, 1, 1, cornerRounding: -1));
+            Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => new ZplGraphicBox(0, 0, 1, 1, cornerRounding: 9));
+            Assert.AreEqual(8, new ZplGraphicBox(0, 0, 1, 1, cornerRounding: 8).CornerRounding);
+            Assert.AreEqual(0, new ZplGraphicBox(0, 0, 1, 1, cornerRounding: 0).CornerRounding);
         }
 
         [TestMethod]
@@ -190,7 +225,7 @@ namespace Bitbeans.Zpl.Tests
             Assert.AreEqual("^FO10,20\n^GC100,1,B^FS", new ZplGraphicCircle(10, 20, 100).ToZplString());
             Assert.AreEqual("^FT10,20\n^GC100,5,W^FS", new ZplGraphicCircle(10, 20, 100, 5, LineColor.White, bottomToTop: true).ToZplString());
             Assert.AreEqual(100, new ZplGraphicCircle(10, 20, 100).Diameter);
-            Assert.AreEqual("^FO15,30\n^GC150,7,B^FS", new ZplGraphicCircle(10, 20, 100, 5).ToZplString(Scaled));
+            Assert.AreEqual("^FO15,30\n^GC150,8,B^FS", new ZplGraphicCircle(10, 20, 100, 5).ToZplString(Scaled));
         }
 
         [TestMethod]
@@ -257,7 +292,7 @@ namespace Bitbeans.Zpl.Tests
             Assert.AreEqual('R', move.StorageDevice);
             Assert.AreEqual("SAMPLE", move.ObjectName);
             Assert.AreEqual("PNG", move.Extension);
-            Assert.AreEqual("^FO10,20\n^IMR:SAMPLE.PNG", move.ToZplString());
+            Assert.AreEqual("^FO10,20\n^IMR:SAMPLE.PNG^FS", move.ToZplString());
         }
 
         [TestMethod]
@@ -269,7 +304,9 @@ namespace Bitbeans.Zpl.Tests
             Assert.AreEqual(1, recall.MagnificationFactorX);
             Assert.AreEqual(1, recall.MagnificationFactorY);
             Assert.AreEqual("^FO10,20\n^XGR:SAMPLE.GRF,1,1^FS", recall.ToZplString());
-            Assert.AreEqual("^FT\n^XGE:IMG.GRF,2,3^FS", new ZplRecallGraphic(10, 20, 'E', "IMG", 2, 3, true).ToZplString());
+            //bottomToTop without useDefaultPosition renders the coordinates, like every other element
+            Assert.AreEqual("^FT10,20\n^XGE:IMG.GRF,2,3^FS", new ZplRecallGraphic(10, 20, 'E', "IMG", 2, 3, true).ToZplString());
+            Assert.AreEqual("^FT\n^XGE:IMG.GRF,2,3^FS", new ZplRecallGraphic(10, 20, 'E', "IMG", 2, 3, true, true).ToZplString());
         }
 
         [TestMethod]
@@ -328,11 +365,11 @@ namespace Bitbeans.Zpl.Tests
         }
 
         [TestMethod]
-        public void DownloadGraphicsUnknownCompressionSchemeRendersEmptyData()
+        public void DownloadGraphicsRejectsUnknownCompressionScheme()
         {
-            var download = new ZplDownloadGraphics('R', "SAMPLE", [1], new FakeImageConverter(), (ZplCompressionScheme)99);
-
-            Assert.AreEqual("~DGR:SAMPLE.GRF,6,2,\n", download.ToZplString());
+            var ex = Assert.ThrowsExactly<ArgumentOutOfRangeException>(
+                () => new ZplDownloadGraphics('R', "SAMPLE", [1], new FakeImageConverter(), (ZplCompressionScheme)99));
+            Assert.AreEqual("compressionScheme", ex.ParamName);
         }
 
         [TestMethod]

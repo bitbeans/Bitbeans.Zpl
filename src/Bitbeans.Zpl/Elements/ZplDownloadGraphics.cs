@@ -37,6 +37,7 @@ namespace Bitbeans.Zpl.Elements
         /// <param name="imageConverter">Converter used to create the bitonal image, e.g. <c>Bitbeans.Zpl.SkiaSharp.SkiaImageConverter</c>.</param>
         /// <param name="compressionScheme">Compression of the graphic data; default <see cref="ZplCompressionScheme.ACS"/>.</param>
         /// <exception cref="ArgumentNullException"><paramref name="imageName"/>, <paramref name="imageData"/> or <paramref name="imageConverter"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="compressionScheme"/> is not a defined <see cref="ZplCompressionScheme"/>.</exception>
         /// <exception cref="ArgumentException"><paramref name="imageName"/> is longer than 8 characters.</exception>
         public ZplDownloadGraphics(
             char storageDevice,
@@ -53,6 +54,11 @@ namespace Bitbeans.Zpl.Elements
             if (imageName.Length > 8)
             {
                 throw new ArgumentException("maximum length of 8 characters exceeded", nameof(imageName));
+            }
+
+            if (!Enum.IsDefined(compressionScheme))
+            {
+                throw new ArgumentOutOfRangeException(nameof(compressionScheme), compressionScheme, "Unknown compression scheme.");
             }
 
             _extension = "GRF"; //Fixed
@@ -87,11 +93,10 @@ namespace Bitbeans.Zpl.Elements
                     //TODO: Reduce multiple conversions of byte array to string. 
                     zplData = ZebraZ64CompressionHelper.Compress(imageResult.RawData);
                     break;
-                case ZplCompressionScheme.B64:
-                    //TODO: Implement this compression scheme.
+                default:
+                    //ZplCompressionScheme.B64, all other values are rejected by the constructor
                     zplData = ZebraB64CompressionHelper.Compress(imageResult.RawData);
                     break;
-                    //throw new NotSupportedException();
             }
 
             return new List<string>

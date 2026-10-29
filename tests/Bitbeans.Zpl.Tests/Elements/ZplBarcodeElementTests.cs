@@ -72,8 +72,12 @@ namespace Bitbeans.Zpl.Tests
         [TestMethod]
         public void AnsiCodabarRejectsInvalidStartAndStopCharacter()
         {
-            Assert.ThrowsExactly<InvalidOperationException>(() => new ZplBarcodeAnsiCodabar("1", 'E', 'A', 0, 0));
-            Assert.ThrowsExactly<InvalidOperationException>(() => new ZplBarcodeAnsiCodabar("1", 'A', 'Z', 0, 0));
+            var start = Assert.ThrowsExactly<ArgumentException>(() => new ZplBarcodeAnsiCodabar("1", 'E', 'A', 0, 0));
+            Assert.AreEqual("startCharacter", start.ParamName);
+            Assert.Contains("start character", start.Message);
+            var stop = Assert.ThrowsExactly<ArgumentException>(() => new ZplBarcodeAnsiCodabar("1", 'A', 'Z', 0, 0));
+            Assert.AreEqual("stopCharacter", stop.ParamName);
+            Assert.Contains("stop character", stop.Message);
         }
 
         [TestMethod]
@@ -130,7 +134,7 @@ namespace Bitbeans.Zpl.Tests
         public void LogmarsHonorsHexadecimalIndicator()
         {
             var element = new ZplBarcodeLogmars("A_B", 10, 20, 100, 2, 3, FieldOrientation.Normal, false, '_');
-            Assert.AreEqual("^FO10,20\n^BY2,3\n^BLN,100,N\n^FH^FDA_B^FS", element.ToZplString());
+            Assert.AreEqual("^FO10,20\n^BY2,3\n^BLN,100,N\n^FH^FDA_5FB^FS", element.ToZplString());
         }
 
         [TestMethod]
@@ -150,7 +154,7 @@ namespace Bitbeans.Zpl.Tests
         public void MsiWithOptions()
         {
             var element = new ZplBarcodeMsi("12_4", 10, 20, 100, 2, 3, FieldOrientation.Rotated180, MsiBarcodeCheckDigitMode.Mod1_10, '_', false, true, true);
-            Assert.AreEqual("^FO10,20\n^BY2,3\n^BMI,B,100,N,Y,Y\n^FH^FD12_4^FS", element.ToZplString());
+            Assert.AreEqual("^FO10,20\n^BY2,3\n^BMI,B,100,N,Y,Y\n^FH^FD12_5F4^FS", element.ToZplString());
             Assert.IsTrue(element.PrintCheckDigit);
         }
 
@@ -201,13 +205,61 @@ namespace Bitbeans.Zpl.Tests
         }
 
         [TestMethod]
-        public void HeightIsScaledButModuleWidthIsNot()
+        public void HeightAndModuleWidthAreScaled()
         {
             var options = new ZplRenderOptions { SourcePrintDpi = 200, TargetPrintDpi = 300 };
 
             Assert.AreEqual(
-                "^FO15,30\n^BY2,3\n^BCN,150,Y,N\n^FD1^FS",
+                "^FO15,30\n^BY3,3\n^BCN,150,Y,N\n^FD1^FS",
                 new ZplBarcode128("1", 10, 20).ToZplString(options));
+            //the wide bar ratio is not a dot value and is not scaled
+            Assert.AreEqual(
+                "^FO15,30\n^BY5,2.5\n^BCN,150,Y,N\n^FD1^FS",
+                new ZplBarcode128("1", 10, 20, moduleWidth: 3, wideBarToNarrowBarWidthRatio: 2.5).ToZplString(options));
+        }
+
+        [TestMethod]
+        public void ModuleWidthIsRoundedAndClampedTo1To10()
+        {
+            var down = new ZplRenderOptions { SourcePrintDpi = 300, TargetPrintDpi = 203 };
+            Assert.AreEqual("^FO0,0\n^BY1,3\n^BCN,68,Y,N\n^FD1^FS", new ZplBarcode128("1", 0, 0, moduleWidth: 1).ToZplString(down));
+            Assert.AreEqual("^FO0,0\n^BY1,3\n^BCN,68,Y,N\n^FD1^FS", new ZplBarcode128("1", 0, 0, moduleWidth: 2).ToZplString(down));
+            Assert.AreEqual("^FO0,0\n^BY2,3\n^BCN,68,Y,N\n^FD1^FS", new ZplBarcode128("1", 0, 0, moduleWidth: 3).ToZplString(down));
+
+            var up = new ZplRenderOptions { SourcePrintDpi = 100, TargetPrintDpi = 600 };
+            Assert.AreEqual("^FO0,0\n^BY10,3\n^BCN,600,Y,N\n^FD1^FS", new ZplBarcode128("1", 0, 0, moduleWidth: 5).ToZplString(up));
+        }
+
+        [TestMethod]
+        public void Pdf417ModuleWidthIsScaled()
+        {
+            var options = new ZplRenderOptions { SourcePrintDpi = 200, TargetPrintDpi = 300 };
+            Assert.AreEqual("^FO0,0\n^BY3\n^B7N,12,0,,,N\n^FDX^FS", new ZplPDF417("X", 0, 0, 8, 2).ToZplString(options));
+        }
+
+        [TestMethod]
+        public void AztecAndQrMagnificationAreScaledAndClamped()
+        {
+            var options = new ZplRenderOptions { SourcePrintDpi = 200, TargetPrintDpi = 300 };
+            Assert.AreEqual("^FO0,0\n^BON,3,N,0,N,1,\n^FDX^FS", new ZplAztecBarcode("X", 0, 0, 2).ToZplString(options));
+            Assert.AreEqual("^FO0,0\n^BQN,2,3,Q,7\n^FDQA,X^FS", new ZplQrCode("X", 0, 0, magnificationFactor: 2).ToZplString(options));
+
+            var up = new ZplRenderOptions { SourcePrintDpi = 100, TargetPrintDpi = 600 };
+            Assert.AreEqual("^FO0,0\n^BON,10,N,0,N,1,\n^FDX^FS", new ZplAztecBarcode("X", 0, 0, 5).ToZplString(up));
+            Assert.AreEqual("^FO0,0\n^BQN,2,10,Q,7\n^FDQA,X^FS", new ZplQrCode("X", 0, 0, magnificationFactor: 5).ToZplString(up));
+        }
+
+        [TestMethod]
+        public void AztecAndQrRejectMagnificationOutsideRange()
+        {
+            Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => new ZplAztecBarcode("X", 0, 0, 0));
+            Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => new ZplAztecBarcode("X", 0, 0, 11));
+            Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => new ZplQrCode("X", 0, 0, magnificationFactor: 0));
+            Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => new ZplQrCode("X", 0, 0, magnificationFactor: 11));
+            Assert.AreEqual(1, new ZplQrCode("X", 0, 0, magnificationFactor: 1).MagnificationFactor);
+            Assert.AreEqual(10, new ZplQrCode("X", 0, 0, magnificationFactor: 10).MagnificationFactor);
+            Assert.AreEqual(1, new ZplAztecBarcode("X", 0, 0, 1).MagnificationFactor);
+            Assert.AreEqual(10, new ZplAztecBarcode("X", 0, 0, 10).MagnificationFactor);
         }
 
         [TestMethod]
@@ -231,7 +283,7 @@ namespace Bitbeans.Zpl.Tests
         public void FieldTypesetAndHexadecimalIndicator()
         {
             var element = new ZplBarcode128("A_B", 10, 20, hexadecimalIndicator: '_', bottomToTop: true);
-            Assert.AreEqual("^FT10,20\n^BY2,3\n^BCN,100,Y,N\n^FH^FDA_B^FS", element.ToZplString());
+            Assert.AreEqual("^FT10,20\n^BY2,3\n^BCN,100,Y,N\n^FH^FDA_5FB^FS", element.ToZplString());
 
             var custom = new ZplBarcode128("AB", 10, 20, hexadecimalIndicator: '\\');
             Assert.AreEqual("^FO10,20\n^BY2,3\n^BCN,100,Y,N\n^FH\\^FDAB^FS", custom.ToZplString());

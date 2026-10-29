@@ -61,6 +61,9 @@ namespace Bitbeans.Zpl.Elements
             HangingIndent = hangingIndent;
         }
 
+        /// <summary>Inside a field block <c>\&amp;</c> is a line break and <c>\\</c> a literal backslash, so a backslash in the text is written as <c>\\</c>.</summary>
+        protected override bool EscapeBackslash => true;
+
         private string RenderTextJustification()
         {
             switch (TextJustification)
