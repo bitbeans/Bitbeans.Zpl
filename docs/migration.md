@@ -53,6 +53,19 @@ new ZplDownloadObjects('R', "SAMPLE.PNG", imageData, converter);
 - Viewer: fields are finalized at `^FS` instead of `^FD`
   ([upstream #332](https://github.com/BinaryKits/BinaryKits.Zpl/pull/332)), which fixes `^BY` default barcode
   heights and several positioning cases.
+- Field data is escaped. `^` and `~` in content no longer inject commands; they are written as hex escapes
+  with `^FH`. Content that already contains hex escapes (`_1D`) is escaped again, so pass the literal
+  character (`"\u001D"`) instead.
+- Backslashes in text fields are kept instead of being replaced with a space.
+- `^BY` module widths and QR/Aztec magnification are scaled with the print DPI. `Scale(int)` rounds
+  instead of truncating, so converted labels can differ by one dot.
+- `ZplImageMove` and `ZplRecallFormat` end with `^FS`, `ZplRecallFormat` no longer throws.
+- `ZplRecallGraphic` defaults to `useDefaultPosition: false`.
+- Constructors validate more input: hexadecimal indicators, QR orientation (only normal), QR/Aztec
+  magnification (1 to 10), corner rounding (0 to 8), Code 128 mode, graphic symbol characters and
+  compression schemes. `ZplBarcodeAnsiCodabar` throws `ArgumentException`.
+- B64/Z64 decoding checks the CRC and throws `FormatException` for corrupt data.
+- Subclasses of `ZplBarcode` call `RenderModuleWidth(context)` instead of `RenderModuleWidth()`.
 
 ### Viewer API
 

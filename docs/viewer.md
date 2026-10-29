@@ -48,6 +48,10 @@ foreach (LabelInfo label in analyzeInfo.LabelInfos)
 | `UnknownCommands` | Commands the viewer does not support |
 | `Errors` | Commands that could not be parsed, including the exception message |
 
+Elements in `LabelInfos` keep the field data as it appears in the ZPL, including `^FH` hex escapes, so
+that the drawer can decode them. They are meant for drawing and inspection. Calling `ToZplString()` on
+them escapes the indicator again (`_5F` becomes `_5F5F`); build new elements with plain text to produce ZPL.
+
 The `IPrinterStorage` shares downloaded graphics (`~DG`, `~DY`) and formats between the analyzer and
 the drawer. Reuse the same instance for both, and across calls if labels reference earlier downloads.
 

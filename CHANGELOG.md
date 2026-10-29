@@ -30,9 +30,37 @@ First release as **Bitbeans.Zpl**, a fork of [BinaryKits.Zpl](https://github.com
   ([upstream #332](https://github.com/BinaryKits/BinaryKits.Zpl/pull/332), extended to all symbologies).
 - Transparent image pixels are converted to white instead of black.
 - Z64 compression uses `ZLibStream`.
+- Field data of all barcodes, 2D codes and text fields is escaped: `^`, `~` and the active hexadecimal
+  indicator are written as hex escapes. Content with `^` or `~` and no indicator gets `^FH` automatically.
+  Content that already contains escapes such as `_1D` is escaped again; write the literal character instead.
+- Text fields keep backslashes (`ZplFieldBlock` writes `\\`) instead of replacing them with a space.
+  `ZplRecallFieldNumber` escapes `^`, `~` and `_` instead of replacing them with a space.
+- Module widths (`^BY`) and QR/Aztec magnification follow the DPI scale and are clamped to 1 to 10.
+  `ZplRenderOptions.Scale(int)` rounds instead of truncating and never turns a non-zero value into 0.
+  Box corner rounding is not scaled.
+- `ZplImageMove` and `ZplRecallFormat` output ends with `^FS`; `ZplRecallFormat` renders `^XF`
+  instead of throwing.
+- `ZplRecallGraphic` uses `useDefaultPosition: false` by default.
+- Stricter validation (`ArgumentException`/`ArgumentOutOfRangeException`): hexadecimal indicators
+  (`^`, `~`, space, control and non-ASCII characters), QR orientation other than normal, QR/Aztec
+  magnification outside 1 to 10, corner rounding outside 0 to 8, Code 128 modes other than `N`/`U`/`A`/`D`,
+  undefined graphic symbol characters, unknown compression schemes, incomplete ACS rows and print DPI of 0
+  or less. `ZplBarcodeAnsiCodabar` throws `ArgumentException` instead of `InvalidOperationException`.
+- B64/Z64 `Uncompress` verifies the CRC and the complete format and throws `FormatException` on mismatch.
+- The protected `ZplBarcode.RenderModuleWidth()` takes the `ZplRenderOptions`.
+- Viewer: QR magnification is clamped to 1 to 10 and invalid `^FH` indicators fall back to `_`.
 
 ### Fixed
 
+- ZPL injection through field data containing `^` or `~`.
+- `^FR` was not written for `^GB`, `^GC`, `^GE` and `^GD` with reverse print.
+- Code 128 UCC check digit and mode were not written.
+- PDF417 rendered `^BX` parameters; Aztec menu symbol, MaxiCode, Codabar, LOGMARS, MSI and Industrial
+  2 of 5 parameter and `^FH` handling.
+- `^BY`, `^FO` and `^FT` used the current culture for numbers.
+- `^GF` output missed `^FS`.
+- Viewer: `^CI`, empty `^XG` magnification, QR binary byte counts, format merging on Linux and templates
+  that were changed by merging.
 - `ZplDownloadGraphics` always halved the image instead of scaling by the dpi factor
   ([upstream #346](https://github.com/BinaryKits/BinaryKits.Zpl/issues/346)).
 - `ZplDownloadGraphics` did not throw for image names longer than 8 characters.
