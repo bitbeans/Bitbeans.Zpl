@@ -12,11 +12,12 @@ namespace Bitbeans.Zpl.Viewer.CommandAnalyzers
         public override ZplElementBase Analyze(string zplCommand, VirtualPrinter virtualPrinter, IPrinterStorage printerStorage)
         {
             char indicator = '_';
-            string[] zplDataParts = this.SplitCommand(zplCommand);
-            // ^, ~, spaces and control characters cannot be indicators, the default is used instead
-            if (zplDataParts[0].Length > 0 && zplDataParts[0][0] is > ' ' and < '~' and not '^')
+            // The parameter is read untrimmed because a space is a valid indicator.
+            // ^, ~, control and non-ASCII characters cannot be indicators, the default is used instead.
+            string parameter = zplCommand.Substring(this.PrinterCommandPrefix.Length);
+            if (parameter.Length > 0 && parameter[0] is >= ' ' and < '~' and not '^')
             {
-                indicator = zplDataParts[0][0];
+                indicator = parameter[0];
             }
 
             virtualPrinter.SetNextElementFieldHexadecimalIndicator(indicator);

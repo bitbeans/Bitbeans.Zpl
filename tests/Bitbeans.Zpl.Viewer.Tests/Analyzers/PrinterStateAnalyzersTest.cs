@@ -243,7 +243,6 @@ namespace Bitbeans.Zpl.Viewer.Tests.Analyzers
         }
 
         [TestMethod]
-        [DataRow("^FH ")]
         [DataRow("^FH~")]
         [DataRow("^FH^")]
         [DataRow("^FH\u0001")]
@@ -252,6 +251,12 @@ namespace Bitbeans.Zpl.Viewer.Tests.Analyzers
         public void FieldHexadecimal_InvalidIndicator_FallsBackToDefault(string command)
         {
             Assert.AreEqual('_', Run(new FieldHexadecimalZplCommandAnalyzer(), command).NextElementFieldHexadecimalIndicator);
+        }
+
+        [TestMethod]
+        public void FieldHexadecimal_SpaceIsAValidIndicator()
+        {
+            Assert.AreEqual(' ', Run(new FieldHexadecimalZplCommandAnalyzer(), "^FH ").NextElementFieldHexadecimalIndicator);
         }
 
         // ^FN n

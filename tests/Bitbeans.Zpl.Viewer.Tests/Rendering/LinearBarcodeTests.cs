@@ -994,20 +994,34 @@ namespace Bitbeans.Zpl.Viewer.Tests.Rendering
         [TestMethod]
         public void Msi_Mod11AndMod10CheckDigitsOfLongContentMatchTheExplicitDigits()
         {
-            // mod 11 of 12345678 is 6 (weights 2..7 restart after six digits), then the mod 10 digit of 123456786 is 3
+            // weighted sum of 12345678 is 138 (weights 2..7 restart after six digits), (11 - 138 mod 11) mod 11 = 5,
+            // then the mod 10 digit of 123456785 is 5
             using SKBitmap computed = Render("^XA^BY2,3,80^FO40,120^BMN,D,80,N,N,N^FD12345678^FS^XZ");
-            using SKBitmap explicitDigits = Render("^XA^BY2,3,80^FO40,120^BMN,A,80,N,N,N^FD1234567863^FS^XZ");
+            using SKBitmap explicitDigits = Render("^XA^BY2,3,80^FO40,120^BMN,A,80,N,N,N^FD1234567855^FS^XZ");
 
             Assert.IsNotNull(RenderHelper.DarkBounds(computed));
             Assert.IsTrue(RenderHelper.SameImage(computed, explicitDigits));
         }
 
         [TestMethod]
-        public void Msi_Mod11RemainderOfTenBecomesZero()
+        [DataRow("1234567", "123456741")]
+        [DataRow("5", "513")]
+        public void Msi_Mod11CheckDigitIsElevenMinusRemainder(string data, string expected)
         {
-            // 5 * 2 = 10, 10 mod 11 = 10 is written as 0; the mod 10 digit of "50" is 5
-            using SKBitmap computed = Render("^XA^BY2,3,80^FO40,120^BMN,D,80,N,N,N^FD5^FS^XZ");
-            using SKBitmap explicitDigits = Render("^XA^BY2,3,80^FO40,120^BMN,A,80,N,N,N^FD505^FS^XZ");
+            // IBM weights 2..7: 1234567 has the weighted sum 106 and the check digit (11 - 106 mod 11) mod 11 = 4
+            using SKBitmap computed = Render($"^XA^BY2,3,80^FO40,120^BMN,D,80,N,N,N^FD{data}^FS^XZ");
+            using SKBitmap explicitDigits = Render($"^XA^BY2,3,80^FO40,120^BMN,A,80,N,N,N^FD{expected}^FS^XZ");
+
+            Assert.IsNotNull(RenderHelper.DarkBounds(computed));
+            Assert.IsTrue(RenderHelper.SameImage(computed, explicitDigits));
+        }
+
+        [TestMethod]
+        public void Msi_Mod11CheckValueOfTenIsWrittenAsTwoDigits()
+        {
+            // 6 * 2 = 12, (11 - 12 mod 11) mod 11 = 10 is written as "10"; the mod 10 digit of "610" is 6
+            using SKBitmap computed = Render("^XA^BY2,3,80^FO40,120^BMN,D,80,N,N,N^FD6^FS^XZ");
+            using SKBitmap explicitDigits = Render("^XA^BY2,3,80^FO40,120^BMN,A,80,N,N,N^FD6106^FS^XZ");
 
             Assert.IsNotNull(RenderHelper.DarkBounds(computed));
             Assert.IsTrue(RenderHelper.SameImage(computed, explicitDigits));

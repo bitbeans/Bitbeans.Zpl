@@ -106,9 +106,9 @@ namespace Bitbeans.Zpl.Viewer.Tests.Rendering
         {
             // the analyzer does not hand the justification to graphic symbols, so set it on the elements
             SKRectI left = RenderHelper.DarkBounds(RenderHelper.RenderElements(
-                [RenderHelper.WithJustification(new ZplGraphicSymbol(GraphicSymbolCharacter.Copyright, 200, 100, 60, 60), FieldJustification.Left)])).Value;
+                [new ZplGraphicSymbol(GraphicSymbolCharacter.Copyright, 200, 100, 60, 60, fieldJustification: FieldJustification.Left)])).Value;
             SKRectI right = RenderHelper.DarkBounds(RenderHelper.RenderElements(
-                [RenderHelper.WithJustification(new ZplGraphicSymbol(GraphicSymbolCharacter.Copyright, 200, 100, 60, 60), FieldJustification.Right)])).Value;
+                [new ZplGraphicSymbol(GraphicSymbolCharacter.Copyright, 200, 100, 60, 60, fieldJustification: FieldJustification.Right)])).Value;
 
             Assert.IsTrue(left.Left >= 198, $"{left}");
             Assert.IsTrue(right.Right <= 202, $"{right}");
@@ -119,9 +119,9 @@ namespace Bitbeans.Zpl.Viewer.Tests.Rendering
         public void Outline_FieldTypesetRightJustifiedEndsAtX()
         {
             SKRectI left = RenderHelper.DarkBounds(RenderHelper.RenderElements(
-                [RenderHelper.WithJustification(new ZplGraphicSymbol(GraphicSymbolCharacter.Copyright, 200, 200, 60, 60, bottomToTop: true), FieldJustification.Left)])).Value;
+                [new ZplGraphicSymbol(GraphicSymbolCharacter.Copyright, 200, 200, 60, 60, bottomToTop: true, fieldJustification: FieldJustification.Left)])).Value;
             SKRectI right = RenderHelper.DarkBounds(RenderHelper.RenderElements(
-                [RenderHelper.WithJustification(new ZplGraphicSymbol(GraphicSymbolCharacter.Copyright, 200, 200, 60, 60, bottomToTop: true), FieldJustification.Right)])).Value;
+                [new ZplGraphicSymbol(GraphicSymbolCharacter.Copyright, 200, 200, 60, 60, bottomToTop: true, fieldJustification: FieldJustification.Right)])).Value;
 
             Assert.IsTrue(left.Left >= 198, $"{left}");
             Assert.IsTrue(right.Right <= 202, $"{right}");
@@ -230,8 +230,8 @@ namespace Bitbeans.Zpl.Viewer.Tests.Rendering
         [TestMethod]
         public void Bitmap_RightJustifiedEndsAtX()
         {
-            ZplElementBase[] origin = [RenderHelper.WithJustification(new ZplGraphicSymbol(GraphicSymbolCharacter.Copyright, 100, 20, 10, 18), FieldJustification.Right)];
-            ZplElementBase[] typeset = [RenderHelper.WithJustification(new ZplGraphicSymbol(GraphicSymbolCharacter.Copyright, 100, 60, 10, 18, bottomToTop: true), FieldJustification.Right)];
+            ZplElementBase[] origin = [new ZplGraphicSymbol(GraphicSymbolCharacter.Copyright, 100, 20, 10, 18, fieldJustification: FieldJustification.Right)];
+            ZplElementBase[] typeset = [new ZplGraphicSymbol(GraphicSymbolCharacter.Copyright, 100, 60, 10, 18, bottomToTop: true, fieldJustification: FieldJustification.Right)];
 
             using SKBitmap bmpOrigin = RenderHelper.RenderElements(origin, Bitmap("GS"));
             using SKBitmap bmpTypeset = RenderHelper.RenderElements(typeset, Bitmap("GS"));

@@ -157,7 +157,7 @@ namespace Bitbeans.Zpl.Viewer.CommandAnalyzers
                 }
                 else if (virtualPrinter.NextElementFieldData is GraphicSymbolFieldData graphicSymbol)
                 {
-                    return new ZplGraphicSymbol(content, x, y, graphicSymbol.Width, graphicSymbol.Height, graphicSymbol.FieldOrientation, bottomToTop, useDefaultPosition);
+                    return new ZplGraphicSymbol(content, x, y, graphicSymbol.Width, graphicSymbol.Height, graphicSymbol.FieldOrientation, bottomToTop, useDefaultPosition, fieldJustification);
                 }
                 else if (virtualPrinter.NextElementFieldData is CodeMsiBarcodeFieldData msi)
                 {

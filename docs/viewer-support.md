@@ -91,7 +91,8 @@ CODABLOCK (`^BB`), TLC39 (`^BT`), Micro PDF417 (`^BF`), Micro QR.
   command inside the `^FD`/`^FV` of that field.
 - Carriage returns and line feeds are ignored everywhere in the ZPL stream, also inside `^FD`. Use `\&` in
   `^FB` fields (or `^FH` escapes) for line breaks.
-- `^FH` indicators that are invalid (space, `^`, `~`, control and non-ASCII characters) fall back to `_`.
+- `^FH` indicators that are invalid (`^`, `~`, control and non-ASCII characters) fall back to `_`. A space is a
+  valid indicator.
 - `^CF` keeps the last height and width if a value is omitted. `^FW` only applies to `^A` fonts without an
   explicit orientation, also when it follows `^A` in the same field.
 - `^FT` with an omitted y coordinate cannot continue at the end of the previous text field (the drawers only support

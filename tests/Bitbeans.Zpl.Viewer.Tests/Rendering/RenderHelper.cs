@@ -110,28 +110,6 @@ namespace Bitbeans.Zpl.Viewer.Tests.Rendering
             return element;
         }
 
-        /// <summary>
-        /// Some elements (e.g. the graphic symbol) cannot be given a field justification through their constructors,
-        /// so replace the position element by reflection to reach the justified drawing code.
-        /// </summary>
-        public static ZplPositionedElementBase WithJustification(ZplPositionedElementBase element, FieldJustification justification)
-        {
-            if (element.FieldOrigin != null)
-            {
-                typeof(ZplPositionedElementBase)
-                    .GetProperty(nameof(ZplPositionedElementBase.FieldOrigin))
-                    .SetValue(element, new ZplFieldOrigin(element.PositionX, element.PositionY, justification));
-            }
-            else
-            {
-                typeof(ZplPositionedElementBase)
-                    .GetProperty(nameof(ZplPositionedElementBase.FieldTypeset))
-                    .SetValue(element, new ZplFieldTypeset(element.PositionX, element.PositionY, justification));
-            }
-
-            return element;
-        }
-
         public static bool SameImage(SKBitmap a, SKBitmap b)
         {
             return a.Width == b.Width && a.Height == b.Height && a.Bytes.AsSpan().SequenceEqual(b.Bytes);

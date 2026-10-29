@@ -21,6 +21,28 @@ namespace Bitbeans.Zpl.Viewer.Tests.Analyzers
             return info.LabelInfos[label].ZplElements.OfType<ZplTextField>().ToArray();
         }
 
+        [TestMethod]
+        public void SpaceAsHexadecimalIndicatorIsKept()
+        {
+            AnalyzeInfo info = AnalyzerTestHelper.Analyze("^XA^FO0,0^FH ^FD 41^FS^XZ");
+
+            Assert.IsEmpty(info.Errors);
+            ZplTextField text = Texts(info, 0)[0];
+            Assert.AreEqual(' ', text.HexadecimalIndicator);
+            Assert.AreEqual(" 41", text.Text);
+        }
+
+        [TestMethod]
+        public void GraphicSymbolKeepsTheFieldJustification()
+        {
+            AnalyzeInfo info = AnalyzerTestHelper.Analyze("^XA^FO100,20,1^GSN,18,10^FDC^FS^FWN,1^FT100,60^GSN,18,10^FDC^FS^XZ");
+
+            ZplGraphicSymbol[] symbols = info.LabelInfos[0].ZplElements.OfType<ZplGraphicSymbol>().ToArray();
+            Assert.HasCount(2, symbols);
+            Assert.AreEqual(FieldJustification.Right, symbols[0].FieldOrigin.FieldJustification);
+            Assert.AreEqual(FieldJustification.Right, symbols[1].FieldTypeset.FieldJustification);
+        }
+
         // 1: unknown ^XF
         [TestMethod]
         public void RecallOfUnknownFormatIsAnErrorAndOtherLabelsAreKept()

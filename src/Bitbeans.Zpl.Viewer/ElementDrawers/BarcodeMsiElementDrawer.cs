@@ -149,8 +149,8 @@ public class BarcodeMsiElementDrawer : BarcodeDrawerBase
             weight++;
             if (weight > 7) weight = 2;
         }
-        int check = sum % 11;
-        if (check == 10) return "0";
+        // (11 - sum mod 11) mod 11; a check value of 10 is written as the two digits "10"
+        int check = (11 - (sum % 11)) % 11;
         return check.ToString();
     }
 }

@@ -42,7 +42,7 @@ First release as **Bitbeans.Zpl**, a fork of [BinaryKits.Zpl](https://github.com
   instead of throwing.
 - `ZplRecallGraphic` uses `useDefaultPosition: false` by default.
 - Stricter validation (`ArgumentException`/`ArgumentOutOfRangeException`): hexadecimal indicators
-  (`^`, `~`, space, control and non-ASCII characters), QR orientation other than normal, QR/Aztec
+  (`^`, `~`, control and non-ASCII characters; a space is allowed), QR orientation other than normal, QR/Aztec
   magnification outside 1 to 10, corner rounding outside 0 to 8, Code 128 modes other than `N`/`U`/`A`/`D`,
   undefined graphic symbol characters, unknown compression schemes, incomplete ACS rows and print DPI of 0
   or less. `ZplBarcodeAnsiCodabar` throws `ArgumentException` instead of `InvalidOperationException`.
@@ -58,6 +58,10 @@ First release as **Bitbeans.Zpl**, a fork of [BinaryKits.Zpl](https://github.com
 
 ### Fixed
 
+- ACS compression: `!` fills the rest of the line with one bits (hex `F`) instead of the hex digit `1`.
+- MSI Mod 11 check digit is `(11 - sum mod 11) mod 11` (IBM weights 2 to 7); a value of 10 is written as `10`.
+- `ZplGraphicSymbol` accepts a field justification; the viewer passes the `^FO`/`^FT`/`^FW` justification to `^GS`.
+- A space can be used as `^FH` indicator.
 - ZPL injection through field data containing `^` or `~`.
 - `^FR` was not written for `^GB`, `^GC`, `^GE` and `^GD` with reverse print.
 - Code 128 UCC check digit and mode were not written.
