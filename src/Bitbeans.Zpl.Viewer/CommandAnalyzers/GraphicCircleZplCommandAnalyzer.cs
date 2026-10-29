@@ -31,7 +31,7 @@ namespace Bitbeans.Zpl.Viewer.CommandAnalyzers
 
             string[] zplDataParts = this.SplitCommand(zplCommand);
 
-            if (zplDataParts.Length > 0 && int.TryParse(zplDataParts[0], out tmpint))
+            if (int.TryParse(zplDataParts[0], out tmpint))
             {
                 circleDiameter = tmpint;
             }

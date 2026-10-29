@@ -23,7 +23,7 @@ namespace Bitbeans.Zpl.Viewer.CommandAnalyzers
 
             if (zplDataParts.Length > 1)
             {
-                checkDigit = this.ConvertBoolean(zplDataParts[1], "Y");
+                checkDigit = this.ConvertBoolean(zplDataParts[1]);
             }
 
             if (zplDataParts.Length > 2 && int.TryParse(zplDataParts[2], out int tmpint))
@@ -41,7 +41,7 @@ namespace Bitbeans.Zpl.Viewer.CommandAnalyzers
                 printInterpretationLineAboveCode = this.ConvertBoolean(zplDataParts[4]);
             }
 
-            if (zplDataParts.Length > 5 && char.TryParse(zplDataParts[6], out char startChar))
+            if (zplDataParts.Length > 5 && char.TryParse(zplDataParts[5], out char startChar))
             {
                 startCharacter = startChar;
             }

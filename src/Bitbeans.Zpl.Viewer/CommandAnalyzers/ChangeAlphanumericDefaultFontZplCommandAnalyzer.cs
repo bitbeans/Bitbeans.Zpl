@@ -15,13 +15,10 @@ namespace Bitbeans.Zpl.Viewer.CommandAnalyzers
             int fontHeight = 9;
             int fontWidth = 0;
 
-            if (zplDataParts.Length > 0)
+            string newFont = zplDataParts[0];
+            if (!string.IsNullOrEmpty(newFont))
             {
-                string newFont = zplDataParts[0];
-                if (!string.IsNullOrEmpty(newFont))
-                {
-                    virtualPrinter.SetFontName(newFont);
-                }
+                virtualPrinter.SetFontName(newFont);
             }
 
             if (zplDataParts.Length > 1 && int.TryParse(zplDataParts[1], out tmpint))

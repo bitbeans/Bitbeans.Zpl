@@ -13,27 +13,15 @@ namespace Bitbeans.Zpl.Viewer
 
         public void AddFile(char storageDevice, string fileName, byte[] data)
         {
-            if (!this.cache.ContainsKey(storageDevice))
-            {
-                this.cache.TryAdd(storageDevice, new ConcurrentDictionary<string, byte[]>());
-            }
-
-            if (this.cache.TryGetValue(storageDevice, out ConcurrentDictionary<string, byte[]> files))
-            {
-                files.TryAdd(fileName, data);
-            }
+            ConcurrentDictionary<string, byte[]> files = this.cache.GetOrAdd(storageDevice, _ => new ConcurrentDictionary<string, byte[]>());
+            files.TryAdd(fileName, data);
         }
 
         public byte[] GetFile(char storageDevice, string fileName)
         {
-            if (!this.cache.ContainsKey(storageDevice))
+            if (this.cache.TryGetValue(storageDevice, out ConcurrentDictionary<string, byte[]> files)
+                && files.TryGetValue(fileName, out byte[] data))
             {
-                return [];
-            }
-
-            if (this.cache.TryGetValue(storageDevice, out ConcurrentDictionary<string, byte[]> files))
-            {
-                files.TryGetValue(fileName, out byte[] data);
                 return data ?? [];
             }
 

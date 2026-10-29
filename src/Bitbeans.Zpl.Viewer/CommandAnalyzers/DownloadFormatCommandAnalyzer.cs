@@ -13,14 +13,9 @@ namespace Bitbeans.Zpl.Viewer.CommandAnalyzers
         ///<inheritdoc/>
         public override ZplElementBase Analyze(string zplCommand, VirtualPrinter virtualPrinter, IPrinterStorage printerStorage)
         {
+            // The pattern accepts every ^DF command (storage device and extension are optional)
             Match commandMatch = commandRegex.Match(zplCommand);
-            if (commandMatch.Success)
-            {
-                char storageDevice = commandMatch.Groups[1].Success ? commandMatch.Groups[1].Value[0] : 'R';
-                string formatName = commandMatch.Groups[2].Value;
-
-                virtualPrinter.SetNextDownloadFormatName(formatName);
-            }
+            virtualPrinter.SetNextDownloadFormatName(commandMatch.Groups[2].Value);
 
             return null;
         }

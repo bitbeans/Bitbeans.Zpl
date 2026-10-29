@@ -35,10 +35,10 @@ namespace Bitbeans.Zpl.Viewer.CommandAnalyzers
             {
                 height = tmpint;
             }
-            else if (zplDataParts.Length > 1)
+            else if (zplDataParts.Length > 1
+                && decimal.TryParse(zplDataParts[1], NumberStyles.Number, CultureInfo.InvariantCulture, out decimal tempDecimal))
             {
                 //Sometimes a decimal is given, this works around that.
-                decimal tempDecimal = Convert.ToDecimal(zplDataParts[1], new CultureInfo("en-US"));
                 int tempHeight = (int)Math.Floor(tempDecimal);
                 if (tempHeight > 0)
                 {

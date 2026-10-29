@@ -1,5 +1,7 @@
 ﻿using Bitbeans.Zpl.Elements;
 
+using System.Globalization;
+
 namespace Bitbeans.Zpl.Viewer.CommandAnalyzers
 {
     public class BarCodeFieldDefaultZplCommandAnalyzer : ZplCommandAnalyzerBase
@@ -14,7 +16,7 @@ namespace Bitbeans.Zpl.Viewer.CommandAnalyzers
             int tmpint;
             double tmpdbl;
 
-            if (zplDataParts.Length > 0 && int.TryParse(zplDataParts[0], out tmpint))
+            if (int.TryParse(zplDataParts[0], out tmpint))
             {
                 // TODO: add validation message: between 1 and 10
                 if (tmpint < 1)
@@ -29,7 +31,7 @@ namespace Bitbeans.Zpl.Viewer.CommandAnalyzers
                 virtualPrinter.SetBarcodeModuleWidth(tmpint);
             }
 
-            if (zplDataParts.Length > 1 && double.TryParse(zplDataParts[1], out tmpdbl))
+            if (zplDataParts.Length > 1 && double.TryParse(zplDataParts[1], NumberStyles.Float, CultureInfo.InvariantCulture, out tmpdbl))
             {
                 // TODO: add validation message: between 2.0 and 3.0 in 0.1 increments
                 if (tmpdbl < 2.0)

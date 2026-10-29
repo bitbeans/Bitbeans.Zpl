@@ -27,7 +27,7 @@ public class LogmarsZplCommandAnalyzer : ZplCommandAnalyzerBase
 
         if (zplDataParts.Length > 2)
         {
-            printInterpretationLineAbove = this.ConvertBoolean(zplDataParts[2], "Y");
+            printInterpretationLineAbove = this.ConvertBoolean(zplDataParts[2]);
         }
 
         virtualPrinter.SetNextElementFieldData(

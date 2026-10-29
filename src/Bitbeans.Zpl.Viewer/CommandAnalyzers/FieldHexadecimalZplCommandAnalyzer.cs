@@ -11,7 +11,7 @@ namespace Bitbeans.Zpl.Viewer.CommandAnalyzers
         {
             char indicator = '_';
             string[] zplDataParts = this.SplitCommand(zplCommand);
-            if (zplDataParts.Length > 0 && zplDataParts[0].Length > 0)
+            if (zplDataParts[0].Length > 0)
             {
                 indicator = zplDataParts[0][0];
             }

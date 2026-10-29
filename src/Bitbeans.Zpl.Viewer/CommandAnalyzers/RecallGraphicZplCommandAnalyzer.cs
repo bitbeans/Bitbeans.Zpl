@@ -32,13 +32,21 @@ namespace Bitbeans.Zpl.Viewer.CommandAnalyzers
             {
                 char storageDevice = commandMatch.Groups[1].Success ? commandMatch.Groups[1].Value[0] : 'R';
                 string imageName = commandMatch.Groups[2].Value;
-                int magnificationFactorX = commandMatch.Groups[3].Success ? int.Parse(commandMatch.Groups[3].Value) : 1;
-                int magnificationFactorY = commandMatch.Groups[4].Success ? int.Parse(commandMatch.Groups[4].Value) : 1;
+                int magnificationFactorX = ParseMagnificationFactor(commandMatch.Groups[3]);
+                int magnificationFactorY = ParseMagnificationFactor(commandMatch.Groups[4]);
 
                 return new ZplRecallGraphic(x, y, storageDevice, imageName, magnificationFactorX, magnificationFactorY, bottomToTop, useDefaultPosition);
             }
 
             return null;
+        }
+
+        /// <summary>
+        /// A missing or empty magnification factor keeps the default of 1.
+        /// </summary>
+        private static int ParseMagnificationFactor(Group group)
+        {
+            return group.Success && int.TryParse(group.Value, out int factor) ? factor : 1;
         }
     }
 }

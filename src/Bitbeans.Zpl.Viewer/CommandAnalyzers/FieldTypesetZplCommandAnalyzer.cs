@@ -1,6 +1,8 @@
 ﻿using Bitbeans.Zpl;
 using Bitbeans.Zpl.Elements;
 
+using System.Globalization;
+
 namespace Bitbeans.Zpl.Viewer.CommandAnalyzers
 {
     public class FieldTypesetZplCommandAnalyzer : ZplCommandAnalyzerBase
@@ -18,14 +20,14 @@ namespace Bitbeans.Zpl.Viewer.CommandAnalyzers
             bool useDefaultPosition = false;
 
             // Handle missing coordinates - when coordinates are missing, use default positioning
-            if (zplDataParts.Length == 0 || string.IsNullOrEmpty(zplDataParts[0]))
+            if (string.IsNullOrEmpty(zplDataParts[0]))
             {
                 // No coordinates specified - use default position
                 useDefaultPosition = true;
             }
             else
             {
-                if (decimal.TryParse(zplDataParts[0], out tmpdec) &&
+                if (decimal.TryParse(zplDataParts[0], NumberStyles.Number, CultureInfo.InvariantCulture, out tmpdec) &&
                     int.MinValue <= tmpdec && tmpdec <= int.MaxValue)
                 {
                     x = decimal.ToInt32(tmpdec);
@@ -39,7 +41,7 @@ namespace Bitbeans.Zpl.Viewer.CommandAnalyzers
 
             if (zplDataParts.Length > 1 && !string.IsNullOrEmpty(zplDataParts[1]))
             {
-                if (decimal.TryParse(zplDataParts[1], out tmpdec) &&
+                if (decimal.TryParse(zplDataParts[1], NumberStyles.Number, CultureInfo.InvariantCulture, out tmpdec) &&
                     int.MinValue <= tmpdec && tmpdec <= int.MaxValue)
                 {
                     y = decimal.ToInt32(tmpdec);

@@ -161,11 +161,6 @@ namespace Bitbeans.Zpl.Viewer
             }
         }
 
-        // When adding new commands: 1 per line, always upper case, comment why if possible
-        private static readonly HashSet<string> ignoredCommands = new(StringComparer.OrdinalIgnoreCase)
-        {
-        };
-
         private static string[] SplitZplCommands(string zplData)
         {
             if (string.IsNullOrWhiteSpace(zplData))
@@ -202,7 +197,7 @@ namespace Bitbeans.Zpl.Viewer
                         {
                             caret = command.Length > 3 ? command[3] : c;
                         }
-                        else if (!ignoredCommands.Contains(commandLetters))
+                        else
                         {
                             results.Add(command);
                         }
@@ -218,12 +213,10 @@ namespace Bitbeans.Zpl.Viewer
                 buffer.Append(c);
             }
 
+            // The buffer always holds at least the last character (the input is not blank)
             string lastCommand = buffer.ToString();
-            if (lastCommand.Length > 0)
-            {
-                PatchCommand(ref lastCommand, caret, tilde);
-                results.Add(lastCommand);
-            }
+            PatchCommand(ref lastCommand, caret, tilde);
+            results.Add(lastCommand);
 
             return results.ToArray();
         }
