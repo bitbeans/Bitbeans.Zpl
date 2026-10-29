@@ -22,12 +22,12 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
             if (element is ZplImageMove imageMove)
             {
                 byte[] imageData = this.printerStorage.GetFile(imageMove.StorageDevice, imageMove.ObjectName);
-                SKBitmap image = SKBitmap.Decode(imageData);
-
                 if (imageData.Length == 0)
                 {
                     return currentPosition;
                 }
+
+                SKBitmap image = SKBitmap.Decode(imageData);
 
                 float x = imageMove.PositionX;
                 float y = imageMove.PositionY;

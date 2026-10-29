@@ -1,4 +1,4 @@
-using Bitbeans.Zpl;
+﻿using Bitbeans.Zpl;
 using Bitbeans.Zpl.Elements;
 using Bitbeans.Zpl.Viewer.BitmapFonts;
 using Bitbeans.Zpl.Viewer.Helpers;
@@ -433,7 +433,7 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
             int gapCount = words.Length - 1;
             float gapWidth = (lineWidth - wordsWidth) / gapCount;
 
-            if (!float.IsFinite(gapWidth) || gapWidth <= 0)
+            if (gapWidth <= 0)
             {
                 renderer.DrawText(textLine, fontData, metrics, x, y, paint);
                 return;
@@ -477,7 +477,7 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
             int gapCount = words.Length - 1;
             float gapWidth = (lineWidth - wordsWidth) / gapCount;
 
-            if (!float.IsFinite(gapWidth) || gapWidth <= 0)
+            if (gapWidth <= 0)
             {
                 this.skCanvas.DrawShapedTextSafe(textLine, x, y, SKTextAlign.Left, font, paint);
                 return;
@@ -565,10 +565,9 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
                     }
                     else
                     {
-                        if (line.Length > 0)
-                        {
-                            lines.Add(new WrappedTextLine(line.ToString().Trim(), shouldJustify: true));
-                        }
+                        // a word that does not fit is never the first one of a line (otherwise it would be a long word),
+                        // so the current line is not empty
+                        lines.Add(new WrappedTextLine(line.ToString().Trim(), shouldJustify: true));
 
                         line = new StringBuilder(word + " ");
                         width = wordWidth + spaceWidth;

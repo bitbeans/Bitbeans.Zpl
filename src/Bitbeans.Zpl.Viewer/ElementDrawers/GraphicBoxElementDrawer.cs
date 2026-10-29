@@ -48,68 +48,7 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
         ///<inheritdoc/>
         public override SKPoint Draw(ZplElementBase element, DrawerOptions options, SKPoint currentPosition, InternationalFont internationalFont)
         {
-            if (element is ZplGraphicDiagonalLine diagonalLine)
-            {
-                int border = diagonalLine.BorderThickness;
-                int width = diagonalLine.Width;
-                int height = diagonalLine.Height;
-                int x = diagonalLine.PositionX;
-                int y = diagonalLine.PositionY;
-
-                using SKPaint skPaint = new()
-                {
-                    IsAntialias = options.Antialias,
-                    Style = SKPaintStyle.Stroke,
-                    StrokeCap = SKStrokeCap.Square,
-                    Color = diagonalLine.LineColor == LineColor.White ? SKColors.White : SKColors.Black,
-                    StrokeWidth = border
-                };
-
-                // Corrected: RightLeaningDiagonal = true means bottom-left to top-right
-                SKPoint start, end;
-                if (diagonalLine.RightLeaningDiagonal)
-                {
-                    // Bottom-left to top-right
-                    start = new SKPoint(x, y + height);
-                    end = new SKPoint(x + width, y);
-                }
-                else
-                {
-                    // Top-left to bottom-right
-                    start = new SKPoint(x, y);
-                    end = new SKPoint(x + width, y + height);
-                }
-
-                this.skCanvas.DrawLine(start, end, skPaint);
-            }
-            else if (element is ZplGraphicEllipse ellipse)
-            {
-                int border = ellipse.BorderThickness;
-                int width = ellipse.Width;
-                int height = ellipse.Height;
-                int x = ellipse.PositionX;
-                int y = ellipse.PositionY;
-
-                using SKPaint skPaint = new()
-                {
-                    IsAntialias = options.Antialias,
-                    Style = SKPaintStyle.Stroke,
-                    StrokeCap = SKStrokeCap.Round,
-                    Color = ellipse.LineColor == LineColor.White ? SKColors.White : SKColors.Black,
-                    StrokeWidth = border
-                };
-
-                // Center the ellipse based on border
-                SKRect rect = new(
-                    x + border / 2f,
-                    y + border / 2f,
-                    x + width - border / 2f,
-                    y + height - border / 2f
-                );
-
-                this.skCanvas.DrawOval(rect, skPaint);
-            }
-            else if (element is ZplGraphicBox graphicBox)
+            if (element is ZplGraphicBox graphicBox)
             {
                 int border1 = graphicBox.BorderThickness;
                 int width1 = graphicBox.Width;
@@ -131,7 +70,7 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
                     border1 = (int)Math.Ceiling((float)width1 / 2);
                 }
 
-                if (border1 > height1 / 2 && height1 <= width1)
+                if (border1 > height1 / 2)
                 {
                     border1 = (int)Math.Ceiling((float)height1 / 2);
                 }

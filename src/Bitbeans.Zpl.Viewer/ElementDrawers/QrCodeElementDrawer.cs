@@ -52,11 +52,6 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
                 // support hand-rolled GS1
                 bool gs1Mode = false;
 
-                if (qrcode.HexadecimalIndicator != null)
-                {
-                    content = content.ReplaceHexEscapes(qrcode.HexadecimalIndicator.Value, internationalFont);
-                }
-
                 Match gs1Match = gs1Regex.Match(content);
                 if (gs1Match.Success)
                 {

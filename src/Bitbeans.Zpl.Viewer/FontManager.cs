@@ -16,6 +16,11 @@ namespace Bitbeans.Zpl.Viewer
         private static readonly SKFontManager systemFontManager = SKFontManager.Default;
 
         /// <summary>
+        /// Looks a family up in the system fonts (replaceable for tests, e.g. to simulate a system without fonts).
+        /// </summary>
+        internal Func<string, SKFontStyle, SKTypeface> SystemTypefaceMatcher { get; set; } = systemFontManager.MatchFamily;
+
+        /// <summary>
         /// Gets or sets the list of font family names used as the primary font stack for rendering text.
         /// </summary>
         /// <remarks>The font stack is ordered by preference; the first available font in the list will be
@@ -66,7 +71,7 @@ namespace Bitbeans.Zpl.Viewer
         private SKTypeface typeface0;
         internal SKTypeface Typeface0 {
             get {
-                this.typeface0 ??= this.GetDefaultTypeface("0");
+                this.typeface0 ??= this.GetDefaultTypeface(this.FontStack0, fontStyle0);
                 return this.typeface0;
             }
         }
@@ -74,7 +79,7 @@ namespace Bitbeans.Zpl.Viewer
         private SKTypeface typefaceA;
         internal SKTypeface TypefaceA {
             get {
-                this.typefaceA ??= this.GetDefaultTypeface("A");
+                this.typefaceA ??= this.GetDefaultTypeface(this.FontStackA, fontStyleA);
                 return this.typefaceA;
             }
         }
@@ -108,22 +113,8 @@ namespace Bitbeans.Zpl.Viewer
             }
         }
 
-        private SKTypeface GetDefaultTypeface(string fontType)
+        private SKTypeface GetDefaultTypeface(List<string> fontStack, SKFontStyle fontStyle)
         {
-            List<string> fontStack = fontType switch
-            {
-                "0" => this.FontStack0,
-                "A" => this.FontStackA,
-                _ => this.FontStackA,
-            };
-
-            SKFontStyle fontStyle = fontType switch
-            {
-                "0" => fontStyle0,
-                "A" => fontStyleA,
-                _ => fontStyleA,
-            };
-
             foreach (string fontFamily in fontStack)
             {
                 SKTypeface typeface = this.GetTypeFaceByFamily(fontFamily, fontStyle);
@@ -133,7 +124,7 @@ namespace Bitbeans.Zpl.Viewer
                 }
             }
 
-            return systemFontManager.MatchFamily(SKTypeface.Default.FamilyName, fontStyle) ?? SKTypeface.Default;
+            return this.SystemTypefaceMatcher(SKTypeface.Default.FamilyName, fontStyle) ?? SKTypeface.Default;
         }
 
         private SKTypeface GetTypeFaceByFamily(string familyName, SKFontStyle fontStyle)
@@ -142,19 +133,13 @@ namespace Bitbeans.Zpl.Viewer
             {
                 return typefaces
                     // group italic and oblique together
-                    .OrderBy(t => Math.Abs((t.FontStyle.Slant == SKFontStyleSlant.Upright ? 0 : 1) - (fontStyle.Slant == SKFontStyleSlant.Upright ? 0 : 1)))
+                    .OrderBy(t => Math.Abs(Convert.ToInt32(t.FontStyle.Slant != SKFontStyleSlant.Upright) - Convert.ToInt32(fontStyle.Slant != SKFontStyleSlant.Upright)))
                     .ThenBy(t => Math.Abs(t.FontStyle.Width - fontStyle.Width))
                     .ThenBy(t => Math.Abs(t.FontStyle.Weight - fontStyle.Weight))
                     .First();
             }
 
-            SKTypeface typefaceFromSystem = systemFontManager.MatchFamily(familyName, fontStyle);
-            if (typefaceFromSystem != null)
-            {
-                return typefaceFromSystem;
-            }
-
-            return null;
+            return this.SystemTypefaceMatcher(familyName, fontStyle);
         }
 
     }
