@@ -44,10 +44,20 @@ namespace Bitbeans.Zpl.Helpers
         /// <param name="hexData">Hexadecimal data (two digits per byte) of the whole image; line breaks are ignored.</param>
         /// <param name="bytesPerRow">Number of bytes per image row; defines the line length.</param>
         /// <returns>The ACS compressed data, to be used as the data of <c>~DG</c>.</returns>
+        /// <exception cref="ArgumentException"><paramref name="bytesPerRow"/> is not greater than 0, or the length of <paramref name="hexData"/> is not a multiple of two digits per byte times <paramref name="bytesPerRow"/> (an incomplete last row would be dropped).</exception>
         public static string Compress(string hexData, int bytesPerRow)
         {
+            if (bytesPerRow <= 0)
+            {
+                throw new ArgumentException("The number of bytes per row must be greater than 0.", nameof(bytesPerRow));
+            }
+
             var chunkSize = bytesPerRow * 2;
             var cleanedHexData = hexData.Replace("\n", string.Empty).Replace("\r", string.Empty);
+            if (cleanedHexData.Length % chunkSize != 0)
+            {
+                throw new ArgumentException($"The hexadecimal data length ({cleanedHexData.Length}) is not a multiple of the row length ({chunkSize} digits).", nameof(hexData));
+            }
 
             var compressedLines = new StringBuilder(hexData.Length);
             var compressedCurrentLine = new StringBuilder(chunkSize);

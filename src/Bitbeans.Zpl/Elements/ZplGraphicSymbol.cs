@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace Bitbeans.Zpl.Elements
@@ -19,7 +20,7 @@ namespace Bitbeans.Zpl.Elements
         public GraphicSymbolCharacter? Character { get; private set; }
 
         /// <summary>Creates a graphic symbol from a character.</summary>
-        /// <param name="text">String whose first character (<c>A</c> to <c>E</c>, see <see cref="GraphicSymbolCharacter"/>) selects the symbol; the value is not validated. <see langword="null"/> or empty renders no symbol.</param>
+        /// <param name="text">String whose first character (<c>A</c> to <c>E</c>, see <see cref="GraphicSymbolCharacter"/>) selects the symbol; it must be one of these characters. <see langword="null"/> or empty renders no symbol.</param>
         /// <param name="positionX">X position of the field in dots, relative to the label home (<c>^LH</c>); scaled by <see cref="ZplRenderOptions.ScaleFactor"/> when rendered.</param>
         /// <param name="positionY">Y position of the field in dots, relative to the label home (<c>^LH</c>); scaled by <see cref="ZplRenderOptions.ScaleFactor"/> when rendered.</param>
         /// <param name="width">Character width in dots.</param>
@@ -44,7 +45,7 @@ namespace Bitbeans.Zpl.Elements
                 character = (GraphicSymbolCharacter)text[0];
             }
 
-            Character = character;
+            Character = ValidateCharacter(character, nameof(text));
             FieldOrientation = fieldOrientation;
             Width = width;
             Height = height;
@@ -70,10 +71,20 @@ namespace Bitbeans.Zpl.Elements
             bool useDefaultPosition = false)
             : base(positionX, positionY, bottomToTop, useDefaultPosition)
         {
-            Character = character;
+            Character = ValidateCharacter(character, nameof(character));
             FieldOrientation = fieldOrientation;
             Width = width;
             Height = height;
+        }
+
+        private static GraphicSymbolCharacter? ValidateCharacter(GraphicSymbolCharacter? character, string paramName)
+        {
+            if (character is GraphicSymbolCharacter value && !Enum.IsDefined(value))
+            {
+                throw new ArgumentException("The character is not a defined graphic symbol (A to E).", paramName);
+            }
+
+            return character;
         }
 
         /// <summary>Renders the position and <c>^GSo,h,w^FDc^FS</c>.</summary>

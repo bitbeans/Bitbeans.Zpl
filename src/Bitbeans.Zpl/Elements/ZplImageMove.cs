@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace Bitbeans.Zpl.Elements
 {
-    /// <summary>Image move (<c>^IM</c>): moves an image from the storage area directly into the bitmap. Identical to recalling a graphic (<c>^XG</c>) without sizing parameters.</summary>
+    /// <summary>Image move (<c>^IM</c>): moves an image from the storage area directly into the bitmap. Identical to recalling a graphic (<c>^XG</c>) without sizing parameters. Rendered as <c>^IMd:name.ext^FS</c>.</summary>
     /// <remarks>
     /// Format: <c>^IMd:o.x</c>
     /// </remarks>
@@ -43,7 +43,7 @@ namespace Bitbeans.Zpl.Elements
         {
             var result = new List<string>();
             result.AddRange(RenderPosition(context));
-            result.Add($"^IM{StorageDevice}:{ObjectName}.{Extension}");
+            result.Add($"^IM{StorageDevice}:{ObjectName}.{Extension}^FS");
 
             return result;
         }

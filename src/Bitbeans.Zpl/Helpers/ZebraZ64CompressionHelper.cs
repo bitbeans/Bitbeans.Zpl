@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.IO.Compression;
-using System.Text.RegularExpressions;
 
 namespace Bitbeans.Zpl.Helpers
 {
@@ -14,8 +13,6 @@ namespace Bitbeans.Zpl.Helpers
     /// </summary>
     public static class ZebraZ64CompressionHelper
     {
-        private static readonly Regex _z64Regex = new Regex(":(Z64):(\\S+):([0-9a-fA-F]+)", RegexOptions.Compiled);
-
         /// <summary>
         /// Compress hexadecimal data to the Z64 format
         /// </summary>
@@ -44,17 +41,18 @@ namespace Bitbeans.Zpl.Helpers
         /// </summary>
         /// <param name="hexData">Z64 encoded data (<c>:Z64:data:crc</c>)</param>
         /// <returns>Binary data</returns>
-        /// <exception cref="FormatException">The data is not in the Z64 format</exception>
+        /// <exception cref="FormatException">The data is not completely in the Z64 format, is not valid Base64 or zlib data, or the CRC (CRC-16 over the Base64 text) does not match</exception>
         public static byte[] Uncompress(string hexData)
         {
-            var match = _z64Regex.Match(hexData);
-            if (!match.Success)
+            var base64 = ZebraBase64Format.ReadVerifiedBase64(hexData, "Z64");
+            try
             {
-                throw new FormatException("Hex string not in Z64 format");
+                return Inflate(base64.FromBase64());
             }
-
-            var imageBase64 = match.Groups[2].Value;
-            return Inflate(imageBase64.FromBase64());
+            catch (InvalidDataException ex)
+            {
+                throw new FormatException("Z64 data is not valid zlib data", ex);
+            }
         }
 
         /// <summary>

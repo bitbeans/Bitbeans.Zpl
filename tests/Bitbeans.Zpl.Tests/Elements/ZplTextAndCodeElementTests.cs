@@ -1,5 +1,6 @@
 using Bitbeans.Zpl.Elements;
 using System;
+using System.Linq;
 
 namespace Bitbeans.Zpl.Tests
 {
@@ -51,8 +52,12 @@ namespace Bitbeans.Zpl.Tests
         {
             var font = new ZplFont();
             Assert.AreEqual(
-                "^A0N,30,30\n^FO1,2\n^FH^FDa_5Fb_5E_7Ec d^FS",
+                "^A0N,30,30\n^FO1,2\n^FH^FDa_5Fb_5E_7Ec\\d^FS",
                 new ZplTextField("a_b^~c\\d", 1, 2, font, hexadecimalIndicator: '_').ToZplString());
+            //the custom indicator itself is escaped, otherwise "A!41" would print "AA"
+            Assert.AreEqual(
+                "^A0N,30,30\n^FO1,2\n^FH!^FDA!2141!21!5E^FS",
+                new ZplTextField("A!41!^", 1, 2, font, hexadecimalIndicator: '!').ToZplString());
             Assert.AreEqual(
                 "^A0N,30,30\n^FO1,2\n^FH!^FDa!5Fb!5E!7E^FS",
                 new ZplTextField("a_b^~", 1, 2, font, hexadecimalIndicator: '!').ToZplString());
@@ -65,8 +70,39 @@ namespace Bitbeans.Zpl.Tests
         public void TextFieldReplacesCommandCharactersWithoutHexadecimalIndicator()
         {
             Assert.AreEqual(
-                "^A0N,30,30\n^FO1,2\n^FDa b c d_e^FS",
+                "^A0N,30,30\n^FO1,2\n^FDa b c\\d_e^FS",
                 new ZplTextField("a^b~c\\d_e", 1, 2, new ZplFont()).ToZplString());
+        }
+
+        [TestMethod]
+        public void TextFieldKeepsBackslashes()
+        {
+            Assert.AreEqual(
+                "^A0N,30,30\n^FO1,2\n^FDC:\\dir\\&x^FS",
+                new ZplTextField("C:\\dir\\&x", 1, 2, new ZplFont()).ToZplString());
+        }
+
+        [TestMethod]
+        public void TextBlockKeepsBackslashes()
+        {
+            Assert.AreEqual(
+                "^A0N,30,30\n^FO1,2\n^TBN,100,50\n^FDa\\b^FS",
+                new ZplTextBlock("a\\b", 1, 2, 100, 50, new ZplFont()).ToZplString());
+        }
+
+        [TestMethod]
+        public void FieldBlocksEscapeBackslashesAndConvertNewLines()
+        {
+            Assert.AreEqual(
+                "^A0N,30,30\n^FO1,2\n^FB100,1,0,L,0\n^FDa\\\\b\\&c^FS",
+                new ZplFieldBlock("a\\b\nc", 1, 2, 100, new ZplFont()).ToZplString());
+            Assert.AreEqual(
+                "^A0N,30,30\n^FO1,2\n^FB100,9999,9999,L,0\n^FDa\\\\b c^FS",
+                new ZplSingleLineFieldBlock("a\\b\nc", 1, 2, 100, new ZplFont()).ToZplString());
+            //a literal "\&" in the text is not a line break
+            Assert.AreEqual(
+                "^A0N,30,30\n^FO1,2\n^FB100,1,0,L,0\n^FDa\\\\&b^FS",
+                new ZplFieldBlock("a\\&b", 1, 2, 100, new ZplFont()).ToZplString());
         }
 
         [TestMethod]
@@ -190,9 +226,99 @@ namespace Bitbeans.Zpl.Tests
             Assert.AreEqual("^FO10,20\n^FDother^FS", element.ToZplString());
 
             var hex = new ZplFieldDataElementBase("a_b", 10, 20, FieldOrientation.Normal, '_', true, false);
-            Assert.AreEqual("^FT10,20\n^FH^FDa_b^FS", hex.ToZplString());
+            Assert.AreEqual("^FT10,20\n^FH^FDa_5Fb^FS", hex.ToZplString());
             var hexCustom = new ZplFieldDataElementBase("a", 10, 20, FieldOrientation.Normal, '!', false, false);
             Assert.AreEqual("^FO10,20\n^FH!^FDa^FS", hexCustom.ToZplString());
+        }
+
+        [TestMethod]
+        public void FieldDataElementEscapesCommandCharactersAutomatically()
+        {
+            //content must never be able to inject ZPL commands: ^FH_ is added and ^, ~ and _ are escaped
+            var injected = new ZplFieldDataElementBase("A^FS^FO0,0", 10, 20, FieldOrientation.Normal, null, false, false);
+            Assert.AreEqual("^FO10,20\n^FH^FDA_5EFS_5EFO0,0^FS", injected.ToZplString());
+
+            var tilde = new ZplFieldDataElementBase("a~b_c", 10, 20, FieldOrientation.Normal, null, false, false);
+            Assert.AreEqual("^FO10,20\n^FH^FDa_7Eb_5Fc^FS", tilde.ToZplString());
+
+            //without command characters nothing is changed (and "_" stays as it is)
+            var plain = new ZplFieldDataElementBase("a_b\\c", 10, 20, FieldOrientation.Normal, null, false, false);
+            Assert.AreEqual("^FO10,20\n^FDa_b\\c^FS", plain.ToZplString());
+        }
+
+        [TestMethod]
+        public void FieldDataElementEscapesCustomIndicatorAndCommandCharacters()
+        {
+            var element = new ZplFieldDataElementBase("a!b^c_d", 10, 20, FieldOrientation.Normal, '!', false, false);
+            Assert.AreEqual("^FO10,20\n^FH!^FDa!21b!5Ec_d^FS", element.ToZplString());
+
+            var onlyIndicator = new ZplFieldDataElementBase("a!b", 10, 20, FieldOrientation.Normal, '!', false, false);
+            Assert.AreEqual("^FO10,20\n^FH!^FDa!21b^FS", onlyIndicator.ToZplString());
+        }
+
+        [TestMethod]
+        public void FieldDataElementWritesCharactersAbove255Literally()
+        {
+            var element = new ZplFieldDataElementBase("Ā€^", 10, 20, FieldOrientation.Normal, null, false, false);
+            Assert.AreEqual("^FO10,20\n^FH^FDĀ€_5E^FS", element.ToZplString());
+        }
+
+        [TestMethod]
+        public void FieldDataElementWithNullContentRendersEmptyData()
+        {
+            var element = new ZplFieldDataElementBase(null, 10, 20, FieldOrientation.Normal, null, false, false);
+            Assert.AreEqual("^FO10,20\n^FD^FS", element.ToZplString());
+        }
+
+        [TestMethod]
+        public void EveryFieldDataElementEscapesInjectedCommands()
+        {
+            const string Injected = "A^FS^FO0,0";
+            const string Escaped = "^FH^FDA_5EFS_5EFO0,0^FS";
+            ZplElementBase[] elements =
+            [
+                new ZplBarcode128(Injected, 0, 0), new ZplBarcode39(Injected, 0, 0), new ZplBarcode93(Injected, 0, 0),
+                new ZplBarcode11(Injected, 0, 0), new ZplBarcodeAnsiCodabar(Injected, 'A', 'B', 0, 0),
+                new ZplBarcodeEan13(Injected, 0, 0), new ZplBarcodeEan8(Injected, 0, 0),
+                new ZplBarcodeIndustrial2of5(Injected, 0, 0), new ZplBarcodeInterleaved2of5(Injected, 0, 0),
+                new ZplBarcodeLogmars(Injected, 0, 0, 100, 2, 3, FieldOrientation.Normal, false), new ZplBarcodeUpcA(Injected, 0, 0), new ZplBarcodeUpcE(Injected, 0, 0),
+                new ZplBarcodeUpcExtension(Injected, 0, 0), new ZplBarcodeMsi(Injected, 0, 0, 100, 2, 3, FieldOrientation.Normal, MsiBarcodeCheckDigitMode.None, null),
+                new ZplAztecBarcode(Injected, 0, 0), new ZplDataMatrix(Injected, 0, 0), new ZplMaxiCode(Injected, 0, 0), new ZplPDF417(Injected, 0, 0),
+            ];
+
+            foreach (var element in elements)
+            {
+                var lines = element.Render().ToList();
+                Assert.AreEqual(Escaped, lines[^1], element.GetType().Name);
+                Assert.AreEqual(1, lines.Count(l => l.Contains("^FS")), element.GetType().Name);
+            }
+
+            Assert.AreEqual("^FO0,0\n^BQN,2,2,Q,7\n^FH^FDQA,A_5EFS_5EFO0,0^FS", new ZplQrCode(Injected, 0, 0).ToZplString());
+        }
+
+        [TestMethod]
+        public void HexadecimalIndicatorIsValidated()
+        {
+            var font = new ZplFont();
+            foreach (char invalid in new[] { '^', '~', ' ', '\n', '\0', '\u007F', 'ä', 'Ā' })
+            {
+                Assert.ThrowsExactly<ArgumentException>(() => new ZplTextField("x", 0, 0, font, hexadecimalIndicator: invalid), $"text {(int)invalid}");
+                Assert.ThrowsExactly<ArgumentException>(() => new ZplFieldBlock("x", 0, 0, 100, font, hexadecimalIndicator: invalid), $"block {(int)invalid}");
+                Assert.ThrowsExactly<ArgumentException>(() => new ZplTextBlock("x", 0, 0, 100, 100, font, hexadecimalIndicator: invalid), $"text block {(int)invalid}");
+                Assert.ThrowsExactly<ArgumentException>(() => new ZplSingleLineFieldBlock("x", 0, 0, 100, font, hexadecimalIndicator: invalid), $"single {(int)invalid}");
+                Assert.ThrowsExactly<ArgumentException>(() => new ZplFieldDataElementBase("x", 0, 0, FieldOrientation.Normal, invalid, false, false), $"data {(int)invalid}");
+                Assert.ThrowsExactly<ArgumentException>(() => new ZplBarcode128("x", 0, 0, hexadecimalIndicator: invalid), $"128 {(int)invalid}");
+                Assert.ThrowsExactly<ArgumentException>(() => new ZplQrCode("x", 0, 0, hexadecimalIndicator: invalid), $"qr {(int)invalid}");
+            }
+
+            var ex = Assert.ThrowsExactly<ArgumentException>(() => new ZplTextField("x", 0, 0, font, hexadecimalIndicator: '^'));
+            Assert.AreEqual("hexadecimalIndicator", ex.ParamName);
+
+            foreach (char valid in new[] { '_', '!', '\\', '#', '}', '0', 'a' })
+            {
+                Assert.AreEqual(valid, new ZplTextField("x", 0, 0, font, hexadecimalIndicator: valid).HexadecimalIndicator);
+                Assert.AreEqual(valid, new ZplFieldDataElementBase("x", 0, 0, FieldOrientation.Normal, valid, false, false).HexadecimalIndicator);
+            }
         }
 
         [TestMethod]
@@ -288,7 +414,7 @@ namespace Bitbeans.Zpl.Tests
             Assert.IsFalse(pdf.Compact);
             Assert.AreEqual(0, pdf.SecurityLevel);
             Assert.AreEqual("^FO10,20\n^BY2\n^B7N,8,0,,,N\n^FDX^FS", pdf.ToZplString());
-            Assert.AreEqual("^FO15,30\n^BY2\n^B7N,12,0,,,N\n^FDX^FS", pdf.ToZplString(Scaled));
+            Assert.AreEqual("^FO15,30\n^BY3\n^B7N,12,0,,,N\n^FDX^FS", pdf.ToZplString(Scaled));
         }
 
         [TestMethod]
@@ -312,11 +438,29 @@ namespace Bitbeans.Zpl.Tests
         }
 
         [TestMethod]
+        [DataRow(FieldOrientation.Rotated90)]
+        [DataRow(FieldOrientation.Rotated180)]
+        [DataRow(FieldOrientation.Rotated270)]
+        public void QrCodeRejectsOtherOrientationsThanNormal(FieldOrientation orientation)
+        {
+            var ex = Assert.ThrowsExactly<ArgumentException>(() => new ZplQrCode("X", 10, 20, fieldOrientation: orientation));
+            Assert.AreEqual("fieldOrientation", ex.ParamName);
+        }
+
+        [TestMethod]
+        public void QrCodeVerticalQuietZoneIsNotRendered()
+        {
+            var qr = new ZplQrCode("X", 10, 20, verticalQuietZone: 33);
+            Assert.AreEqual(33, qr.VerticalQuietZone);
+            Assert.AreEqual("^FO10,20\n^BQN,2,2,Q,7\n^FDQA,X^FS", qr.ToZplString());
+        }
+
+        [TestMethod]
         public void QrCodeWithOptions()
         {
             Assert.AreEqual(
-                "^FT10,20\n^BQR,1,4,H,3\n^FH^FDHA,X^FS",
-                new ZplQrCode("X", 10, 20, 1, 4, ErrorCorrectionLevel.UltraHighReliability, 3, FieldOrientation.Rotated90, '_', true).ToZplString());
+                "^FT10,20\n^BQN,1,4,H,3\n^FH^FDHA,X^FS",
+                new ZplQrCode("X", 10, 20, 1, 4, ErrorCorrectionLevel.UltraHighReliability, 3, FieldOrientation.Normal, '_', true).ToZplString());
             Assert.AreEqual(
                 "^FO10,20\n^BQN,2,2,L,7\n^FH!^FDLA,X^FS",
                 new ZplQrCode("X", 10, 20, errorCorrectionLevel: ErrorCorrectionLevel.HighDensity, hexadecimalIndicator: '!').ToZplString());

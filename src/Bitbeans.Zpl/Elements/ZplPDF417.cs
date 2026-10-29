@@ -27,13 +27,13 @@ namespace Bitbeans.Zpl.Elements
         /// <param name="positionX">X position of the field in dots, relative to the label home (<c>^LH</c>); scaled by <see cref="ZplRenderOptions.ScaleFactor"/> when rendered.</param>
         /// <param name="positionY">Y position of the field in dots, relative to the label home (<c>^LH</c>); scaled by <see cref="ZplRenderOptions.ScaleFactor"/> when rendered.</param>
         /// <param name="height">Height of the individual rows in dots; default 8.</param>
-        /// <param name="moduleWidth">Module width in dots; default 2.</param>
+        /// <param name="moduleWidth">Module width in dots (<c>^BY</c> parameter <c>w</c>, 1 to 10); default 2. Scaled by <see cref="ZplRenderOptions.ScaleFactor"/> when rendered.</param>
         /// <param name="columns">1-30: number of data columns to encode. <see langword="null"/> (default) balances rows and columns automatically.</param>
         /// <param name="rows">3-90: number of rows to encode. <see langword="null"/> (default) balances rows and columns automatically.</param>
         /// <param name="compact">Truncate the right row indicators and the stop pattern; default <see langword="false"/>.</param>
         /// <param name="securityLevel">0-8: number of error detection and correction code words. The default (0) provides error detection only; higher levels add error correction and increase the symbol size.</param>
         /// <param name="fieldOrientation">Field orientation: normal (<c>N</c>), rotated 90 degrees (<c>R</c>), inverted 180 degrees (<c>I</c>) or read from bottom up (<c>B</c>).</param>
-        /// <param name="hexadecimalIndicator">Hexadecimal escape character for <c>^FH</c>, or <see langword="null"/> to not emit <c>^FH</c>. The default indicator <c>_</c> is rendered as a plain <c>^FH</c>.</param>
+        /// <param name="hexadecimalIndicator">Hexadecimal escape character for <c>^FH</c>, or <see langword="null"/> to emit <c>^FH</c> only when the content contains <c>^</c> or <c>~</c>. When set, the indicator character in the content is escaped too. Must be a printable ASCII character other than <c>^</c> and <c>~</c> (otherwise <see cref="System.ArgumentException"/>). The default indicator <c>_</c> is rendered as a plain <c>^FH</c>.</param>
         /// <param name="bottomToTop"><see langword="true"/> to position the field with <c>^FT</c> (<see cref="ZplFieldTypeset"/>) instead of <c>^FO</c> (<see cref="ZplFieldOrigin"/>).</param>
         /// <param name="useDefaultPosition">Only evaluated together with <paramref name="bottomToTop"/>: <see langword="true"/> renders <c>^FT</c> without coordinates so the printer continues at its default position. Ignored for <c>^FO</c>.</param>
         public ZplPDF417(
@@ -70,7 +70,7 @@ namespace Bitbeans.Zpl.Elements
             //^ FDMM,AAC - 42 ^ FS
             List<string> result = new List<string>();
             result.AddRange(RenderPosition(context));
-            result.Add($"^BY{ModuleWidth}");
+            result.Add($"^BY{context.ScaleModuleWidth(ModuleWidth)}");
             result.Add($"^B7{RenderFieldOrientation()},{context.Scale(Height)},{SecurityLevel},{Columns},{Rows},{RenderBoolean(Compact)}");
             result.Add(RenderFieldDataSection());
 

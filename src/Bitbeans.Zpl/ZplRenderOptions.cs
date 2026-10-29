@@ -1,4 +1,6 @@
-﻿namespace Bitbeans.Zpl
+﻿using System;
+
+namespace Bitbeans.Zpl
 {
     /// <summary>Settings that control how ZPL elements are rendered.</summary>
     public class ZplRenderOptions
@@ -18,29 +20,59 @@
         /// <remarks>
         /// Default: 203
         /// </remarks>
-        public int SourcePrintDpi { get; set; }
+        /// <exception cref="ArgumentOutOfRangeException">The value is not greater than 0.</exception>
+        public int SourcePrintDpi
+        {
+            get => _sourcePrintDpi;
+            set
+            {
+                ArgumentOutOfRangeException.ThrowIfLessThanOrEqual(value, 0);
+                _sourcePrintDpi = value;
+            }
+        }
+
+        private int _sourcePrintDpi;
+        private int _targetPrintDpi;
 
         /// <summary>Resolution in dots per inch of the printer the ZPL is generated for. Together with <see cref="SourcePrintDpi"/> it defines <see cref="ScaleFactor"/>.</summary>
         /// <remarks>
         /// Default: 203
         /// </remarks>
-        public int TargetPrintDpi { get; set; }
+        /// <exception cref="ArgumentOutOfRangeException">The value is not greater than 0.</exception>
+        public int TargetPrintDpi
+        {
+            get => _targetPrintDpi;
+            set
+            {
+                ArgumentOutOfRangeException.ThrowIfLessThanOrEqual(value, 0);
+                _targetPrintDpi = value;
+            }
+        }
 
         /// <summary>Join the lines of each element into one line, so that every element is rendered on a single line. Default: <see langword="false"/>.</summary>
         public bool CompressedRendering { get; set; }
 
         /// <summary>Factor applied to dot values (<see cref="TargetPrintDpi"/> divided by <see cref="SourcePrintDpi"/>).</summary>
         /// <remarks>
-        /// Positions, sizes and heights are scaled; module widths (<c>^BY</c>) are not.
+        /// Positions, sizes, heights and module widths (<c>^BY</c>, magnification factors; see <see cref="ScaleModuleWidth(int)"/>) are scaled. Corner rounding indexes (<c>^GB</c>) are not.
         /// </remarks>
         public double ScaleFactor { get { return (double)TargetPrintDpi / SourcePrintDpi; } }
 
-        /// <summary>Scales a dot value by <see cref="ScaleFactor"/>, truncating toward zero.</summary>
+        /// <summary>Scales a dot value by <see cref="ScaleFactor"/>, rounding half away from zero. A non-zero input never becomes 0 (it yields at least 1, or at most -1), so thin lines stay visible.</summary>
         /// <param name="input">Value in dots at <see cref="SourcePrintDpi"/>.</param>
         /// <returns>Value in dots at <see cref="TargetPrintDpi"/>.</returns>
         public int Scale(int input)
         {
-            return (int)(input * ScaleFactor);
+            int scaled = (int)Math.Round(input * ScaleFactor, MidpointRounding.AwayFromZero);
+            return scaled == 0 ? Math.Sign(input) : scaled;
+        }
+
+        /// <summary>Scales a module width or magnification factor (<c>^BY</c> width, <c>^BQ</c>/<c>^BO</c> magnification) by <see cref="ScaleFactor"/>. The result is rounded and limited to the range 1 to 10 that ZPL allows.</summary>
+        /// <param name="input">Value in dots at <see cref="SourcePrintDpi"/>.</param>
+        /// <returns>The scaled value, 1 to 10.</returns>
+        public int ScaleModuleWidth(int input)
+        {
+            return Math.Clamp(Scale(input), 1, 10);
         }
 
         /// <summary>Scales a value by <see cref="ScaleFactor"/> without rounding.</summary>

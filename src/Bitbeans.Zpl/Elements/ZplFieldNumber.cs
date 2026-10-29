@@ -16,13 +16,16 @@ namespace Bitbeans.Zpl.Elements
         /// </summary>
         /// <param name="number">Field number from 0 to 9999</param>
         /// <param name="formatElement">Element providing location, font</param>
+        /// <exception cref="ArgumentNullException"><paramref name="formatElement"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentException">If element is not an <see cref="IFormatElement"/>
         /// (allowing its data to be set when merging formats)</exception>
         public ZplFieldNumber(int number, ZplElementBase formatElement)
         {
-            if (!(formatElement is IFormatElement))
+            ArgumentNullException.ThrowIfNull(formatElement);
+
+            if (formatElement is not IFormatElement)
             {
-                throw new ArgumentException("", nameof(formatElement));
+                throw new ArgumentException("The format element must implement IFormatElement so that its data can be set when merging formats.", nameof(formatElement));
             }
 
             Number = number;
