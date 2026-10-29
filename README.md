@@ -85,7 +85,7 @@ using Bitbeans.Zpl.Viewer.Models;
 
 IPrinterStorage printerStorage = new PrinterStorage();
 var analyzer = new ZplAnalyzer(printerStorage);
-var drawer = new ZplElementDrawer(printerStorage);
+using var drawer = new ZplElementDrawer(printerStorage);
 
 AnalyzeInfo analyzeInfo = analyzer.Analyze(zpl);
 foreach (LabelInfo label in analyzeInfo.LabelInfos)
