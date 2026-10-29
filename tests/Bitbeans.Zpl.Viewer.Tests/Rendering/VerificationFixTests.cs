@@ -139,6 +139,17 @@ namespace Bitbeans.Zpl.Viewer.Tests.Rendering
         }
 
         [TestMethod]
+        public void DownloadedBmpIsDrawn()
+        {
+            // 1x1 black 24 bit BMP
+            const string Bmp = "424D3A0000000000000036000000280000000100000001000000010018000000000004000000130B0000130B0000000000000000000000000000";
+
+            using SKBitmap bmp = RenderHelper.Render("~DYR:DOT,B,B,58,," + Bmp + "^XA^FO10,10^IMR:DOT.BMP^FS^XZ");
+
+            Assert.AreEqual(new SKRectI(10, 10, 11, 11), RenderHelper.DarkBounds(bmp).Value);
+        }
+
+        [TestMethod]
         public void CoreImageMoveFindsTheParsedDownload()
         {
             PrinterStorage storage = new();
