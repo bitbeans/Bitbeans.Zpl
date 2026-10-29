@@ -87,8 +87,7 @@ public class BarcodeMsiElementDrawer : BarcodeDrawerBase
     // B: 1 Mod 10 (Luhn-like)
     private string Mod10(string input)
     {
-        if (string.IsNullOrEmpty(input) ||
-            input.Any(c => c < '0' || c > '9'))
+        if (input.Any(c => c < '0' || c > '9'))
         {
             return string.Empty;
         }
@@ -115,27 +114,18 @@ public class BarcodeMsiElementDrawer : BarcodeDrawerBase
     // C: 2 Mod 10 (Double Mod 10, i.e. Mod 10, then Mod 10 again)
     private string DoubleMod10(string input)
     {
-        if (string.IsNullOrEmpty(input) ||
-            input.Any(c => c < '0' || c > '9'))
+        if (input.Any(c => c < '0' || c > '9'))
         {
             return string.Empty;
         }
 
-        string first = Mod10(input);
-
-        if (string.IsNullOrEmpty(first))
-        {
-            return string.Empty;
-        }
-
-        return Mod10(first);
+        return Mod10(Mod10(input));
     }
 
     // D: 1 Mod 11 and 1 Mod 10 (Mod 11, then append Mod 10)
     private string Mod11AndMod10(string input)
     {
-        if (string.IsNullOrEmpty(input) ||
-            input.Any(c => c < '0' || c > '9'))
+        if (input.Any(c => c < '0' || c > '9'))
         {
             return string.Empty;
         }

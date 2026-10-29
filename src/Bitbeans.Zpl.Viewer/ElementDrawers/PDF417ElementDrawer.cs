@@ -1,4 +1,4 @@
-using Bitbeans.Zpl;
+﻿using Bitbeans.Zpl;
 using Bitbeans.Zpl.Elements;
 using Bitbeans.Zpl.Viewer.Helpers;
 using SkiaSharp;
@@ -120,7 +120,7 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
         // bitmatrix scaling instead of bitmap
         private static BitMatrix ProportionalUpscale(BitMatrix old, int scale)
         {
-            if (scale == 0 || scale == 1)
+            if (scale == 1)
             {
                 return old;
             }
@@ -154,7 +154,7 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
             int width = old_matrix.Width;
             int rows = old_matrix.Height / old_bar_height; // logical rows;
 
-            if (new_bar_height == old_bar_height || new_bar_height == 0)
+            if (new_bar_height == old_bar_height)
             {
                 return old_matrix;
             }

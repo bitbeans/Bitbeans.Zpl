@@ -89,14 +89,7 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
 
             for (int i = content.Length - 1; i >= 0; i--)
             {
-                int index = Code93Alphabet.IndexOf(content[i]);
-
-                if (index < 0)
-                {
-                    throw new ArgumentException("Invalid Code 93 content.", nameof(content));
-                }
-
-                total += index * weight;
+                total += Code93Alphabet.IndexOf(content[i]) * weight;
 
                 if (++weight > maxWeight)
                 {
@@ -109,14 +102,7 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
 
         private static char MapDisplayChar(char character)
         {
-            int index = Code93Alphabet.IndexOf(character);
-
-            if (index < 0)
-            {
-                throw new ArgumentException("Invalid Code 93 character.", nameof(character));
-            }
-
-            return Code93DisplayAlphabet[index];
+            return Code93DisplayAlphabet[Code93Alphabet.IndexOf(character)];
         }
 
         private static string ConvertToExtended(string content)

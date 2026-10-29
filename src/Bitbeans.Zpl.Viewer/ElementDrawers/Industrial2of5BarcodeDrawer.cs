@@ -52,7 +52,7 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
                     content = content.ReplaceHexEscapes(hexIndicator, internationalFont);
                 }
 
-                if (string.IsNullOrEmpty(content) || content.Any(c => !char.IsDigit(c)))
+                if (content.Any(c => !char.IsDigit(c)))
                 {
                     return currentPosition;
                 }

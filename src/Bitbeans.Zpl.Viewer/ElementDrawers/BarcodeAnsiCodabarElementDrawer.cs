@@ -31,7 +31,6 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
                 char start = barcode.StartCharacter;
                 char end = barcode.StopCharacter;
                 string content = barcode.Content.Trim('*');
-                string interpretation = $"{start}{content}{end}";
 
                 if (string.IsNullOrEmpty(content))
                 {
@@ -48,6 +47,8 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
                 {
                     content = content.ReplaceHexEscapes(hexIndicator, internationalFont);
                 }
+
+                string interpretation = $"{start}{content}{end}";
 
                 CodaBarWriter writer = new();
                 bool[] result = writer.encode(content);

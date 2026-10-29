@@ -50,10 +50,6 @@ namespace Bitbeans.Zpl.Viewer
             new BarcodeLogmarsElementDrawer()
         ];
 
-        private static readonly int pdfDpi = 72;
-        private static readonly float zplDpi = 203.2f;
-        private static readonly float pdfScaleFactor = pdfDpi / zplDpi;
-
         private readonly DrawerOptions drawerOptions;
         private readonly IPrinterStorage printerStorage;
 
@@ -80,8 +76,6 @@ namespace Bitbeans.Zpl.Viewer
             ILogger logger = null)
         {
             logger ??= NullLogger.Instance;
-            List<byte[]> result = [];
-            List<SKImage> imageHistory = [];
             int labelImageWidth = Convert.ToInt32(labelWidth * printDensityDpmm);
             int labelImageHeight = Convert.ToInt32(labelHeight * printDensityDpmm);
 
@@ -115,7 +109,6 @@ namespace Bitbeans.Zpl.Viewer
 
                 try
                 {
-                    //The inverse drawing is moved to the element drawer, so only collect imageHistory for the PDF
                     if (drawer.IsReverseDraw(element))
                     {
                         //basically only ZplGraphicBox/Circle depending on requirements
@@ -197,8 +190,6 @@ namespace Bitbeans.Zpl.Viewer
             ILogger logger = null)
         {
             logger ??= NullLogger.Instance;
-            List<byte[]> result = [];
-            List<SKImage> imageHistory = [];
             int labelImageWidth = Convert.ToInt32(labelWidth * printDensityDpmm);
             int labelImageHeight = Convert.ToInt32(labelHeight * printDensityDpmm);
 
@@ -264,52 +255,6 @@ namespace Bitbeans.Zpl.Viewer
                     }
                 }
             }
-        }
-
-        /**
-         * PDF transparency and SKBlendMode are not very good friends, SKBlendMode.Xor behaves as SKBlendMode.SrcOver.
-         *
-         * This function extracts all the pixels that are removed in the draw process
-         * Then that is used to make a white image as overlay in the PDF to get the same effect as SKBlendMode.Xor
-         */
-        private static void FixPdfInvertDraw(SKImageInfo info, List<SKImage> imageHistory, SKSurface surface, SKCanvas skCanvas)
-        {
-            //fix inverted colors
-            using SKSurface surfacePdfInvertColorFix = SKSurface.Create(info);
-            using SKCanvas skImageCanvasPdfInvertColorFix = surfacePdfInvertColorFix.Canvas;
-            skImageCanvasPdfInvertColorFix.Clear(SKColors.Transparent);
-
-            //make an image of everything that was once colored
-            foreach (SKImage imageHistoryState in imageHistory)
-            {
-                SKPaint pdfPaint = new()
-                {
-                    BlendMode = SKBlendMode.SrcOver
-                };
-                skImageCanvasPdfInvertColorFix.DrawImage(imageHistoryState, 0f, 0f, SKSamplingOptions.Default, pdfPaint);
-            }
-
-            //subtract the parts that are transparent in the final image
-            SKImage finalSurfaceImage = surface.Snapshot();
-            SKPaint pdfFinalPaint = new()
-            {
-                BlendMode = SKBlendMode.DstOut
-            };
-            skImageCanvasPdfInvertColorFix.DrawImage(finalSurfaceImage, 0f, 0f, SKSamplingOptions.Default, pdfFinalPaint);
-
-            //now invert the colors of the pixels that should be white place it on the canvas
-            SKImage pdfTransparentPartsImage = surfacePdfInvertColorFix.Snapshot();
-            SKBitmap pdfTransparentPartsBitmap = SKBitmap.FromImage(pdfTransparentPartsImage);
-            SKPaint pdfFinalPaintInverted = new();
-            float[] inverter = [
-                -1f,  0f,  0f, 0f, 1f,
-                0f, -1f,  0f, 0f, 1f,
-                0f,  0f, -1f, 0f, 1f,
-                0f,  0f,  0f, 1f, 0f
-            ];
-            pdfFinalPaintInverted.ColorFilter = SKColorFilter.CreateColorMatrix(inverter);
-            pdfFinalPaintInverted.BlendMode = SKBlendMode.SrcOver;
-            skCanvas.DrawBitmap(pdfTransparentPartsBitmap, 0, 0, SKSamplingOptions.Default, pdfFinalPaintInverted);
         }
 
         private static void InvertDraw(SKCanvas baseCanvas, SKBitmap bmToInvert)
