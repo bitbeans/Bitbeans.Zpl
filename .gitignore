@@ -28,3 +28,6 @@ Thumbs.db
 
 # Viewer test output
 tests/Bitbeans.Zpl.Viewer.Tests/Output/
+
+# Local agent worktrees
+.claude/

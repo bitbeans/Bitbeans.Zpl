@@ -1,0 +1,41 @@
+name: Bug report
+description: Something produces wrong ZPL, renders incorrectly or crashes
+labels: [bug]
+body:
+  - type: dropdown
+    id: package
+    attributes:
+      label: Package
+      options: [Bitbeans.Zpl, Bitbeans.Zpl.SkiaSharp, Bitbeans.Zpl.Viewer]
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Package version
+    validations:
+      required: true
+  - type: textarea
+    id: zpl
+    attributes:
+      label: ZPL or code to reproduce
+      render: text
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected result
+      description: For the viewer, a photo or scan of the real printer output helps a lot.
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual result
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: OS and .NET version

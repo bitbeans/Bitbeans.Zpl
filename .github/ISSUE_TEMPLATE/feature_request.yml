@@ -1,0 +1,16 @@
+name: Feature request
+description: Support for a ZPL command, symbology or API improvement
+labels: [enhancement]
+body:
+  - type: textarea
+    id: request
+    attributes:
+      label: What do you need?
+      description: Reference the ZPL command (for example ^BR) and the relevant page of the ZPL II programming guide.
+    validations:
+      required: true
+  - type: textarea
+    id: example
+    attributes:
+      label: Example ZPL
+      render: text
