@@ -7,8 +7,10 @@ using System.Globalization;
 
 namespace Bitbeans.Zpl.Viewer.CommandAnalyzers
 {
+    /// <summary>Analyzes <c>^B7</c> (PDF417) and stores the barcode parameters for the next field.</summary>
     public class PDF417ZplCommandAnalyzer : ZplCommandAnalyzerBase
     {
+        /// <summary>Initializes a new instance of the <see cref="PDF417ZplCommandAnalyzer"/> class for the <c>^B7</c> command.</summary>
         public PDF417ZplCommandAnalyzer() : base("^B7") { }
         ///<inheritdoc/>
         public override ZplElementBase Analyze(string zplCommand, VirtualPrinter virtualPrinter, IPrinterStorage printerStorage)

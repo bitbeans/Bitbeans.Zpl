@@ -9,6 +9,7 @@ using System;
 
 namespace Bitbeans.Zpl.Viewer.ElementDrawers
 {
+    /// <summary>Draws UPC/EAN extension (<c>^BS</c>) barcode elements.</summary>
     public class BarcodeUpcExtensionElementDrawer : BarcodeDrawerBase
     {
         ///<inheritdoc/>

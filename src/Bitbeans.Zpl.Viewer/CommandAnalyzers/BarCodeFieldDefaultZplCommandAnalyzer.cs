@@ -4,8 +4,10 @@ using System.Globalization;
 
 namespace Bitbeans.Zpl.Viewer.CommandAnalyzers
 {
+    /// <summary>Analyzes <c>^BY</c> (bar code field default) and stores the module width, wide-to-narrow bar ratio and bar code height as defaults for the following barcodes. Values are clamped to the allowed ranges (1 to 10, 2.0 to 3.0 and 1 or more).</summary>
     public class BarCodeFieldDefaultZplCommandAnalyzer : ZplCommandAnalyzerBase
     {
+        /// <summary>Initializes a new instance of the <see cref="BarCodeFieldDefaultZplCommandAnalyzer"/> class for the <c>^BY</c> command.</summary>
         public BarCodeFieldDefaultZplCommandAnalyzer() : base("^BY") { }
 
         ///<inheritdoc/>

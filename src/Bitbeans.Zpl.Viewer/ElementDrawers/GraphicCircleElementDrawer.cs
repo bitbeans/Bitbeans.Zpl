@@ -5,6 +5,7 @@ using SkiaSharp;
 
 namespace Bitbeans.Zpl.Viewer.ElementDrawers
 {
+    /// <summary>Draws graphic circle (<c>^GC</c>) elements.</summary>
     public class GraphicCircleElementDrawer : ElementDrawerBase
     {
         ///<inheritdoc/>
@@ -13,6 +14,7 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
             return element is ZplGraphicCircle;
         }
 
+        ///<inheritdoc/>
         public override bool IsReverseDraw(ZplElementBase element)
         {
             if (element is ZplGraphicCircle graphicCircle)
@@ -23,6 +25,7 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
             return false;
         }
 
+        ///<inheritdoc/>
         public override bool IsWhiteDraw(ZplElementBase element)
         {
             if (element is ZplGraphicCircle graphicCircle)

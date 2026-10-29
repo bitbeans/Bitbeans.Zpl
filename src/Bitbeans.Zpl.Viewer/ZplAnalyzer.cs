@@ -10,6 +10,7 @@ using System.Text.RegularExpressions;
 
 namespace Bitbeans.Zpl.Viewer
 {
+    /// <summary>Analyzes ZPL text with the registered command analyzers and returns the elements of every label.</summary>
     public class ZplAnalyzer : IZplAnalyzer
     {
         private static readonly Regex verticalWhitespaceRegex = new(@"[\n\v\f\r]", RegexOptions.Compiled);
@@ -77,6 +78,9 @@ namespace Bitbeans.Zpl.Viewer
         private const string fieldSeparatorCommand = "^FS";
         private const string commentCommand = "^FX";
 
+        /// <summary>Initializes a new instance of the <see cref="ZplAnalyzer"/> class.</summary>
+        /// <param name="printerStorage">The printer storage for downloaded objects.</param>
+        /// <param name="formatMerger">The merger for recalled formats; <see cref="FormatMerger"/> if <see langword="null"/>.</param>
         public ZplAnalyzer(IPrinterStorage printerStorage, IFormatMerger formatMerger = null)
         {
             this.printerStorage = printerStorage;
@@ -84,6 +88,7 @@ namespace Bitbeans.Zpl.Viewer
             this.virtualPrinter = new VirtualPrinter();
         }
 
+        ///<inheritdoc/>
         public AnalyzeInfo Analyze(string zplData)
         {
             string[] zplCommands = SplitZplCommands(zplData);

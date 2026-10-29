@@ -4,8 +4,10 @@ using Bitbeans.Zpl.Viewer.Models;
 
 namespace Bitbeans.Zpl.Viewer.CommandAnalyzers
 {
+    /// <summary>Analyzes <c>^B8</c> (EAN-8) and stores the barcode parameters for the next field.</summary>
     public class CodeEAN8BarcodeZplCommandAnalyzer : ZplCommandAnalyzerBase
     {
+        /// <summary>Initializes a new instance of the <see cref="CodeEAN8BarcodeZplCommandAnalyzer"/> class for the <c>^B8</c> command.</summary>
         public CodeEAN8BarcodeZplCommandAnalyzer() : base("^B8") { }
 
         ///<inheritdoc/>

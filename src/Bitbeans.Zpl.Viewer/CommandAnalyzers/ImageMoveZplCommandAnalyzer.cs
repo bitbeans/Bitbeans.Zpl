@@ -2,8 +2,10 @@
 
 namespace Bitbeans.Zpl.Viewer.CommandAnalyzers
 {
+    /// <summary>Analyzes <c>^IM</c> (image move) and returns an element that draws the stored image at the pending field position.</summary>
     public class ImageMoveZplCommandAnalyzer : ZplCommandAnalyzerBase
     {
+        /// <summary>Initializes a new instance of the <see cref="ImageMoveZplCommandAnalyzer"/> class for the <c>^IM</c> command.</summary>
         public ImageMoveZplCommandAnalyzer() : base("^IM") { }
 
         ///<inheritdoc/>

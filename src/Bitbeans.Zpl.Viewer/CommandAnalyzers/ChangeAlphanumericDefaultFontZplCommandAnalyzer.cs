@@ -2,8 +2,10 @@
 
 namespace Bitbeans.Zpl.Viewer.CommandAnalyzers
 {
+    /// <summary>Analyzes <c>^CF</c> (change alphanumeric default font) and stores the default font name, height and width in the virtual printer. Omitted values keep the previous ones.</summary>
     public class ChangeAlphanumericDefaultFontZplCommandAnalyzer : ZplCommandAnalyzerBase
     {
+        /// <summary>Initializes a new instance of the <see cref="ChangeAlphanumericDefaultFontZplCommandAnalyzer"/> class for the <c>^CF</c> command.</summary>
         public ChangeAlphanumericDefaultFontZplCommandAnalyzer() : base("^CF") { }
 
         ///<inheritdoc/>

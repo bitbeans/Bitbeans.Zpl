@@ -5,6 +5,7 @@ using SkiaSharp;
 
 namespace Bitbeans.Zpl.Viewer.ElementDrawers
 {
+    /// <summary>Draws graphic diagonal line (<c>^GD</c>) elements.</summary>
     public class GraphicDiagonalLineElementDrawer : ElementDrawerBase
     {
         ///<inheritdoc/>
@@ -13,6 +14,7 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
             return element is ZplGraphicDiagonalLine;
         }
 
+        ///<inheritdoc/>
         public override bool IsReverseDraw(ZplElementBase element)
         {
             if (element is ZplGraphicDiagonalLine graphicLine)
@@ -23,6 +25,7 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
             return false;
         }
 
+        ///<inheritdoc/>
         public override bool IsWhiteDraw(ZplElementBase element)
         {
             if (element is ZplGraphicDiagonalLine graphicLine)

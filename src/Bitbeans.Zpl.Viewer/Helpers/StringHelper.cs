@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 
 namespace Bitbeans.Zpl.Viewer.Helpers
 {
+    /// <summary>String extension methods for ZPL field data.</summary>
     public static class StringHelper
     {
         private static readonly Regex hexDigits = new(@"^[0-9A-Fa-f]{2}$", RegexOptions.Compiled);

@@ -6,11 +6,14 @@ using System.Text;
 
 namespace Bitbeans.Zpl.Viewer.Symologies;
 
+/// <summary>Encoder for Code 11 barcodes.</summary>
 public static class Code11Symbology
 {
     private const string Charset = "0123456789-";
     private const string StartStopPattern = "1011001";
+    /// <summary>The character that represents the start and stop symbol in the interpretation line.</summary>
     public const string StartStopInterpretationCharacter = "▵";
+    /// <summary>The character that represents the stop symbol in the interpretation line when two check digits are used.</summary>
     public const string LargeStopInterpretationCharacter = "△";
 
     private static readonly Dictionary<char, string> patternMap = new()
@@ -28,6 +31,12 @@ public static class Code11Symbology
         ['-'] = "101101"
     };
 
+    /// <summary>Encodes the content as a Code 11 bar pattern including start and stop symbols and the check digits.</summary>
+    /// <param name="content">The data to encode.</param>
+    /// <param name="checkDigitCount">The number of check digits to add.</param>
+    /// <returns>The bar pattern (<see langword="true"/> is a bar) and the interpretation line text.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="content"/> is <see langword="null"/>.</exception>
+    /// <exception cref="ArgumentException"><paramref name="content"/> is empty or contains a character other than digits and the dash.</exception>
     public static (bool[] Data, string Interpretation) Encode(string content, Code11CheckDigitCount checkDigitCount)
     {
         if (content == null)

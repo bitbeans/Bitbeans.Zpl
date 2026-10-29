@@ -3,8 +3,10 @@ using Bitbeans.Zpl.Elements;
 
 namespace Bitbeans.Zpl.Viewer.CommandAnalyzers
 {
+    /// <summary>Analyzes <c>^GB</c> (graphic box) and returns a box element at the pending field position.</summary>
     public class GraphicBoxZplCommandAnalyzer : ZplCommandAnalyzerBase
     {
+        /// <summary>Initializes a new instance of the <see cref="GraphicBoxZplCommandAnalyzer"/> class for the <c>^GB</c> command.</summary>
         public GraphicBoxZplCommandAnalyzer() : base("^GB") { }
 
         ///<inheritdoc/>

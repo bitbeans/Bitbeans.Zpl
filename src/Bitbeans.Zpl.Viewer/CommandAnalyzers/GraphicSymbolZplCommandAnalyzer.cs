@@ -4,8 +4,10 @@ using Bitbeans.Zpl.Viewer.Models;
 
 namespace Bitbeans.Zpl.Viewer.CommandAnalyzers
 {
+    /// <summary>Analyzes <c>^GS</c> (graphic symbol) and stores the orientation, height and width for the next field, whose field data selects the symbol character.</summary>
     public class GraphicSymbolZplCommandAnalyzer : ZplCommandAnalyzerBase
     {
+        /// <summary>Initializes a new instance of the <see cref="GraphicSymbolZplCommandAnalyzer"/> class for the <c>^GS</c> command.</summary>
         public GraphicSymbolZplCommandAnalyzer() : base("^GS") { }
 
         ///<inheritdoc/>

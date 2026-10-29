@@ -3,8 +3,10 @@ using Bitbeans.Zpl.Elements;
 
 namespace Bitbeans.Zpl.Viewer.CommandAnalyzers
 {
+    /// <summary>Analyzes <c>^GC</c> (graphic circle) and returns a circle element at the pending field position.</summary>
     public class GraphicCircleZplCommandAnalyzer : ZplCommandAnalyzerBase
     {
+        /// <summary>Initializes a new instance of the <see cref="GraphicCircleZplCommandAnalyzer"/> class for the <c>^GC</c> command.</summary>
         public GraphicCircleZplCommandAnalyzer() : base("^GC") { }
 
         ///<inheritdoc/>

@@ -3,8 +3,10 @@ using Bitbeans.Zpl.Elements;
 
 namespace Bitbeans.Zpl.Viewer.CommandAnalyzers
 {
+    /// <summary>Analyzes <c>^GD</c> (graphic diagonal line) and returns a diagonal line element at the pending field position.</summary>
     public class GraphicDiagonalLineZplCommandAnalyzer : ZplCommandAnalyzerBase
     {
+        /// <summary>Initializes a new instance of the <see cref="GraphicDiagonalLineZplCommandAnalyzer"/> class for the <c>^GD</c> command.</summary>
         public GraphicDiagonalLineZplCommandAnalyzer() : base("^GD") { }
 
         ///<inheritdoc/>

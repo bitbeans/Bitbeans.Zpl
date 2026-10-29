@@ -4,8 +4,10 @@ using Bitbeans.Zpl.Viewer.Models;
 
 namespace Bitbeans.Zpl.Viewer.CommandAnalyzers
 {
+    /// <summary>Analyzes <c>^BC</c> (Code 128) and stores the barcode parameters for the next field.</summary>
     public class Code128BarcodeZplCommandAnalyzer : ZplCommandAnalyzerBase
     {
+        /// <summary>Initializes a new instance of the <see cref="Code128BarcodeZplCommandAnalyzer"/> class for the <c>^BC</c> command.</summary>
         public Code128BarcodeZplCommandAnalyzer() : base("^BC") { }
 
         ///<inheritdoc/>

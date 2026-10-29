@@ -21,8 +21,17 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
         /// Minimum acceptable magin between a barcode and its interpretation line, in pixels
         /// </summary>
         protected const float MIN_LABEL_MARGIN = 5f;
+        /// <summary>The ZPL font used for the interpretation line.</summary>
         protected const string INTERPRETATION_LINE_FONT_NAME = "A";
 
+        /// <summary>Draws the barcode image, rotated according to the field orientation.</summary>
+        /// <param name="barcodeImageData">The encoded barcode image.</param>
+        /// <param name="x">The X position of the barcode.</param>
+        /// <param name="y">The Y position of the barcode.</param>
+        /// <param name="barcodeWidth">The width of the barcode in pixels.</param>
+        /// <param name="barcodeHeight">The height of the barcode in pixels.</param>
+        /// <param name="useFieldOrigin"><see langword="true"/> if the field was positioned with <c>^FO</c>; <see langword="false"/> if it was positioned with <c>^FT</c> (bottom-left origin).</param>
+        /// <param name="fieldOrientation">The field orientation.</param>
         protected void DrawBarcode(byte[] barcodeImageData, float x, float y, int barcodeWidth, int barcodeHeight, bool useFieldOrigin, Zpl.FieldOrientation fieldOrientation)
         {
             using (new SKAutoCanvasRestore(this.skCanvas))
@@ -46,6 +55,17 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
             }
         }
 
+        /// <summary>Draws the interpretation line above or below the barcode using an outline font.</summary>
+        /// <param name="interpretation">The human-readable interpretation text.</param>
+        /// <param name="skFont">The font used to draw the text.</param>
+        /// <param name="x">The X position of the barcode.</param>
+        /// <param name="y">The Y position of the barcode.</param>
+        /// <param name="barcodeWidth">The width of the barcode in pixels.</param>
+        /// <param name="barcodeHeight">The height of the barcode in pixels.</param>
+        /// <param name="useFieldOrigin"><see langword="true"/> if the field was positioned with <c>^FO</c>; <see langword="false"/> if it was positioned with <c>^FT</c> (bottom-left origin).</param>
+        /// <param name="fieldOrientation">The field orientation.</param>
+        /// <param name="printInterpretationLineAboveCode"><see langword="true"/> to print the interpretation line above the barcode.</param>
+        /// <param name="options">The drawer options.</param>
         protected void DrawInterpretationLine(string interpretation, SKFont skFont, float x, float y, int barcodeWidth, int barcodeHeight, bool useFieldOrigin, Zpl.FieldOrientation fieldOrientation, bool printInterpretationLineAboveCode, DrawerOptions options)
         {
             using (new SKAutoCanvasRestore(this.skCanvas))
@@ -90,6 +110,19 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
             }
         }
 
+        /// <summary>Draws the interpretation line above or below the barcode, using the bitmap font if strict bitmap rendering is enabled and a font is available, otherwise an outline font.</summary>
+        /// <param name="interpretation">The human-readable interpretation text.</param>
+        /// <param name="x">The X position of the barcode.</param>
+        /// <param name="y">The Y position of the barcode.</param>
+        /// <param name="barcodeWidth">The width of the barcode in pixels.</param>
+        /// <param name="barcodeHeight">The height of the barcode in pixels.</param>
+        /// <param name="useFieldOrigin"><see langword="true"/> if the field was positioned with <c>^FO</c>; <see langword="false"/> if it was positioned with <c>^FT</c> (bottom-left origin).</param>
+        /// <param name="fieldOrientation">The field orientation.</param>
+        /// <param name="printInterpretationLineAboveCode"><see langword="true"/> to print the interpretation line above the barcode.</param>
+        /// <param name="options">The drawer options.</param>
+        /// <param name="internationalFont">The active international character set (<c>^CI</c>).</param>
+        /// <param name="printDensityDpmm">The print density in dots per millimeter.</param>
+        /// <param name="moduleWidth">The module width in pixels.</param>
         protected void DrawBitmapInterpretationLine(
             string interpretation,
             float x,
@@ -143,6 +176,14 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
             }
         }
 
+        /// <summary>Tries to get the bitmap font and metrics for the interpretation line, scaled by the module width (at most 10).</summary>
+        /// <param name="options">The drawer options.</param>
+        /// <param name="internationalFont">The active international character set (<c>^CI</c>).</param>
+        /// <param name="printDensityDpmm">The print density in dots per millimeter.</param>
+        /// <param name="moduleWidth">The module width in pixels.</param>
+        /// <param name="fontData">The bitmap font if available; otherwise <see langword="null"/>.</param>
+        /// <param name="metrics">The scaled metrics if available; otherwise <see langword="null"/>.</param>
+        /// <returns><see langword="true"/> if strict bitmap rendering is enabled and the provider has the font; otherwise <see langword="false"/>.</returns>
         protected bool TryGetBitmapInterpretationLineFont(
             DrawerOptions options,
             InternationalFont internationalFont,
@@ -166,6 +207,13 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
             return true;
         }
 
+        /// <summary>Draws a digit with the bitmap font.</summary>
+        /// <param name="digit">The digit text.</param>
+        /// <param name="fontData">The bitmap font data.</param>
+        /// <param name="metrics">The font metrics.</param>
+        /// <param name="x">The X coordinate of the left edge.</param>
+        /// <param name="y">The Y coordinate of the top edge.</param>
+        /// <param name="paint">The paint used for drawing.</param>
         protected void DrawBitmapDigit(
             string digit,
             ZplBitmapFontData fontData,
@@ -178,6 +226,14 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
             renderer.DrawText(digit, fontData, metrics, x, y, paint);
         }
 
+        /// <summary>Gets the matrix that rotates a barcode around its anchor according to the field orientation.</summary>
+        /// <param name="x">The X position of the barcode.</param>
+        /// <param name="y">The Y position of the barcode.</param>
+        /// <param name="width">The barcode width in pixels.</param>
+        /// <param name="height">The barcode height in pixels.</param>
+        /// <param name="useFieldOrigin"><see langword="true"/> if the field was positioned with <c>^FO</c>; <see langword="false"/> if it was positioned with <c>^FT</c> (bottom-left origin).</param>
+        /// <param name="fieldOrientation">The field orientation.</param>
+        /// <returns>The rotation matrix, or <see cref="SKMatrix.Empty"/> for the normal orientation.</returns>
         protected static SKMatrix GetRotationMatrix(float x, float y, int width, int height, bool useFieldOrigin, Zpl.FieldOrientation fieldOrientation)
         {
             SKMatrix matrix = SKMatrix.Empty;
@@ -219,6 +275,11 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
             return matrix;
         }
 
+        /// <summary>Converts a bar pattern to a bitmap: bars are black, spaces transparent, each module is scaled horizontally and the image is stretched to the height.</summary>
+        /// <param name="array">The bar pattern, one entry per module (<see langword="true"/> is a bar).</param>
+        /// <param name="height">The bitmap height in pixels.</param>
+        /// <param name="moduleWidth">The width of one module in pixels.</param>
+        /// <returns>The new bitmap; the caller disposes it.</returns>
         protected static SKBitmap BoolArrayToSKBitmap(bool[] array, int height, int moduleWidth = 1)
         {
             using SKBitmap image = new(array.Length, 1);
@@ -232,6 +293,12 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
             return image.Resize(new SKSizeI(image.Width * moduleWidth, height), sampling);
         }
 
+        /// <summary>Like <see cref="BoolArrayToSKBitmap"/>, but only modules that are set in both the pattern and the mask are drawn as bars.</summary>
+        /// <param name="array">The bar pattern.</param>
+        /// <param name="mask">The mask; only modules set in the mask can be bars.</param>
+        /// <param name="height">The bitmap height in pixels.</param>
+        /// <param name="moduleWidth">The width of one module in pixels.</param>
+        /// <returns>The new bitmap; the caller disposes it.</returns>
         protected static SKBitmap BoolArrayWithMaskToSKBitmap(bool[] array, bool[] mask, int height, int moduleWidth = 1)
         {
             using SKBitmap image = new(array.Length, 1);
@@ -245,6 +312,10 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
             return image.Resize(new SKSizeI(image.Width * moduleWidth, height), sampling);
         }
 
+        /// <summary>Converts a two-dimensional symbol to a bitmap: set modules are black, others transparent, each module is scaled by the pixel scale.</summary>
+        /// <param name="matrix">The bit matrix.</param>
+        /// <param name="pixelScale">The size of one module in pixels.</param>
+        /// <returns>The new bitmap; the caller disposes it.</returns>
         protected static SKBitmap BitMatrixToSKBitmap(BitMatrix matrix, int pixelScale)
         {
             using SKBitmap image = new(matrix.Width, matrix.Height);
@@ -261,6 +332,11 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
             return image.Resize(new SKSizeI(image.Width * pixelScale, image.Height * pixelScale), sampling);
         }
 
+        /// <summary>Rescales a bar pattern from single-module runs to the given widths: runs of one module become narrow, longer runs wide, and the final run is always narrow.</summary>
+        /// <param name="array">The bar pattern with narrow (1 module) and wide (2 or more modules) runs.</param>
+        /// <param name="wide">The wide bar width in modules.</param>
+        /// <param name="narrow">The narrow bar width in modules.</param>
+        /// <returns>The scaled bar pattern.</returns>
         protected static bool[] AdjustWidths(bool[] array, int wide, int narrow)
         {
             List<bool> result = [];

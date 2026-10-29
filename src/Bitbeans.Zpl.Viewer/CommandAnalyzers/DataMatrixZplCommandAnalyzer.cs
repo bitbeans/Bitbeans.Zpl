@@ -4,8 +4,10 @@ using Bitbeans.Zpl.Viewer.Models;
 
 namespace Bitbeans.Zpl.Viewer.CommandAnalyzers
 {
+    /// <summary>Analyzes <c>^BX</c> (Data Matrix) and stores the barcode parameters for the next field.</summary>
     public class DataMatrixZplCommandAnalyzer : ZplCommandAnalyzerBase
     {
+        /// <summary>Initializes a new instance of the <see cref="DataMatrixZplCommandAnalyzer"/> class for the <c>^BX</c> command.</summary>
         public DataMatrixZplCommandAnalyzer() : base("^BX") { }
 
         ///<inheritdoc/>

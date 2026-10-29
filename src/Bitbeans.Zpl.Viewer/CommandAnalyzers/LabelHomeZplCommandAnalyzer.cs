@@ -2,8 +2,10 @@
 
 namespace Bitbeans.Zpl.Viewer.CommandAnalyzers
 {
+    /// <summary>Analyzes <c>^LH</c> (label home) and stores the label home offset that is added to following field positions.</summary>
     public class LabelHomeZplCommandAnalyzer : ZplCommandAnalyzerBase
     {
+        /// <summary>Initializes a new instance of the <see cref="LabelHomeZplCommandAnalyzer"/> class for the <c>^LH</c> command.</summary>
         public LabelHomeZplCommandAnalyzer() : base("^LH") { }
 
         ///<inheritdoc/>

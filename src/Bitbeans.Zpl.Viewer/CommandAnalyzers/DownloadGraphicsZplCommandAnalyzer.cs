@@ -6,10 +6,12 @@ using System.Text.RegularExpressions;
 
 namespace Bitbeans.Zpl.Viewer.CommandAnalyzers
 {
+    /// <summary>Analyzes <c>~DG</c> (download graphics), converts the hexadecimal GRF data to a PNG image and stores it in the printer storage.</summary>
     public class DownloadGraphicsZplCommandAnalyzer : ZplCommandAnalyzerBase
     {
         private static readonly Regex commandRegex = new(@"^~DG(\w:)?(.*?\..+?),(\d+),(\d+),(.+)$", RegexOptions.Compiled);
 
+        /// <summary>Initializes a new instance of the <see cref="DownloadGraphicsZplCommandAnalyzer"/> class for the <c>~DG</c> command.</summary>
         public DownloadGraphicsZplCommandAnalyzer() : base("~DG") { }
 
         ///<inheritdoc/>

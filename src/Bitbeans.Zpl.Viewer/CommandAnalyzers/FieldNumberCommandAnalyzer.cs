@@ -2,8 +2,10 @@
 
 namespace Bitbeans.Zpl.Viewer.CommandAnalyzers
 {
+    /// <summary>Analyzes <c>^FN</c> (field number) and stores the field number of the next field so that its data can be replaced when a format is recalled.</summary>
     public class FieldNumberCommandAnalyzer : ZplCommandAnalyzerBase
     {
+        /// <summary>Initializes a new instance of the <see cref="FieldNumberCommandAnalyzer"/> class for the <c>^FN</c> command.</summary>
         public FieldNumberCommandAnalyzer() : base("^FN") { }
 
         ///<inheritdoc/>

@@ -5,8 +5,10 @@ using System.Globalization;
 
 namespace Bitbeans.Zpl.Viewer.CommandAnalyzers
 {
+    /// <summary>Analyzes <c>^FO</c> (field origin) and stores the top-left position (shifted by the label home ^LH) and optional justification of the next field.</summary>
     public class FieldOriginZplCommandAnalzer : ZplCommandAnalyzerBase
     {
+        /// <summary>Initializes a new instance of the <see cref="FieldOriginZplCommandAnalzer"/> class for the <c>^FO</c> command.</summary>
         public FieldOriginZplCommandAnalzer() : base("^FO") { }
 
         ///<inheritdoc/>

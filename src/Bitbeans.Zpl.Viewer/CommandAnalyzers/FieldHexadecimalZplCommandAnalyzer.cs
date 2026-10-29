@@ -2,8 +2,10 @@
 
 namespace Bitbeans.Zpl.Viewer.CommandAnalyzers
 {
+    /// <summary>Analyzes <c>^FH</c> (field hexadecimal indicator) and stores the escape character used for hexadecimal sequences in the next field data. Defaults to <c>_</c>.</summary>
     public class FieldHexadecimalZplCommandAnalyzer : ZplCommandAnalyzerBase
     {
+        /// <summary>Initializes a new instance of the <see cref="FieldHexadecimalZplCommandAnalyzer"/> class for the <c>^FH</c> command.</summary>
         public FieldHexadecimalZplCommandAnalyzer() : base("^FH") { }
 
         ///<inheritdoc/>

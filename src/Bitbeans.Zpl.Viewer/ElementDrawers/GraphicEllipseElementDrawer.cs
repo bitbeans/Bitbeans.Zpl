@@ -5,6 +5,7 @@ using SkiaSharp;
 
 namespace Bitbeans.Zpl.Viewer.ElementDrawers
 {
+    /// <summary>Draws graphic ellipse (<c>^GE</c>) elements.</summary>
     public class GraphicEllipseElementDrawer : ElementDrawerBase
     {
         ///<inheritdoc/>
@@ -13,6 +14,7 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
             return element is ZplGraphicEllipse;
         }
 
+        ///<inheritdoc/>
         public override bool IsReverseDraw(ZplElementBase element)
         {
             if (element is ZplGraphicEllipse graphicEllipse)
@@ -23,6 +25,7 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
             return false;
         }
 
+        ///<inheritdoc/>
         public override bool IsWhiteDraw(ZplElementBase element)
         {
             if (element is ZplGraphicEllipse graphicEllipse)

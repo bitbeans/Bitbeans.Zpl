@@ -6,14 +6,20 @@ using System.Text.RegularExpressions;
 
 namespace Bitbeans.Zpl.Viewer.Symologies
 {
+    /// <summary>The code sets of Code 128.</summary>
     public enum Code128CodeSet
     {
+        /// <summary>Automatic selection of the code sets.</summary>
         Code128 = 0,
+        /// <summary>Code set A (start code 103).</summary>
         Code128A = 103,
+        /// <summary>Code set B (start code 104).</summary>
         Code128B = 104,
+        /// <summary>Code set C (start code 105).</summary>
         Code128C = 105
     }
 
+    /// <summary>Encoder for Code 128 barcodes with the ZPL specific modes.</summary>
     public static class ZplCode128Symbology
     {
         // detect Type-C as late as possible
@@ -252,11 +258,24 @@ namespace Bitbeans.Zpl.Viewer.Symologies
             };
         }
 
+        /// <summary>Encodes the content as a Code 128 bar pattern.</summary>
+        /// <param name="content">The data to encode.</param>
+        /// <param name="initialCodeSet">The code set to start with; <see cref="Code128CodeSet.Code128"/> selects the code sets automatically.</param>
+        /// <param name="gs1"><see langword="true"/> to encode GS1-128 (with an FNC1 after the start symbol).</param>
+        /// <returns>The bar pattern (<see langword="true"/> is a bar) and the interpretation line text.</returns>
         public static (bool[], string) Encode(string content, Code128CodeSet initialCodeSet, bool gs1)
         {
             return EncodeInternal(content, initialCodeSet, gs1, null);
         }
 
+        /// <summary>Encodes the content as a Code 128 bar pattern, applying the ZPL mode (<c>m</c> parameter of <c>^BC</c>) and the UCC check digit option.</summary>
+        /// <param name="content">The data to encode.</param>
+        /// <param name="initialCodeSet">The code set to start with; <see cref="Code128CodeSet.Code128"/> selects the code sets automatically.</param>
+        /// <param name="gs1"><see langword="true"/> to encode GS1-128 (with an FNC1 after the start symbol).</param>
+        /// <param name="mode">The Code 128 mode: <c>N</c>, <c>U</c>, <c>A</c> or <c>D</c>.</param>
+        /// <param name="uccCheckDigit"><see langword="true"/> to calculate and add the UCC check digit.</param>
+        /// <returns>The bar pattern (<see langword="true"/> is a bar) and the interpretation line text.</returns>
+        /// <exception cref="Exception">In UCC/EAN mode, the application identifier 00 content is empty, not numeric or does not consist of the identifier and 17 or 18 digits.</exception>
         public static (bool[], string) Encode(string content, Code128CodeSet initialCodeSet, bool gs1, string mode, bool uccCheckDigit)
         {
             (string preparedContent, Code128CodeSet preparedCodeSet, bool preparedGs1, string interpretationOverride) = PrepareContent(content, initialCodeSet, gs1, mode, uccCheckDigit);

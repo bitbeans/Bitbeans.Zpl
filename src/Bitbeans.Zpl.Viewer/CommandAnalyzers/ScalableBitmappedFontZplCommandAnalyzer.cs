@@ -3,8 +3,10 @@ using Bitbeans.Zpl.Elements;
 
 namespace Bitbeans.Zpl.Viewer.CommandAnalyzers
 {
+    /// <summary>Analyzes <c>^A</c> (scalable/bitmapped font) and stores the font name, orientation, height and width for the next field only.</summary>
     public class ScalableBitmappedFontZplCommandAnalyzer : ZplCommandAnalyzerBase
     {
+        /// <summary>Initializes a new instance of the <see cref="ScalableBitmappedFontZplCommandAnalyzer"/> class for the <c>^A</c> command.</summary>
         public ScalableBitmappedFontZplCommandAnalyzer() : base("^A") { }
 
         ///<inheritdoc/>

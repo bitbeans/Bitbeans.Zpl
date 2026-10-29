@@ -9,6 +9,7 @@ using System.Linq;
 
 namespace Bitbeans.Zpl.Viewer
 {
+    /// <summary>Resolves the typefaces used for text and interpretation lines from font stacks, registered typefaces and the system fonts.</summary>
     public class FontManager
     {
         private readonly Dictionary<string, IList<SKTypeface>> registeredTypefaces = new(StringComparer.OrdinalIgnoreCase);
@@ -84,8 +85,10 @@ namespace Bitbeans.Zpl.Viewer
             }
         }
 
+        /// <summary>Gets the typeface of the ZPL symbol font used by <c>^GS</c>.</summary>
         public SKTypeface TypefaceGS { get; } = SKTypeface.FromStream(new MemoryStream(Resources.ZplGS));
 
+        /// <summary>Initializes a new instance of the <see cref="FontManager"/> class; font <c>0</c> maps to the default typeface 0, every other font to the default typeface A.</summary>
         public FontManager() {
             this.FontLoader = (fontName) => {
                 if (fontName == "0")

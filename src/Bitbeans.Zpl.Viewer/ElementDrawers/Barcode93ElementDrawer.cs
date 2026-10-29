@@ -10,6 +10,7 @@ using ZXing.OneD;
 
 namespace Bitbeans.Zpl.Viewer.ElementDrawers
 {
+    /// <summary>Draws Code 93 (<c>^BA</c>) barcode elements.</summary>
     public class Barcode93ElementDrawer : BarcodeDrawerBase
     {
         ///<inheritdoc/>
@@ -60,8 +61,13 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
 
         private const string Code93Alphabet = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-. $/+%abcd";
         private const string Code93DisplayAlphabet = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-. $/+%!#&@";
+        /// <summary>The character that represents the start and stop symbol in the interpretation line.</summary>
         public const string Code93StartStopSymbol = "▯";
 
+        /// <summary>Builds the interpretation line of a Code 93 barcode: the content between start/stop symbols, optionally followed by the two check characters (C and K).</summary>
+        /// <param name="content">The barcode content.</param>
+        /// <param name="includeCheckDigits"><see langword="true"/> to append the check characters.</param>
+        /// <returns>The interpretation text.</returns>
         public static string BuildCode93Interpretation(string content, bool includeCheckDigits)
         {
             string interpretation = Code93StartStopSymbol + content;

@@ -3,8 +3,10 @@ using Bitbeans.Zpl.Viewer.Models;
 
 namespace Bitbeans.Zpl.Viewer.CommandAnalyzers
 {
+    /// <summary>Analyzes <c>^BD</c> (MaxiCode) and stores the barcode parameters for the next field.</summary>
     public class MaxiCodeBarcodeZplCommandAnalyzer : ZplCommandAnalyzerBase
     {
+        /// <summary>Initializes a new instance of the <see cref="MaxiCodeBarcodeZplCommandAnalyzer"/> class for the <c>^BD</c> command.</summary>
         public MaxiCodeBarcodeZplCommandAnalyzer() : base("^BD") { }
 
         ///<inheritdoc/>
