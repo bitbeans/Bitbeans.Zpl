@@ -38,7 +38,7 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
                     content = content.ReplaceHexEscapes(hexIndicator, internationalFont);
                 }
 
-                string mode = string.IsNullOrWhiteSpace(barcode.Mode) ? "N" : barcode.Mode.ToUpperInvariant();
+                string mode = barcode.Mode;
                 Code128CodeSet codeSet = Code128CodeSet.Code128B;
                 bool gs1 = false;
                 if (mode == "A")

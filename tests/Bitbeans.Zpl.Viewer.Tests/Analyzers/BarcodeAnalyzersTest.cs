@@ -188,7 +188,16 @@ namespace Bitbeans.Zpl.Viewer.Tests.Analyzers
             Assert.IsTrue(data.PrintInterpretationLine);
             Assert.IsFalse(data.PrintInterpretationLineAboveCode);
             Assert.IsFalse(data.UccCheckDigit);
-            Assert.AreEqual(string.Empty, data.Mode);
+            Assert.AreEqual("N", data.Mode);
+        }
+
+        [TestMethod]
+        [DataRow("u", "U")]
+        [DataRow("d", "D")]
+        [DataRow("X", "N")]
+        public void Code128_ModeIsNormalized(string mode, string expected)
+        {
+            Assert.AreEqual(expected, AnalyzerTestHelper.FieldData<Code128BarcodeFieldData>(new Code128BarcodeZplCommandAnalyzer(), "^BCN,80,Y,N,N," + mode).Mode);
         }
 
         // ^B3 Code 39: o,e,h,f,g

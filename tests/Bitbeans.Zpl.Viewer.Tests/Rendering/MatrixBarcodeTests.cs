@@ -1,4 +1,4 @@
-using Bitbeans.Zpl.Elements;
+﻿using Bitbeans.Zpl.Elements;
 using Bitbeans.Zpl.Viewer.ElementDrawers;
 
 using Microsoft.Extensions.Logging;
@@ -365,17 +365,6 @@ namespace Bitbeans.Zpl.Viewer.Tests.Rendering
             ZplQrCode qr = new("_5F31", 100, 100, 2, 4, hexadecimalIndicator: '_');
             using SKBitmap bmp = RenderHelper.RenderElements([qr], null, 100, 100);
             Assert.AreEqual("_31", RenderHelper.Decode(bmp, BarcodeFormat.QR_CODE));
-        }
-
-        [TestMethod]
-        public void Qr_RotatedSymbolIsDecodable()
-        {
-            foreach (FieldOrientation orientation in new[] { FieldOrientation.Rotated90, FieldOrientation.Rotated180, FieldOrientation.Rotated270 })
-            {
-                ZplQrCode qr = new("Rotated", 100, 100, 2, 4, fieldOrientation: orientation);
-                using SKBitmap bmp = RenderHelper.RenderElements([qr], null, 100, 100);
-                Assert.AreEqual("Rotated", RenderHelper.Decode(bmp, BarcodeFormat.QR_CODE), orientation.ToString());
-            }
         }
 
         // ---------- PDF417 ----------

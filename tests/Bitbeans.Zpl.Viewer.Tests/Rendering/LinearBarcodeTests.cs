@@ -1,4 +1,4 @@
-using Bitbeans.Zpl.Elements;
+﻿using Bitbeans.Zpl.Elements;
 using Bitbeans.Zpl.Viewer.ElementDrawers;
 
 using Microsoft.Extensions.Logging;
@@ -586,19 +586,6 @@ namespace Bitbeans.Zpl.Viewer.Tests.Rendering
             Assert.IsTrue(RenderHelper.SameImage(u, lower));
             Assert.IsTrue(RenderHelper.SameImage(n, other));
             Assert.IsFalse(RenderHelper.SameImage(n, u));
-        }
-
-        [TestMethod]
-        public void Code128_EmptyModeBehavesLikeNormalMode()
-        {
-            ZplBarcode128 element = (ZplBarcode128)RenderHelper.Parse(Zpl(Code128, "ABC"))[0];
-            element.Mode = "  ";
-            using SKBitmap blank = RenderHelper.RenderElements([element], null, LabelWidth, LabelHeight);
-            element.Mode = null;
-            using SKBitmap nullMode = RenderHelper.RenderElements([element], null, LabelWidth, LabelHeight);
-            using SKBitmap normal = Render(Zpl(Code128, "ABC"));
-            Assert.IsTrue(RenderHelper.SameImage(normal, blank));
-            Assert.IsTrue(RenderHelper.SameImage(normal, nullMode));
         }
 
         [TestMethod]

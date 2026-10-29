@@ -42,9 +42,14 @@ namespace Bitbeans.Zpl.Viewer.CommandAnalyzers
                 uccCheckDigit = this.ConvertBoolean(zplDataParts[4]);
             }
 
+            // Unknown modes are printed like the normal mode
             if (zplDataParts.Length > 5)
             {
-                mode = zplDataParts[5];
+                string parsedMode = zplDataParts[5].ToUpperInvariant();
+                if (parsedMode is "U" or "A" or "D")
+                {
+                    mode = parsedMode;
+                }
             }
 
             //The field data are processing in the FieldDataZplCommandAnalyzer
