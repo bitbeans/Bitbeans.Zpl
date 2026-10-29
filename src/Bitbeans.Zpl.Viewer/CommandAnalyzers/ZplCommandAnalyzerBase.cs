@@ -1,6 +1,8 @@
 ﻿using Bitbeans.Zpl;
 using Bitbeans.Zpl.Elements;
 
+using System;
+
 namespace Bitbeans.Zpl.Viewer.CommandAnalyzers
 {
     /// <summary>Base class of the command analyzers: matches a command by its prefix and provides helpers to split the parameters and convert common ZPL parameter values.</summary>
@@ -31,8 +33,9 @@ namespace Bitbeans.Zpl.Viewer.CommandAnalyzers
         /// <returns>The comma separated parameters; at least one entry, which is empty if no parameters were given.</returns>
         protected string[] SplitCommand(string zplCommand, int dataStartIndex = 0)
         {
-            string zplCommandData = zplCommand.Substring(this.PrinterCommandPrefix.Length + dataStartIndex);
-            return zplCommandData.Trim().Split(',');
+            // A command can be shorter than prefix plus skipped characters (e.g. ^A without font name)
+            int start = Math.Min(this.PrinterCommandPrefix.Length + dataStartIndex, zplCommand.Length);
+            return zplCommand.Substring(start).Trim().Split(',');
         }
 
         /// <summary>Converts an orientation parameter (<c>N</c>, <c>R</c>, <c>I</c> or <c>B</c>) to a <see cref="FieldOrientation"/>.</summary>

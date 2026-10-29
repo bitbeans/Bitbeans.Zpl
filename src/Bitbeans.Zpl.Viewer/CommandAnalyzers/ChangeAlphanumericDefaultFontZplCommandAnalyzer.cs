@@ -18,10 +18,11 @@ namespace Bitbeans.Zpl.Viewer.CommandAnalyzers
             int fontHeight = virtualPrinter.FontHeight > 0 ? virtualPrinter.FontHeight : 9;
             int fontWidth = virtualPrinter.FontWidth;
 
+            // Font names are a single letter A-Z or digit 0-9; anything else keeps the current font
             string newFont = zplDataParts[0];
-            if (!string.IsNullOrEmpty(newFont))
+            if (newFont.Length == 1 && char.IsAsciiLetterOrDigit(newFont[0]))
             {
-                virtualPrinter.SetFontName(newFont);
+                virtualPrinter.SetFontName(char.ToUpperInvariant(newFont[0]).ToString());
             }
 
             if (zplDataParts.Length > 1 && int.TryParse(zplDataParts[1], out tmpint))

@@ -131,6 +131,9 @@ First release as **Bitbeans.Zpl**, a fork of [BinaryKits.Zpl](https://github.com
 - Viewer: centered, right aligned and justified `^FB` lines 2+ respect the hanging indent.
 - Viewer: `^BQ` with a model other than 1 or 2 or a mask outside 0 - 7 uses the defaults 2 / 7.
 
+- Viewer: `^A@` (font by name) and invalid `^A`/`^CF` font names keep the current font instead of failing the field;
+  lowercase font names are accepted; a bare `^A` no longer throws.
+
 ### Changed (viewer API)
 
 - `ZplPositionedElementBase.FieldJustification` and `UseDefaultPositionX`; optional `fieldJustification` parameter on

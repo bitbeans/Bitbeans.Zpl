@@ -12,7 +12,11 @@ namespace Bitbeans.Zpl.Viewer.CommandAnalyzers
         ///<inheritdoc/>
         public override ZplElementBase Analyze(string zplCommand, VirtualPrinter virtualPrinter, IPrinterStorage printerStorage)
         {
-            string fontName = zplCommand[this.PrinterCommandPrefix.Length].ToString();
+            // Font names are A-Z and 0-9; other names (e.g. ^A@ with a font file) keep the current font
+            string fontName = zplCommand.Length > this.PrinterCommandPrefix.Length
+                && char.IsAsciiLetterOrDigit(zplCommand[this.PrinterCommandPrefix.Length])
+                ? char.ToUpperInvariant(zplCommand[this.PrinterCommandPrefix.Length]).ToString()
+                : virtualPrinter.NextFont?.FontName ?? virtualPrinter.FontName;
 
             string[] zplDataParts = this.SplitCommand(zplCommand, 1);
 
