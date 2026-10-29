@@ -66,6 +66,13 @@ namespace Bitbeans.Zpl.Tests
         }
 
         [TestMethod]
+        public void NameThatIsOnlyAnExtensionUsesUnknown()
+        {
+            Assert.AreEqual("^FO0,0\n^IMR:UNKNOWN.PNG^FS", new ZplImageMove(0, 0, 'R', ".PNG", string.Empty).ToZplString());
+            Assert.AreEqual("UNKNOWN.PNG", new ZplDownloadObjects('R', ".PNG", [1], Converter).ObjectName);
+        }
+
+        [TestMethod]
         public void FontIdentifierStillRequiresAFileName()
         {
             var ex = Assert.ThrowsExactly<ArgumentException>(() => new ZplFontIdentifier('E', "R", string.Empty));

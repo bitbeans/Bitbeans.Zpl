@@ -66,7 +66,8 @@ First release as **Bitbeans.Zpl**, a fork of [BinaryKits.Zpl](https://github.com
   `ZplRecallGraphic` and `ZplRecallFormat` throw `ArgumentNullException` for a `null` name. Downloads
   (`ZplDownloadGraphics`, `ZplDownloadObjects`) accept only the writable devices `R`, `E`, `B` and `A`.
 - An omitted object name is valid ZPL (the printer uses `UNKNOWN`): `ZplRecallFormat` accepts an empty name, and
-  `ZplDownloadGraphics`, `ZplDownloadObjects`, `ZplRecallGraphic` and `ZplImageMove` replace an empty name by `UNKNOWN`.
+  `ZplDownloadGraphics`, `ZplDownloadObjects`, `ZplRecallGraphic` and `ZplImageMove` replace an empty name by `UNKNOWN`
+  (a name that is only an extension, `.PNG`, becomes `UNKNOWN.PNG`).
 - `ZplRecallGraphic` accepts a name with extension (`SAMPLE.GRF`); the 8 character limit applies to the name before the
   extension, and `.GRF` is only added when there is no extension (new property `FileName`). Before, the viewer could
   not recall `^XGR:SAMPLE.GRF` because the name including the extension was longer than 8 characters.
@@ -138,7 +139,8 @@ First release as **Bitbeans.Zpl**, a fork of [BinaryKits.Zpl](https://github.com
 - Viewer: `~DG` stores the graphic as `NAME.GRF` (an omitted name as `UNKNOWN.GRF`), and `^XG` accepts a name
   without extension or without name (`^XGR:LOGO`, `^XGR:`); an invalid magnification keeps 1.
 - Viewer: `~DY` stores the object under its name and the extension of the `x` parameter (`~DYR:LOGO,P,P,...` as
-  `LOGO.PNG`), so `^IMR:LOGO.PNG` finds it; `^XG` and `^IM` elements created in code find parsed downloads by their
+  `LOGO.PNG`; codes `B`, `C`, `E`, `F`, `H`, `NRD`, `P`, `PAC`, `T`, `X` and `.GRF` for any other value), so
+  `^IMR:LOGO.PNG` finds it; `^XG` and `^IM` elements created in code find parsed downloads by their
   `FileName`.
 - Viewer: `^GF` defaults the format to A when omitted; format B (binary) is rejected with an error instead of being
   decoded as hexadecimal.

@@ -33,13 +33,13 @@ namespace Bitbeans.Zpl.Viewer.CommandAnalyzers
         /// <summary>
         /// The printer stores the object under its name and the extension given by the <c>x</c> parameter
         /// (<c>~DYR:LOGO,P,P,...</c> becomes <c>LOGO.PNG</c>), so <c>^IM</c> and <c>^XG</c> find it by its full name.
-        /// A name that already has an extension and an omitted name (<c>UNKNOWN</c>) are handled like the printer does.
+        /// A name that already has an extension is kept; an omitted name is <c>UNKNOWN</c> and an unknown extension code <c>.GRF</c>, like on the printer.
         /// </summary>
         private static string GetFileName(string objectName, string extensionCode)
         {
-            if (objectName.Length == 0)
+            if (objectName.Length == 0 || objectName[0] == '.')
             {
-                objectName = "UNKNOWN";
+                objectName = "UNKNOWN" + objectName;
             }
 
             if (objectName.Contains('.'))
@@ -47,19 +47,23 @@ namespace Bitbeans.Zpl.Viewer.CommandAnalyzers
                 return objectName;
             }
 
-            string code = extensionCode.Trim().ToUpperInvariant();
-            string extension = code switch
+            string extension = extensionCode.Trim().ToUpperInvariant() switch
             {
                 "B" => "BMP",
+                "C" => "WML",
                 "E" => "TTE",
-                "G" => "GRF",
+                "F" => "HTM",
+                "H" => "GET",
+                "NRD" => "NRD",
                 "P" => "PNG",
+                "PAC" => "PAC",
                 "T" => "TTF",
                 "X" => "PCX",
-                _ => code,
+                // G and every other value: raw bitmap, the printer's default
+                _ => "GRF",
             };
 
-            return extension.Length == 0 ? objectName : objectName + "." + extension;
+            return objectName + "." + extension;
         }
     }
 }

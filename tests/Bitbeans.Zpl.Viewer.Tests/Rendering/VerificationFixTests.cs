@@ -97,8 +97,13 @@ namespace Bitbeans.Zpl.Viewer.Tests.Rendering
         [DataRow("OBJ", "T", "OBJ.TTF")]
         [DataRow("OBJ", "X", "OBJ.PCX")]
         [DataRow("OBJ", "NRD", "OBJ.NRD")]
-        [DataRow("OBJ", "Q", "OBJ.Q")]
-        [DataRow("OBJ", "", "OBJ")]
+        [DataRow("OBJ", "Q", "OBJ.GRF")]
+        [DataRow("OBJ", "C", "OBJ.WML")]
+        [DataRow("OBJ", "F", "OBJ.HTM")]
+        [DataRow("OBJ", "H", "OBJ.GET")]
+        [DataRow("OBJ", "PAC", "OBJ.PAC")]
+        [DataRow(".PNG", "G", "UNKNOWN.PNG")]
+        [DataRow("OBJ", "", "OBJ.GRF")]
         [DataRow("OBJ.PNG", "G", "OBJ.PNG")]
         [DataRow("", "P", "UNKNOWN.PNG")]
         public void DownloadObjectIsStoredUnderNameAndExtension(string name, string extension, string fileName)
@@ -115,6 +120,18 @@ namespace Bitbeans.Zpl.Viewer.Tests.Rendering
         public void DownloadedPngIsFoundByImageMove()
         {
             string zpl = "~DYR:LOGO,P,P,1,," + SolidPngHex(6, 4) + "^XA^FO15,25^IMR:LOGO.PNG^FS^XZ";
+
+            using SKBitmap bmp = RenderHelper.Render(zpl);
+
+            Assert.AreEqual(new SKRectI(15, 25, 21, 29), RenderHelper.DarkBounds(bmp).Value);
+        }
+
+        [TestMethod]
+        [DataRow("^IMR:.PNG")]
+        [DataRow("^IMR:UNKNOWN.PNG")]
+        public void DownloadWithoutNameIsFoundByImageMoveWithoutName(string imageMove)
+        {
+            string zpl = "~DYR:,P,P,1,," + SolidPngHex(6, 4) + "^XA^FO15,25" + imageMove + "^FS^XZ";
 
             using SKBitmap bmp = RenderHelper.Render(zpl);
 

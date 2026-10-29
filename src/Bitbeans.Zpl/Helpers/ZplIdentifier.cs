@@ -103,22 +103,18 @@ namespace Bitbeans.Zpl.Helpers
         /// <summary>The name the printer uses when the object name of a download or recall is omitted.</summary>
         public const string UnknownName = "UNKNOWN";
 
-        /// <summary>Checks an object name like <see cref="Name"/>; an empty name becomes <c>UNKNOWN</c>, the name the printer uses when it is omitted.</summary>
+        /// <summary>Checks an object name like <see cref="Name"/>; an empty name becomes <c>UNKNOWN</c>, the name the printer uses when it is omitted, and a name that is only an extension (<c>.PNG</c>) becomes <c>UNKNOWN.PNG</c>.</summary>
         public static string ObjectName(string value, string paramName, bool allowDot, int maxLength = int.MaxValue)
         {
-            return Name(value, paramName, allowDot, maxLength, allowEmpty: true).Length == 0 ? UnknownName : value;
+            Name(value, paramName, allowDot, maxLength, allowEmpty: true);
+            // Without name, or with only an extension (".PNG"), the printer uses UNKNOWN as name
+            return value.Length == 0 || value[0] == '.' ? UnknownName + value : value;
         }
 
         /// <summary>Checks a graphic name with an optional extension (<c>LOGO</c> or <c>LOGO.GRF</c>): 1 to 8 characters before the extension; an empty name (also <c>.GRF</c>) becomes <c>UNKNOWN</c>.</summary>
         public static string GraphicName(string value, string paramName)
         {
             string name = ObjectName(value, paramName, allowDot: true);
-            if (name[0] == '.')
-            {
-                // Only the extension is given (".GRF"): the printer uses UNKNOWN as name
-                name = UnknownName + name;
-            }
-
             int dot = name.IndexOf('.');
             int baseLength = dot < 0 ? name.Length : dot;
             if (baseLength > 8 || name.EndsWith('.') || name.IndexOf('.', dot + 1) >= 0)
