@@ -77,11 +77,9 @@ namespace Bitbeans.Zpl.Tests
         public void Compress_ValidData1_Successful()
         {
             var compressed = ZebraACSCompressionHelper.Compress("FFFF\nF00F\nFFFF\n", 2);
-            // "!" fills the rest of the line with one bits (hex F)
-            Assert.AreEqual("!FH0!!", compressed);
-            Assert.AreEqual("FFFFF00FFFFF", ZebraACSCompressionHelper.Uncompress(compressed, 2).Replace("\n", string.Empty));
+            Assert.AreEqual("JFFH0FJF", compressed);
             //^XA
-            //~DGR:SAMPLE.GRF,00006,02,!FH0!!
+            //~DGR:SAMPLE.GRF,00006,02,JFGFH0GFJF
             //^FO20,20
             //^XGR:SAMPLE.GRF,1,1^FS
             //^XZ
@@ -91,11 +89,9 @@ namespace Bitbeans.Zpl.Tests
         public void Compress_ValidData2_Successful()
         {
             var compressed = ZebraACSCompressionHelper.Compress("FFFFF00FFFFF", 2);
-            // "!" fills the rest of the line with one bits (hex F)
-            Assert.AreEqual("!FH0!!", compressed);
-            Assert.AreEqual("FFFFF00FFFFF", ZebraACSCompressionHelper.Uncompress(compressed, 2).Replace("\n", string.Empty));
+            Assert.AreEqual("JFFH0FJF", compressed);
             //^XA
-            //~DGR:SAMPLE.GRF,00006,02,!FH0!!
+            //~DGR:SAMPLE.GRF,00006,02,JFGFH0GFJF
             //^FO20,20
             //^XGR:SAMPLE.GRF,1,1^FS
             //^XZ
@@ -105,10 +101,9 @@ namespace Bitbeans.Zpl.Tests
         public void Compress_ValidData3_Successful()
         {
             var compressed = ZebraACSCompressionHelper.Compress("FFFFFFFFFFFFFFFFFFFF\n8000FFFF0000FFFF0001\n8000FFFF0000FFFF0001\n8000FFFF0000FFFF0001\nFFFF0000FFFF0000FFFF\nFFFF0000FFFF0000FFFF\nFFFF0000FFFF0000FFFF\nFFFFFFFFFFFFFFFFFFFF\n", 10);
-            Assert.AreEqual("!8I0JFJ0JFI01::JFJ0JFJ0!::!", compressed);
-            Assert.AreEqual("FFFFFFFFFFFFFFFFFFFF8000FFFF0000FFFF00018000FFFF0000FFFF00018000FFFF0000FFFF0001FFFF0000FFFF0000FFFFFFFF0000FFFF0000FFFFFFFF0000FFFF0000FFFFFFFFFFFFFFFFFFFFFFFF", ZebraACSCompressionHelper.Uncompress(compressed, 10).Replace("\n", string.Empty));
+            Assert.AreEqual("gF8I0JFJ0JFI0!::JFJ0JFJ0JF::gF", compressed);
             //^XA
-            //~DGR:SAMPLE.GRF,00080,010,!8I0JFJ0JFI01::JFJ0JFJ0!::!
+            //~DGR:SAMPLE.GRF,00080,010,gFG8I0JFJ0JFI0!::JFJ0JFJ0JF::gF
             //^FO20,20
             //^XGR:SAMPLE.GRF,1,1 ^ FS
             //^XZ

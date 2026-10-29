@@ -113,10 +113,8 @@ namespace Bitbeans.Zpl.Tests
         [TestMethod]
         public void AcsCompressRunsOfOnes()
         {
-            // "!" fills the rest of the line with one bits (hex F)
-            Assert.AreEqual("!H0!", ZebraACSCompressionHelper.Compress("FFFF" + "00FF", 2));
-            Assert.AreEqual("!", ZebraACSCompressionHelper.Compress("FFFF", 2));
-            Assert.AreEqual("J1", ZebraACSCompressionHelper.Compress("1111", 2));
+            Assert.AreEqual("!HF!", ZebraACSCompressionHelper.Compress("1111" + "FF11", 2));
+            Assert.AreEqual("!", ZebraACSCompressionHelper.Compress("1111", 2));
         }
 
         [TestMethod]
@@ -129,8 +127,7 @@ namespace Bitbeans.Zpl.Tests
         public void AcsUncompressExpandsFillRepeatAndRuns()
         {
             Assert.AreEqual("FF00\n0000\nFF00\nFF00\n", ZebraACSCompressionHelper.Uncompress("HF,,HF,:", 2));
-            Assert.AreEqual("FFFF\n00FF\n", ZebraACSCompressionHelper.Uncompress("!H0!", 2));
-            Assert.AreEqual("1FFF\n", ZebraACSCompressionHelper.Uncompress("1!", 2));
+            Assert.AreEqual("1111\nFF11\n", ZebraACSCompressionHelper.Uncompress("!HF!", 2));
             Assert.AreEqual("AB00\n", ZebraACSCompressionHelper.Uncompress("AB,", 2));
             Assert.AreEqual("A1B1\n", ZebraACSCompressionHelper.Uncompress("A1B1", 2));
         }

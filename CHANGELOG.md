@@ -58,7 +58,6 @@ First release as **Bitbeans.Zpl**, a fork of [BinaryKits.Zpl](https://github.com
 
 ### Fixed
 
-- ACS compression: `!` fills the rest of the line with one bits (hex `F`) instead of the hex digit `1`.
 - MSI Mod 11 check digit is `(11 - sum mod 11) mod 11` (IBM weights 2 to 7); a value of 10 is written as `10`.
 - `ZplGraphicSymbol` accepts a field justification; the viewer passes the `^FO`/`^FT`/`^FW` justification to `^GS`.
 - A space can be used as `^FH` indicator.
