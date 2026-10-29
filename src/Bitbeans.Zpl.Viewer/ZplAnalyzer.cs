@@ -124,7 +124,7 @@ namespace Bitbeans.Zpl.Viewer
                 this.Analyze(currentCommand, elements, unknownCommands, errors);
 
                 // Ignore comments when checking whether the last command is ^FS
-                if (!currentCommand.Equals(commentCommand))
+                if (!currentCommand.StartsWith(commentCommand, StringComparison.OrdinalIgnoreCase))
                 {
                     lastCommand = currentCommand;
                 }
