@@ -25,7 +25,8 @@ namespace Bitbeans.Zpl.Viewer.CommandAnalyzers
             ErrorCorrectionLevel errorCorrection = ErrorCorrectionLevel.HighReliability;
             int maskValue = 7;
 
-            if (zplDataParts.Length > 1 && int.TryParse(zplDataParts[1], out tmpint))
+            // Like a printer default, a model other than 1 or 2 is replaced by 2 and a mask value outside 0 to 7 by 7
+            if (zplDataParts.Length > 1 && int.TryParse(zplDataParts[1], out tmpint) && tmpint is 1 or 2)
             {
                 model = tmpint;
             }
@@ -41,7 +42,7 @@ namespace Bitbeans.Zpl.Viewer.CommandAnalyzers
                 errorCorrection = this.ConvertErrorCorrectionLevel(zplDataParts[3]);
             }
 
-            if (zplDataParts.Length > 4 && int.TryParse(zplDataParts[4], out tmpint))
+            if (zplDataParts.Length > 4 && int.TryParse(zplDataParts[4], out tmpint) && tmpint is >= 0 and <= 7)
             {
                 maskValue = tmpint;
             }

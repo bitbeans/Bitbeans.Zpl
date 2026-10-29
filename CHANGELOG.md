@@ -109,6 +109,17 @@ First release as **Bitbeans.Zpl**, a fork of [BinaryKits.Zpl](https://github.com
 - Viewer: reverse print fields use a layer limited to the field instead of a label-sized bitmap.
 - Viewer: `Draw`/`DrawSurface` validate the label size and density (`ArgumentOutOfRangeException`); elements without a
   drawer or failing during drawer selection are logged and skipped.
+- Viewer: fields of a stored format (`^DF`) that supply their own `^FN`/`^FD` data print that data as default when the
+  recalling label gives none; data of the recalling label overrides it.
+- Viewer: reverse print `^FB` text is drawn normally into the reverse layer, so overlapping lines no longer cancel each
+  other out; the other reverse drawers follow the same rule.
+- Viewer: `ZplElementDrawer` is `IDisposable` and disposes the `FontManager` of the default options it creates (not of
+  caller-provided options); `FontManager.TypefaceGS` is created lazily and a disposed `FontManager` throws
+  `ObjectDisposedException`.
+- Viewer: `^GF` defaults the format to A when omitted; format B (binary) is rejected with an error instead of being
+  decoded as hexadecimal.
+- Viewer: centered, right aligned and justified `^FB` lines 2+ respect the hanging indent.
+- Viewer: `^BQ` with a model other than 1 or 2 or a mask outside 0 - 7 uses the defaults 2 / 7.
 
 ### Changed (viewer API)
 
@@ -116,7 +127,7 @@ First release as **Bitbeans.Zpl**, a fork of [BinaryKits.Zpl](https://github.com
   `ZplGraphicBox/Circle/Ellipse/DiagonalLine/Field`, `ZplImageMove`, `ZplRecallGraphic`, `ZplFieldBlock`; optional
   `useDefaultPositionX` on `ZplTextField`, `ZplFieldBlock`, `ZplFieldTypeset`; `LabelPosition.UseDefaultPositionX`.
 - `ZplGraphicField.Data` holds the raw ZPL graphic data instead of a hex encoded PNG.
-- `FontManager` implements `IDisposable`.
+- `FontManager` implements `IDisposable`; `ZplElementDrawer` implements `IDisposable`.
 
 ### Removed
 

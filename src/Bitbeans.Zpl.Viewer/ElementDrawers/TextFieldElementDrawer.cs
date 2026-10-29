@@ -145,11 +145,6 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
                         y += textBoundBaseline.Height;
                     }
 
-                    if (textField.ReversePrint)
-                    {
-                        skPaint.BlendMode = SKBlendMode.Xor;
-                    }
-
                     SKTextAlign textAlign = SKTextAlign.Left;
                     if (fieldJustification == FieldJustification.Left)
                     {
@@ -269,7 +264,7 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
 
                 float drawX = GetBitmapAlignedX(displayText, x, totalWidth, fieldJustification);
 
-                using SKPaint paint = ZplBitmapFontRenderer.CreatePaint(textField.ReversePrint);
+                using SKPaint paint = ZplBitmapFontRenderer.CreatePaint(false);
                 ZplBitmapFontRenderer renderer = new(this.skCanvas);
                 renderer.DrawText(displayText, fontData, metrics, drawX, topY, paint);
 

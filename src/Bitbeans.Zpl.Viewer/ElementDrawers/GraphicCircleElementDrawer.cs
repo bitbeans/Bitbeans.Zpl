@@ -79,11 +79,6 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
                     y -= graphicCircle.Diameter;
                 }
 
-                if (graphicCircle.ReversePrint)
-                {
-                    skPaint.BlendMode = SKBlendMode.Xor;
-                }
-
                 this.skCanvas.DrawCircle(x, y, radiusMinusBorder, skPaint);
                 return this.CalculateNextDefaultPosition(baseX, position.Y, graphicCircle.Diameter, graphicCircle.Diameter, graphicCircle.FieldOrigin != null, FieldOrientation.Normal, currentPosition);
             }

@@ -35,7 +35,7 @@ namespace Bitbeans.Zpl.Viewer.Tests.Documentation
 
             IPrinterStorage printerStorage = new PrinterStorage();
             var analyzer = new ZplAnalyzer(printerStorage);
-            var drawer = new ZplElementDrawer(printerStorage);
+            using var drawer = new ZplElementDrawer(printerStorage);
 
             AnalyzeInfo analyzeInfo = analyzer.Analyze(zpl);
             Assert.HasCount(1, analyzeInfo.LabelInfos);
@@ -203,7 +203,7 @@ namespace Bitbeans.Zpl.Viewer.Tests.Documentation
         {
             IPrinterStorage printerStorage = new PrinterStorage();
             var analyzer = new ZplAnalyzer(printerStorage);
-            var drawer = new ZplElementDrawer(printerStorage);
+            using var drawer = new ZplElementDrawer(printerStorage);
 
             AnalyzeInfo analyzeInfo = analyzer.Analyze("^XA^FO50,50^A0N,50,50^FDHello^FS^FO50,120^BCN,100^FD12345^FS^XZ");
 

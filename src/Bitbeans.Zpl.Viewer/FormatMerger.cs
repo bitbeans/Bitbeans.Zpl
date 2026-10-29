@@ -80,6 +80,14 @@ namespace Bitbeans.Zpl.Viewer
                 }
                 else if (zplElement is ZplRecallFieldNumber recallFieldNumber)
                 {
+                    if (rawLabelInfo.DownloadFormatName != null)
+                    {
+                        // Data given in a stored format is the default of all fields with this number; it is kept with the
+                        // format and used when a recalling label supplies no data for the field
+                        elements.Add(recallFieldNumber);
+                        continue;
+                    }
+
                     for (int i = 0; i < elements.Count; i++)
                     {
                         if (elements[i] is ZplFieldNumber fieldNumber && fieldNumber.Number == recallFieldNumber.Number)
@@ -165,11 +173,19 @@ namespace Bitbeans.Zpl.Viewer
         {
             foreach (ZplElementBase formatElement in formatLabelInfo.ZplElements)
             {
+                if (formatElement is ZplRecallFieldNumber)
+                {
+                    // A default of the format, used by the fields below
+                    continue;
+                }
+
                 if (formatElement is ZplFieldNumber fieldNumber)
                 {
+                    // The data of the recalling label replaces the default data of the format
                     // The format element of a field number is never null (checked by its constructor)
-                    ZplRecallFieldNumber recallFieldNumber = (ZplRecallFieldNumber)valuesLabelInfo.ZplElements.FirstOrDefault(e =>
-                        (e as ZplRecallFieldNumber)?.Number == fieldNumber.Number);
+                    ZplRecallFieldNumber recallFieldNumber =
+                        valuesLabelInfo.ZplElements.OfType<ZplRecallFieldNumber>().FirstOrDefault(r => r.Number == fieldNumber.Number) ??
+                        formatLabelInfo.ZplElements.OfType<ZplRecallFieldNumber>().LastOrDefault(r => r.Number == fieldNumber.Number);
                     if (recallFieldNumber != null)
                     {
                         yield return CreateElementWithContent(fieldNumber.FormatElement, recallFieldNumber.Text);

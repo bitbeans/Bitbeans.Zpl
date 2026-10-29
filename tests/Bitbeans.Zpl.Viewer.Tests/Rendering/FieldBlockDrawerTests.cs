@@ -163,9 +163,9 @@ namespace Bitbeans.Zpl.Viewer.Tests.Rendering
             Assert.AreEqual(50, Band(left, 0).Left);
             Assert.AreEqual(60, Band(left, 1).Left);
 
-            // right justified lines move to the left
+            // right justified lines stay at the right edge of the block
             using SKBitmap right = Render(Fb(60, 3, 3, "R", 10, "AAAA BBBB CCCC"));
-            Assert.AreEqual(50 + 36 - 10, Band(right, 1).Left);
+            Assert.AreEqual(50 + 36, Band(right, 1).Left);
         }
 
         [TestMethod]

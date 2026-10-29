@@ -90,7 +90,6 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
                 float positionY = position.Y;
 
                 List<WrappedTextLine> textLines = WordWrap(text, skFont, fieldBlock.Width, fieldBlock.HangingIndent);
-                int hangingIndent = 0;
                 float lineHeight = fontSize + fieldBlock.LineSpace;
                 float y = positionY + textBoundBaseline.Height;
 
@@ -164,10 +163,12 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
                         string textLine = wrappedLine.Text;
                         int visibleLineIndex = Math.Min(lineIndex, Math.Max(fieldBlock.MaxLineCount - 1, 0));
                         float lineY = y + visibleLineIndex * lineHeight;
-                        float x = positionX + hangingIndent;
-
                         skFont.MeasureText(textLine, out SKRect textBounds);
-                        float diff = fieldBlock.Width - textBounds.Width;
+
+                        // The hanging indent applies to the second and all following lines; they use the area from the indent to the block width
+                        float indent = lineIndex == 0 ? 0 : Math.Max(fieldBlock.HangingIndent, 0);
+                        float x = positionX + indent;
+                        float diff = fieldBlock.Width - indent - textBounds.Width;
 
                         switch (fieldBlock.TextJustification)
                         {
@@ -176,25 +177,18 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
                                 break;
                             case TextJustification.Right:
                                 x += diff - textBounds.Left * 2;
-                                hangingIndent = -fieldBlock.HangingIndent;
                                 break;
                             case TextJustification.Left:
                             case TextJustification.Justified:
                             default:
-                                hangingIndent = fieldBlock.HangingIndent;
                                 break;
                         }
 
-                        if (fieldBlock.ReversePrint)
-                        {
-                            skPaint.BlendMode = SKBlendMode.Xor;
-                        }
-
+                        // A reverse print block is drawn normally into the reverse layer of the ZplElementDrawer, which inverts it once
                         if (fieldBlock.TextJustification == TextJustification.Justified &&
                             wrappedLine.ShouldJustify)
                         {
-                            float currentLineIndent = x - positionX;
-                            float availableWidth = Math.Max(fieldBlock.Width - currentLineIndent, 1);
+                            float availableWidth = Math.Max(fieldBlock.Width - indent, 1);
                             this.DrawJustifiedTextLine(textLine, x, lineY, availableWidth, skFont, skPaint);
                         }
                         else
@@ -274,9 +268,8 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
                     x + fieldBlock.Width,
                     topY + totalHeight));
 
-                using SKPaint paint = ZplBitmapFontRenderer.CreatePaint(fieldBlock.ReversePrint);
+                using SKPaint paint = ZplBitmapFontRenderer.CreatePaint(false);
                 ZplBitmapFontRenderer renderer = new(this.skCanvas);
-                int hangingIndent = 0;
                 int lineIndex = 0;
 
                 foreach (WrappedTextLine wrappedLine in textLines)
@@ -284,9 +277,10 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
                     string textLine = wrappedLine.Text;
                     int visibleLineIndex = Math.Min(lineIndex, maxLineCount - 1);
                     int lineWidth = ZplBitmapFontRenderer.MeasureTextWidth(textLine, metrics);
-                    float lineX = x + hangingIndent;
+                    float indent = lineIndex == 0 ? 0 : Math.Max(fieldBlock.HangingIndent, 0);
+                    float lineX = x + indent;
                     float lineY = topY + visibleLineIndex * metrics.LineHeight;
-                    float diff = fieldBlock.Width - lineWidth;
+                    float diff = fieldBlock.Width - indent - lineWidth;
 
                     switch (fieldBlock.TextJustification)
                     {
@@ -295,20 +289,17 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
                             break;
                         case TextJustification.Right:
                             lineX += diff;
-                            hangingIndent = -fieldBlock.HangingIndent;
                             break;
                         case TextJustification.Left:
                         case TextJustification.Justified:
                         default:
-                            hangingIndent = fieldBlock.HangingIndent;
                             break;
                     }
 
                     if (fieldBlock.TextJustification == TextJustification.Justified &&
                         wrappedLine.ShouldJustify)
                     {
-                        float currentLineIndent = lineX - x;
-                        float availableWidth = Math.Max(fieldBlock.Width - currentLineIndent, 1);
+                        float availableWidth = Math.Max(fieldBlock.Width - indent, 1);
                         this.DrawJustifiedBitmapTextLine(textLine, lineX, lineY, availableWidth, fontData, metrics, renderer, paint);
                     }
                     else

@@ -36,7 +36,15 @@ namespace Bitbeans.Zpl.Viewer.CommandAnalyzers
 
             string[] zplDataParts = this.SplitCommand(zplCommand);
 
-            char compressionType = zplDataParts[0][0];
+            // The compression parameter is optional, A (ASCII hexadecimal) is the default
+            string compressionParameter = zplDataParts[0].Trim();
+            char compressionType = compressionParameter.Length > 0 ? char.ToUpperInvariant(compressionParameter[0]) : 'A';
+
+            // The data of format B is raw binary and cannot be told apart from the following ZPL text; it is not decoded
+            if (compressionType == 'B')
+            {
+                throw new NotSupportedException("^GF format B (binary data) is not supported; use format A with hexadecimal, :Z64: or :B64: data.");
+            }
 
             if (zplDataParts.Length > 1 && int.TryParse(zplDataParts[1], out tmpint))
             {

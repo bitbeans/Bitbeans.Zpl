@@ -22,7 +22,7 @@
 | `^BK` | ANSI Codabar | start and stop characters |
 | `^BL` | LOGMARS | |
 | `^BM` | MSI | check digit modes |
-| `^BQ` | QR Code | model 2, error correction, mask, mixed mode data |
+| `^BQ` | QR Code | model 1 or 2, error correction, mask, mixed mode data; a model other than 1 or 2 falls back to 2 and a mask value outside 0 - 7 to 7 (the defaults) |
 | `^BS` | UPC/EAN extension (2 and 5 digits) | |
 | `^BU` | UPC-A | |
 | `^BX` | Data Matrix | ECC 200, module size, rows and columns (when both are set); format, escape character and aspect ratio are parsed but not used for drawing |
@@ -38,7 +38,7 @@ CODABLOCK (`^BB`), TLC39 (`^BT`), Micro PDF417 (`^BF`), Micro QR.
 | `^A` | Scalable / bitmap font (`0`, `A` - `Z`, `1` - `9`), orientation, size |
 | `^CF` | Change default font |
 | `^CI` | Change international font / encoding |
-| `^FB` | Field block: width, lines, line spacing, justification (L, C, R, J), hanging indent |
+| `^FB` | Field block: width, lines, line spacing, justification (L, C, R, J), hanging indent (applies to lines 2+; centered, right aligned and justified lines use the area from the indent to the block width) |
 | `^FD`, `^FV` | Field data, field variable |
 | `^FH` | Hexadecimal indicator |
 | `^FR` | Field reverse print |
@@ -52,7 +52,7 @@ CODABLOCK (`^BB`), TLC39 (`^BT`), Micro PDF417 (`^BF`), Micro QR.
 | `^GC` | Graphic circle |
 | `^GD` | Graphic diagonal line |
 | `^GE` | Graphic ellipse |
-| `^GF` | Graphic field (ASCII hex, compressed `:Z64:` / `:B64:` and ACS data) |
+| `^GF` | Graphic field (format A: ASCII hex, compressed `:Z64:` / `:B64:` and ACS data; the format parameter defaults to A; format B (binary) is rejected with an entry in `AnalyzeInfo.Errors`) |
 | `^GS` | Graphic symbol (®, ©, ™, UL, CSA) |
 | `^IM` | Image move (recall `~DY` object) |
 | `^XG` | Recall graphic, with magnification |
@@ -86,7 +86,11 @@ CODABLOCK (`^BB`), TLC39 (`^BT`), Micro PDF417 (`^BF`), Micro QR.
   earlier one. Recalling a format that was not stored is reported in `AnalyzeInfo.Errors`; the label keeps its own elements.
 - `^FN` with `^FD` in a field that has a position (`^FO`/`^FT`) defines the field and provides the data for all
   fields with this number. Without a position (as in a `^XF` label) it only provides data. The optional
-  quoted prompt (`^FN1"Name"`) is ignored. Data in a `^DF` format does not become a default value.
+  quoted prompt (`^FN1"Name"`) is ignored. Data given with `^FN`/`^FD` in a `^DF` format is the default of all fields
+  with that number: it prints when the recalling label supplies no data for the field number, and data of the
+  recalling label overrides it. A field without any data is not printed.
+- Reverse print (`^FR`, `^LR`) fields are drawn normally into a layer that is inverted once, so overlapping parts of
+  one field (e.g. extra `^FB` lines that do not fit) do not cancel each other out.
 - The escape character of a Data Matrix field (`^BX` parameter g, default `~`) is not treated as the start of a
   command inside the `^FD`/`^FV` of that field.
 - Carriage returns and line feeds are ignored everywhere in the ZPL stream, also inside `^FD`. Use `\&` in

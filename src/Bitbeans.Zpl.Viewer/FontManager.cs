@@ -12,7 +12,7 @@ namespace Bitbeans.Zpl.Viewer
     /// <summary>Resolves the typefaces used for text and interpretation lines from font stacks, registered typefaces and the system fonts.</summary>
     /// <remarks>
     /// The manager owns and caches the typefaces it creates itself (the default typefaces matched in the system fonts and
-    /// <see cref="TypefaceGS"/>); they are shared by all draws and released by <see cref="Dispose"/>. Typefaces passed to
+    /// the lazily created <see cref="TypefaceGS"/>); they are shared by all draws and released by <see cref="Dispose"/>. Typefaces passed to
     /// <see cref="RegisterTypeface"/> or returned by a custom <see cref="FontLoader"/> belong to the caller and are not disposed.
     /// The lazily created typefaces are thread safe, so a manager can be used by concurrent draws.
     /// </remarks>
@@ -82,6 +82,7 @@ namespace Bitbeans.Zpl.Viewer
             get {
                 lock (this.typefaceLock)
                 {
+                    this.ThrowIfDisposed();
                     this.typeface0 ??= this.GetDefaultTypeface(this.FontStack0, fontStyle0);
                     return this.typeface0;
                 }
@@ -93,14 +94,31 @@ namespace Bitbeans.Zpl.Viewer
             get {
                 lock (this.typefaceLock)
                 {
+                    this.ThrowIfDisposed();
                     this.typefaceA ??= this.GetDefaultTypeface(this.FontStackA, fontStyleA);
                     return this.typefaceA;
                 }
             }
         }
 
-        /// <summary>Gets the typeface of the ZPL symbol font used by <c>^GS</c>.</summary>
-        public SKTypeface TypefaceGS { get; } = SKTypeface.FromStream(new MemoryStream(Resources.ZplGS));
+        private SKTypeface typefaceGS;
+
+        /// <summary>Gets the typeface of the ZPL symbol font used by <c>^GS</c>. It is created on first access, owned by the manager and disposed by <see cref="Dispose"/>.</summary>
+        /// <exception cref="ObjectDisposedException">The manager is disposed.</exception>
+        public SKTypeface TypefaceGS
+        {
+            get
+            {
+                lock (this.typefaceLock)
+                {
+                    this.ThrowIfDisposed();
+                    this.typefaceGS ??= SKTypeface.FromStream(new MemoryStream(Resources.ZplGS));
+                    return this.typefaceGS;
+                }
+            }
+        }
+
+        private bool disposed;
 
         /// <summary>Initializes a new instance of the <see cref="FontManager"/> class; font <c>0</c> maps to the default typeface 0, every other font to the default typeface A.</summary>
         public FontManager() {
@@ -120,19 +138,29 @@ namespace Bitbeans.Zpl.Viewer
         /// </summary>
         /// <param name="typeface">The typeface to register. Cannot be null. The typeface's family name is used as the
         /// key for registration.</param>
+        /// <exception cref="ObjectDisposedException">The manager is disposed.</exception>
         public void RegisterTypeface(SKTypeface typeface)
         {
             lock (this.typefaceLock)
             {
+                this.ThrowIfDisposed();
                 this.AddRegisteredTypeface(typeface);
             }
         }
 
-        /// <summary>Disposes the typefaces owned by the manager (the system default typefaces and <see cref="TypefaceGS"/>). Registered typefaces are not disposed. The manager must not be used for drawing afterwards.</summary>
+        /// <summary>Disposes the typefaces owned by the manager (the system default typefaces and <see cref="TypefaceGS"/>). Registered typefaces are not disposed. The manager must not be used afterwards: accessing a typeface or registering one throws an <see cref="ObjectDisposedException"/>. Calling <see cref="Dispose"/> again has no effect.</summary>
         public void Dispose()
         {
             lock (this.typefaceLock)
             {
+                if (this.disposed)
+                {
+                    return;
+                }
+
+                this.disposed = true;
+                this.typefaceGS?.Dispose();
+                this.typefaceGS = null;
                 foreach (SKTypeface typeface in this.ownedTypefaces)
                 {
                     typeface.Dispose();
@@ -143,8 +171,12 @@ namespace Bitbeans.Zpl.Viewer
                 this.typefaceA = null;
             }
 
-            this.TypefaceGS.Dispose();
             GC.SuppressFinalize(this);
+        }
+
+        private void ThrowIfDisposed()
+        {
+            ObjectDisposedException.ThrowIf(this.disposed, this);
         }
 
         private void AddRegisteredTypeface(SKTypeface typeface)

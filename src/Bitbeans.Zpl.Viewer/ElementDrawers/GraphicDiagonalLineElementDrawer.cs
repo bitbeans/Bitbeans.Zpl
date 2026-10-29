@@ -74,11 +74,6 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
                     skPaint.Color = SKColors.White;
                 }
 
-                if (graphicLine.ReversePrint)
-                {
-                    skPaint.BlendMode = SKBlendMode.Xor;
-                }
-
                 using SKPathBuilder pathBuilder = new();
                 if (graphicLine.RightLeaningDiagonal)
                 {
