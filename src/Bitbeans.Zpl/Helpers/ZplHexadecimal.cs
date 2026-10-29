@@ -8,14 +8,14 @@ namespace Bitbeans.Zpl.Helpers
         /// <summary>The indicator used when no indicator is given: <c>^FH</c> without a parameter selects <c>_</c>.</summary>
         internal const char DefaultIndicator = '_';
 
-        /// <summary>Validates a hexadecimal indicator: it must be a printable ASCII character other than the command prefixes <c>^</c> and <c>~</c>.</summary>
+        /// <summary>Validates a hexadecimal indicator: it must be a printable ASCII character (including the space) other than the command prefixes <c>^</c> and <c>~</c>.</summary>
         /// <param name="indicator">The indicator, or <see langword="null"/> when <c>^FH</c> is not used.</param>
         /// <param name="paramName">Name of the constructor parameter, used in the exception.</param>
         /// <returns>The unchanged <paramref name="indicator"/>.</returns>
-        /// <exception cref="ArgumentException"><paramref name="indicator"/> is <c>^</c>, <c>~</c>, a space, a control character or not a printable ASCII character.</exception>
+        /// <exception cref="ArgumentException"><paramref name="indicator"/> is <c>^</c>, <c>~</c>, a control character or not a printable ASCII character.</exception>
         internal static char? Validate(char? indicator, string paramName)
         {
-            if (indicator is char c && (c <= ' ' || c >= '~' || c == '^'))
+            if (indicator is char c && (c < ' ' || c >= '~' || c == '^'))
             {
                 throw new ArgumentException("The hexadecimal indicator must be a printable ASCII character other than '^' and '~'.", paramName);
             }

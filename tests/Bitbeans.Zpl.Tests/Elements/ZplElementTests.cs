@@ -276,6 +276,13 @@ namespace Bitbeans.Zpl.Tests
         }
 
         [TestMethod]
+        public void GraphicSymbolWithJustification()
+        {
+            Assert.AreEqual("^FO10,20,1\n^GSN,40,50^FDB^FS", new ZplGraphicSymbol(GraphicSymbolCharacter.Copyright, 10, 20, 50, 40, fieldJustification: FieldJustification.Right).ToZplString());
+            Assert.AreEqual("^FT10,20,0\n^GSN,40,50^FDC^FS", new ZplGraphicSymbol("C", 10, 20, 50, 40, bottomToTop: true, fieldJustification: FieldJustification.Left).ToZplString());
+        }
+
+        [TestMethod]
         public void GraphicSymbolFromText()
         {
             Assert.AreEqual(GraphicSymbolCharacter.TradeMark, new ZplGraphicSymbol("CD", 1, 2, 3, 4).Character);

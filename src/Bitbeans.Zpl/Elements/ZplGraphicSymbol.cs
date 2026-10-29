@@ -28,6 +28,7 @@ namespace Bitbeans.Zpl.Elements
         /// <param name="fieldOrientation">Field orientation: normal (<c>N</c>), rotated 90 degrees (<c>R</c>), inverted 180 degrees (<c>I</c>) or read from bottom up (<c>B</c>).</param>
         /// <param name="bottomToTop"><see langword="true"/> to position the field with <c>^FT</c> (<see cref="ZplFieldTypeset"/>) instead of <c>^FO</c> (<see cref="ZplFieldOrigin"/>).</param>
         /// <param name="useDefaultPosition">Only evaluated together with <paramref name="bottomToTop"/>: <see langword="true"/> renders <c>^FT</c> without coordinates so the printer continues at its default position. Ignored for <c>^FO</c>.</param>
+        /// <param name="fieldJustification">Field justification rendered as the third parameter of <c>^FO</c>/<c>^FT</c>; <see cref="FieldJustification.None"/> omits it.</param>
         public ZplGraphicSymbol(
             string text,
             int positionX,
@@ -36,8 +37,9 @@ namespace Bitbeans.Zpl.Elements
             int height,
             FieldOrientation fieldOrientation = FieldOrientation.Normal,
             bool bottomToTop = false,
-            bool useDefaultPosition = false)
-            : base(positionX, positionY, bottomToTop, useDefaultPosition)
+            bool useDefaultPosition = false,
+            FieldJustification fieldJustification = FieldJustification.None)
+            : base(positionX, positionY, bottomToTop, useDefaultPosition, fieldJustification)
         {
             GraphicSymbolCharacter? character = default;
             if (!string.IsNullOrEmpty(text))
@@ -60,6 +62,7 @@ namespace Bitbeans.Zpl.Elements
         /// <param name="fieldOrientation">Field orientation: normal (<c>N</c>), rotated 90 degrees (<c>R</c>), inverted 180 degrees (<c>I</c>) or read from bottom up (<c>B</c>).</param>
         /// <param name="bottomToTop"><see langword="true"/> to position the field with <c>^FT</c> (<see cref="ZplFieldTypeset"/>) instead of <c>^FO</c> (<see cref="ZplFieldOrigin"/>).</param>
         /// <param name="useDefaultPosition">Only evaluated together with <paramref name="bottomToTop"/>: <see langword="true"/> renders <c>^FT</c> without coordinates so the printer continues at its default position. Ignored for <c>^FO</c>.</param>
+        /// <param name="fieldJustification">Field justification rendered as the third parameter of <c>^FO</c>/<c>^FT</c>; <see cref="FieldJustification.None"/> omits it.</param>
         public ZplGraphicSymbol(
             GraphicSymbolCharacter? character,
             int positionX,
@@ -68,8 +71,9 @@ namespace Bitbeans.Zpl.Elements
             int height,
             FieldOrientation fieldOrientation = FieldOrientation.Normal,
             bool bottomToTop = false,
-            bool useDefaultPosition = false)
-            : base(positionX, positionY, bottomToTop, useDefaultPosition)
+            bool useDefaultPosition = false,
+            FieldJustification fieldJustification = FieldJustification.None)
+            : base(positionX, positionY, bottomToTop, useDefaultPosition, fieldJustification)
         {
             Character = ValidateCharacter(character, nameof(character));
             FieldOrientation = fieldOrientation;

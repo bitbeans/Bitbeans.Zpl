@@ -91,9 +91,9 @@ namespace Bitbeans.Zpl.Helpers
                     //fills the line, to the right, with zeros
                     compressedCurrentLine.Append(',');
                 }
-                else if (lastChar.Equals('1'))
+                else if (lastChar.Equals('F'))
                 {
-                    //fills the line, to the right, with ones
+                    //fills the line, to the right, with one bits
                     compressedCurrentLine.Append('!');
                 }
                 else
@@ -152,7 +152,7 @@ namespace Bitbeans.Zpl.Helpers
 
                 if (c.Equals('!'))
                 {
-                    var appendOne = new string('1', chunkSize - lineIndex);
+                    var appendOne = new string('F', chunkSize - lineIndex);
                     hexData.Append(appendOne);
                     hexData.Append("\n");
                     lineIndex = 0;

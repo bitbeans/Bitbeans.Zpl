@@ -300,7 +300,7 @@ namespace Bitbeans.Zpl.Tests
         public void HexadecimalIndicatorIsValidated()
         {
             var font = new ZplFont();
-            foreach (char invalid in new[] { '^', '~', ' ', '\n', '\0', '\u007F', 'ä', 'Ā' })
+            foreach (char invalid in new[] { '^', '~', '\n', '\0', '\u007F', 'ä', 'Ā' })
             {
                 Assert.ThrowsExactly<ArgumentException>(() => new ZplTextField("x", 0, 0, font, hexadecimalIndicator: invalid), $"text {(int)invalid}");
                 Assert.ThrowsExactly<ArgumentException>(() => new ZplFieldBlock("x", 0, 0, 100, font, hexadecimalIndicator: invalid), $"block {(int)invalid}");
@@ -314,11 +314,18 @@ namespace Bitbeans.Zpl.Tests
             var ex = Assert.ThrowsExactly<ArgumentException>(() => new ZplTextField("x", 0, 0, font, hexadecimalIndicator: '^'));
             Assert.AreEqual("hexadecimalIndicator", ex.ParamName);
 
-            foreach (char valid in new[] { '_', '!', '\\', '#', '}', '0', 'a' })
+            foreach (char valid in new[] { '_', ' ', '!', '\\', '#', '}', '0', 'a' })
             {
                 Assert.AreEqual(valid, new ZplTextField("x", 0, 0, font, hexadecimalIndicator: valid).HexadecimalIndicator);
                 Assert.AreEqual(valid, new ZplFieldDataElementBase("x", 0, 0, FieldOrientation.Normal, valid, false, false).HexadecimalIndicator);
             }
+        }
+
+        [TestMethod]
+        public void SpaceAsHexadecimalIndicatorEscapesSpaces()
+        {
+            var field = new ZplTextField("A B", 0, 0, new ZplFont(), hexadecimalIndicator: ' ');
+            StringAssert.Contains(field.ToZplString(), "^FH ^FDA 20B^FS");
         }
 
         [TestMethod]
