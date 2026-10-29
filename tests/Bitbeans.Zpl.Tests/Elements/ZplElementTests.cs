@@ -138,7 +138,7 @@ namespace Bitbeans.Zpl.Tests
 
             Assert.AreEqual(3, element.Number);
             Assert.AreSame(text, element.FormatElement);
-            Assert.AreEqual("^A0N,30,30\n^FO10,20\n^FDX^FS\n^FN3^FS", element.ToZplString());
+            Assert.AreEqual("^A0N,30,30\n^FO10,20\n^FN3^FS", element.ToZplString());
         }
 
         [TestMethod]
