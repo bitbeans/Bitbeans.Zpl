@@ -32,7 +32,7 @@ public static class Industrial2of5Symbology
         {
             char digit = content[index];
 
-            if (!char.IsDigit(digit))
+            if (!char.IsAsciiDigit(digit))
             {
                 throw new ArgumentException("Barcode content must contain only digits.", nameof(content));
             }
