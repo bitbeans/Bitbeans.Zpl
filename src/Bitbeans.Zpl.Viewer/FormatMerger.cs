@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 
 namespace Bitbeans.Zpl.Viewer
 {
@@ -57,8 +58,7 @@ namespace Bitbeans.Zpl.Viewer
                     {
                         if (elements[i] is ZplFieldNumber fieldNumber && fieldNumber.Number == recallFieldNumber.Number)
                         {
-                            ((IFormatElement)fieldNumber.FormatElement).SetTemplateContent(recallFieldNumber.Text);
-                            elements[i] = fieldNumber.FormatElement;
+                            elements[i] = CreateElementWithContent(fieldNumber.FormatElement, recallFieldNumber.Text);
                         }
                     }
                 }
@@ -71,11 +71,29 @@ namespace Bitbeans.Zpl.Viewer
             return elements;
         }
 
+        private static readonly MethodInfo memberwiseCloneMethod =
+            typeof(object).GetMethod("MemberwiseClone", BindingFlags.Instance | BindingFlags.NonPublic);
+
+        /// <summary>
+        /// Copies a format element and sets the content of the copy. A format can be recalled by
+        /// several labels, so the template element itself must keep its (empty) content.
+        /// </summary>
+        private static ZplElementBase CreateElementWithContent(ZplElementBase formatElement, string content)
+        {
+            ZplElementBase copy = (ZplElementBase)memberwiseCloneMethod.Invoke(formatElement, null);
+            ((IFormatElement)copy).SetTemplateContent(content);
+            return copy;
+        }
+
         private static LabelInfo GetFormatLabelInfo(
             ZplRecallFormat recallFormat,
             Dictionary<string, LabelInfo> templateFormats)
         {
-            string formatName = Path.GetFileNameWithoutExtension(recallFormat.FormatName);
+            // Strip the optional storage device ("R:FORMAT.ZPL"), Path does not treat ':' as separator on all platforms
+            string fileName = recallFormat.FormatName.Length > 1 && recallFormat.FormatName[1] == ':'
+                ? recallFormat.FormatName.Substring(2)
+                : recallFormat.FormatName;
+            string formatName = Path.GetFileNameWithoutExtension(fileName);
             if (!templateFormats.TryGetValue(formatName, out LabelInfo value))
             {
                 throw new InvalidOperationException($"Could not find format {recallFormat.FormatName}");
@@ -97,15 +115,12 @@ namespace Bitbeans.Zpl.Viewer
             {
                 if (formatElement is ZplFieldNumber fieldNumber)
                 {
-                    if (fieldNumber.FormatElement != null)
+                    // The format element of a field number is never null (checked by its constructor)
+                    ZplRecallFieldNumber recallFieldNumber = (ZplRecallFieldNumber)valuesLabelInfo.ZplElements.FirstOrDefault(e =>
+                        (e as ZplRecallFieldNumber)?.Number == fieldNumber.Number);
+                    if (recallFieldNumber != null)
                     {
-                        ZplRecallFieldNumber recallFieldNumber = (ZplRecallFieldNumber)valuesLabelInfo.ZplElements.FirstOrDefault(e =>
-                            (e as ZplRecallFieldNumber)?.Number == fieldNumber.Number);
-                        if (recallFieldNumber != null)
-                        {
-                            ((IFormatElement)fieldNumber.FormatElement).SetTemplateContent(recallFieldNumber.Text);
-                            yield return fieldNumber.FormatElement;
-                        }
+                        yield return CreateElementWithContent(fieldNumber.FormatElement, recallFieldNumber.Text);
                     }
                 }
                 else

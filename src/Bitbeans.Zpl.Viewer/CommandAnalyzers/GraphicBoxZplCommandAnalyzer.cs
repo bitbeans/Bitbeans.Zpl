@@ -41,7 +41,7 @@ namespace Bitbeans.Zpl.Viewer.CommandAnalyzers
                 height = borderThickness;
             }
 
-            if (zplDataParts.Length > 0 && int.TryParse(zplDataParts[0], out tmpint))
+            if (int.TryParse(zplDataParts[0], out tmpint))
             {
                 width = tmpint;
             }

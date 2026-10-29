@@ -11,14 +11,7 @@ namespace Bitbeans.Zpl.Viewer.CommandAnalyzers
         {
             string[] zplDataParts = this.SplitCommand(zplCommand);
 
-            bool reverse = false;
-
-            if (zplDataParts.Length > 0)
-            {
-                reverse = this.ConvertBoolean(zplDataParts[0]);
-            }
-
-            virtualPrinter.SetLabelReverse(reverse);
+            virtualPrinter.SetLabelReverse(this.ConvertBoolean(zplDataParts[0]));
             return null;
         }
     }

@@ -1,6 +1,8 @@
 ﻿using Bitbeans.Zpl;
 using Bitbeans.Zpl.Elements;
 
+using System.Globalization;
+
 namespace Bitbeans.Zpl.Viewer.CommandAnalyzers
 {
     public class FieldOriginZplCommandAnalzer : ZplCommandAnalyzerBase
@@ -16,15 +18,14 @@ namespace Bitbeans.Zpl.Viewer.CommandAnalyzers
             int x = 0;
             int y = 0;
 
-            if (zplDataParts.Length > 0 &&
-                decimal.TryParse(zplDataParts[0], out tmpdec) &&
+            if (decimal.TryParse(zplDataParts[0], NumberStyles.Number, CultureInfo.InvariantCulture, out tmpdec) &&
                 int.MinValue <= tmpdec && tmpdec <= int.MaxValue)
             {
                 x = decimal.ToInt32(tmpdec);
             }
 
             if (zplDataParts.Length > 1 &&
-                decimal.TryParse(zplDataParts[1], out tmpdec) &&
+                decimal.TryParse(zplDataParts[1], NumberStyles.Number, CultureInfo.InvariantCulture, out tmpdec) &&
                 int.MinValue <= tmpdec && tmpdec <= int.MaxValue)
             {
                 y = decimal.ToInt32(tmpdec);

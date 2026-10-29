@@ -154,11 +154,11 @@ namespace Bitbeans.Zpl.Viewer.CommandAnalyzers
                 }
                 else if (virtualPrinter.NextElementFieldData is CodeMsiBarcodeFieldData msi)
                 {
-                    return new ZplBarcodeMsi(content, x, y, msi.Height ?? barcodeHeight, moduleWidth, wideBarToNarrowBarWidthRatio, msi.FieldOrientation, msi.CheckDigitSelection, hexadecimalIndicator, msi.PrintInterpretationLine, msi.PrintInterpretationLineAboveCode, msi.PrintInterpretationLineWithCheckDigit, bottomToTop);
+                    return new ZplBarcodeMsi(content, x, y, msi.Height ?? barcodeHeight, moduleWidth, wideBarToNarrowBarWidthRatio, msi.FieldOrientation, msi.CheckDigitSelection, hexadecimalIndicator, msi.PrintInterpretationLine, msi.PrintInterpretationLineAboveCode, msi.PrintInterpretationLineWithCheckDigit, bottomToTop, useDefaultPosition);
                 }
                 else if (virtualPrinter.NextElementFieldData is CodeLogmarsBarcodeFieldData logmars)
                 {
-                    return new ZplBarcodeLogmars(content, x, y, logmars.Height ?? barcodeHeight, moduleWidth, wideBarToNarrowBarWidthRatio, logmars.FieldOrientation, logmars.PrintInterpretationLineAboveCode, hexadecimalIndicator, bottomToTop);
+                    return new ZplBarcodeLogmars(content, x, y, logmars.Height ?? barcodeHeight, moduleWidth, wideBarToNarrowBarWidthRatio, logmars.FieldOrientation, logmars.PrintInterpretationLineAboveCode, hexadecimalIndicator, bottomToTop, useDefaultPosition);
                 }
                 else
                 {
@@ -203,19 +203,20 @@ namespace Bitbeans.Zpl.Viewer.CommandAnalyzers
                 {
                     parsedText = fullData;
                 }
-                else if (input == "M")
+                else // input mode "M": the regular expressions only accept "A" or "M"
                 {
                     Match modeMatch = qrCodeFieldDataModeRegex.Match(fullData);
                     if (modeMatch.Success)
                     {
+                        string data = modeMatch.Groups["data"].Value;
                         if (modeMatch.Groups["count"].Success)
                         {
-                            int count = Math.Min(int.Parse(modeMatch.Groups["count"].Value), fullData.Length);
-                            parsedText = modeMatch.Groups["data"].Value.Substring(0, count);
+                            int count = Math.Min(int.Parse(modeMatch.Groups["count"].Value), data.Length);
+                            parsedText = data.Substring(0, count);
                         }
                         else
                         {
-                            parsedText = modeMatch.Groups["data"].Value;
+                            parsedText = data;
                         }
                     }
                     else
@@ -237,7 +238,7 @@ namespace Bitbeans.Zpl.Viewer.CommandAnalyzers
                         string[] dataParts = fullData.Split(',');
                         parsedText = string.Join("", dataParts);
                     }
-                    else if (input == "M")
+                    else // input mode "M": the regular expressions only accept "A" or "M"
                     {
                         StringBuilder builder = new();
                         while (fullData.Length > 0)

@@ -15,7 +15,7 @@ namespace Bitbeans.Zpl.Viewer.CommandAnalyzers
             int x = 0;
             int y = 0;
 
-            if (zplDataParts.Length > 0 && int.TryParse(zplDataParts[0], out tmpint))
+            if (int.TryParse(zplDataParts[0], out tmpint))
             {
                 x = tmpint;
             }
