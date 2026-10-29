@@ -7,7 +7,14 @@ namespace Bitbeans.Zpl.Elements
     /// </summary>
     public class ZplBarcode128 : ZplBarcode
     {
+        /// <summary>
+        /// Code 128 mode: N (no selected mode), U (UCC case mode), A (automatic) or D (UCC/EAN mode)
+        /// </summary>
         public string Mode { get; set; }
+
+        /// <summary>
+        /// Calculate and print the UCC check digit (mode U)
+        /// </summary>
         public bool UccCheckDigit { get; set; }
 
         /// <summary>
@@ -62,15 +69,17 @@ namespace Bitbeans.Zpl.Elements
         ///<inheritdoc/>
         public override IEnumerable<string> Render(ZplRenderOptions context)
         {
-            //TODO:Add 'UCC check digit' and 'mode'
+            //^BCo,h,f,g,e,m
+            var command = $"^BC{RenderFieldOrientation()},{context.Scale(Height)},{RenderPrintInterpretationLine()},{RenderPrintInterpretationLineAboveCode()}";
+            if (UccCheckDigit || Mode != "N")
+            {
+                command += $",{RenderBoolean(UccCheckDigit)},{Mode}";
+            }
 
-            //^FO100,100 ^ BY3
-            //^BCN,100,Y,N,N
-            //^FD123456 ^ FS
             var result = new List<string>();
             result.AddRange(RenderPosition(context));
             result.Add(RenderModuleWidth());
-            result.Add($"^BC{RenderFieldOrientation()},{context.Scale(Height)},{RenderPrintInterpretationLine()},{RenderPrintInterpretationLineAboveCode()}");
+            result.Add(command);
             result.Add(RenderFieldDataSection());
 
             return result;

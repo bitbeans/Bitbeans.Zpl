@@ -38,7 +38,7 @@ namespace Bitbeans.Zpl.Elements
             //^GCd,t,c
             var result = new List<string>();
             result.AddRange(RenderPosition(context));
-            result.Add($"^GC{context.Scale(Diameter)},{context.Scale(BorderThickness)},{RenderLineColor(LineColor)}^FS");
+            result.Add($"{RenderReversePrint()}^GC{context.Scale(Diameter)},{context.Scale(BorderThickness)},{RenderLineColor(LineColor)}^FS");
 
             return result;
         }

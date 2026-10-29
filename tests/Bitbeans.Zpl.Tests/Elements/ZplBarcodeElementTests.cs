@@ -28,7 +28,7 @@ namespace Bitbeans.Zpl.Tests
             Assert.IsFalse(element.UccCheckDigit);
 
             var custom = new ZplBarcode128("1", 1, 2, 80, 4, 2, FieldOrientation.Rotated180, null, false, true, mode: "U", uccCheckDigit: true);
-            Assert.AreEqual("^FO1,2\n^BY4,2\n^BCI,80,N,Y\n^FD1^FS", custom.ToZplString());
+            Assert.AreEqual("^FO1,2\n^BY4,2\n^BCI,80,N,Y,Y,U\n^FD1^FS", custom.ToZplString());
             Assert.AreEqual("U", custom.Mode);
             Assert.IsTrue(custom.UccCheckDigit);
         }

@@ -1,4 +1,4 @@
-﻿namespace Bitbeans.Zpl.Elements
+namespace Bitbeans.Zpl.Elements
 {
     public abstract class ZplGraphicElement : ZplPositionedElementBase
     {
@@ -24,6 +24,15 @@
             BorderThickness = borderThickness;
             LineColor = lineColor;
             ReversePrint = reversePrint;
+        }
+
+        /// <summary>
+        /// Render the field reverse print command (^FR) if <see cref="ReversePrint"/> is set
+        /// </summary>
+        /// <returns>^FR or an empty string</returns>
+        protected string RenderReversePrint()
+        {
+            return ReversePrint ? "^FR" : string.Empty;
         }
     }
 }

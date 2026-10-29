@@ -34,7 +34,7 @@ namespace Bitbeans.Zpl.Elements
             //^GDw,h,t,c,o
             var result = new List<string>();
             result.AddRange(RenderPosition(context));
-            result.Add($"^GD{context.Scale(Width)},{context.Scale(Height)},{context.Scale(BorderThickness)},{RenderLineColor(LineColor)},{(RightLeaningDiagonal ? "R" : "L")}^FS");
+            result.Add($"{RenderReversePrint()}^GD{context.Scale(Width)},{context.Scale(Height)},{context.Scale(BorderThickness)},{RenderLineColor(LineColor)},{(RightLeaningDiagonal ? "R" : "L")}^FS");
 
             return result;
         }
