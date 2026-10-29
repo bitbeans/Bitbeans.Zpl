@@ -31,7 +31,7 @@ namespace Bitbeans.Zpl.Viewer.CommandAnalyzers
                 virtualPrinter.SetBarcodeModuleWidth(tmpint);
             }
 
-            if (zplDataParts.Length > 1 && double.TryParse(zplDataParts[1], NumberStyles.Float, CultureInfo.InvariantCulture, out tmpdbl))
+            if (zplDataParts.Length > 1 && double.TryParse(zplDataParts[1], NumberStyles.Float, CultureInfo.InvariantCulture, out tmpdbl) && double.IsFinite(tmpdbl))
             {
                 // TODO: add validation message: between 2.0 and 3.0 in 0.1 increments
                 if (tmpdbl < 2.0)

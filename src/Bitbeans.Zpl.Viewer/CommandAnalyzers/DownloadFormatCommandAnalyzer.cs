@@ -15,7 +15,8 @@ namespace Bitbeans.Zpl.Viewer.CommandAnalyzers
         {
             // The pattern accepts every ^DF command (storage device and extension are optional)
             Match commandMatch = commandRegex.Match(zplCommand);
-            virtualPrinter.SetNextDownloadFormatName(commandMatch.Groups[2].Value);
+            // Keep the storage device: formats with the same name on different devices are different formats
+            virtualPrinter.SetNextDownloadFormatName(commandMatch.Groups[1].Value + commandMatch.Groups[2].Value);
 
             return null;
         }

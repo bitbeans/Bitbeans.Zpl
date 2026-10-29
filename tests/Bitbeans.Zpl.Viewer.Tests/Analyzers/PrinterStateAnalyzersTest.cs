@@ -245,6 +245,8 @@ namespace Bitbeans.Zpl.Viewer.Tests.Analyzers
         [TestMethod]
         [DataRow("^FH ")]
         [DataRow("^FH~")]
+        [DataRow("^FH^")]
+        [DataRow("^FH\u0001")]
         [DataRow("^FH\u007F")]
         [DataRow("^FHä")]
         public void FieldHexadecimal_InvalidIndicator_FallsBackToDefault(string command)
@@ -540,7 +542,6 @@ namespace Bitbeans.Zpl.Viewer.Tests.Analyzers
         }
 
         [TestMethod]
-        [DataRow("^FT10,")]
         [DataRow("^FT10,abc")]
         [DataRow("^FTabc,def")]
         [DataRow("^FT10,99999999999")]
@@ -554,7 +555,7 @@ namespace Bitbeans.Zpl.Viewer.Tests.Analyzers
         }
 
         [TestMethod]
-        public void FieldTypeset_OnlyXKeepsExplicitPosition()
+        public void FieldTypeset_OnlyXKeepsExplicitPositionAndLastY()
         {
             VirtualPrinter printer = Run(new FieldTypesetZplCommandAnalyzer(), "^FT10");
 

@@ -39,7 +39,10 @@ namespace Bitbeans.Zpl.Viewer.CommandAnalyzers
                 }
             }
 
-            if (zplDataParts.Length > 1 && !string.IsNullOrEmpty(zplDataParts[1]))
+            // An omitted y coordinate is the position after the last formatted text field. The drawers can only
+            // continue at the complete default position (x and y), so the y of the last positioned field is used.
+            bool yOmitted = zplDataParts.Length < 2 || string.IsNullOrEmpty(zplDataParts[1]);
+            if (!yOmitted)
             {
                 if (decimal.TryParse(zplDataParts[1], NumberStyles.Number, CultureInfo.InvariantCulture, out tmpdec) &&
                     int.MinValue <= tmpdec && tmpdec <= int.MaxValue)
@@ -52,11 +55,6 @@ namespace Bitbeans.Zpl.Viewer.CommandAnalyzers
                     useDefaultPosition = true;
                 }
             }
-            else if (zplDataParts.Length > 1)
-            {
-                // Empty y coordinate - use default position
-                useDefaultPosition = true;
-            }
 
             if (zplDataParts.Length > 2)
             {
@@ -68,6 +66,12 @@ namespace Bitbeans.Zpl.Viewer.CommandAnalyzers
             {
                 x += virtualPrinter.LabelHomePosition.X;
                 y += virtualPrinter.LabelHomePosition.Y;
+            }
+
+            if (yOmitted)
+            {
+                // Already includes the label home
+                y = virtualPrinter.LastElementPositionY;
             }
 
             virtualPrinter.SetNextElementPosition(x, y, true, useDefaultPosition);

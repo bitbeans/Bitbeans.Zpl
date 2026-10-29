@@ -14,21 +14,39 @@ namespace Bitbeans.Zpl.Viewer
     /// </summary>
     public class FormatMerger : IFormatMerger
     {
+        /// <summary>
+        /// Merges the formats and throws an <see cref="InvalidOperationException"/> if a recalled format was not
+        /// downloaded. Use <see cref="MergeFormats(List{LabelInfo}, ICollection{string})"/> to receive the errors instead.
+        /// </summary>
         /// <inheritdoc />
         public List<LabelInfo> MergeFormats(List<LabelInfo> rawLabelInfos)
         {
+            List<string> errors = [];
+            List<LabelInfo> mergedLabelInfos = this.MergeFormats(rawLabelInfos, errors);
+            if (errors.Count > 0)
+            {
+                throw new InvalidOperationException(errors[0]);
+            }
+
+            return mergedLabelInfos;
+        }
+
+        /// <inheritdoc />
+        public List<LabelInfo> MergeFormats(List<LabelInfo> rawLabelInfos, ICollection<string> errors)
+        {
             List<LabelInfo> mergedLabelInfos = [];
-            // Format label infos indexed by download format name
+            // Format label infos indexed by storage device and download format name (see GetFormatKey)
             Dictionary<string, LabelInfo> templateFormats = [];
 
             foreach (LabelInfo rawLabelInfo in rawLabelInfos)
             {
-                List<ZplElementBase> elements = GetMergedElements(rawLabelInfo, templateFormats);
+                List<ZplElementBase> elements = GetMergedElements(rawLabelInfo, templateFormats, errors);
                 LabelInfo labelInfo = new() { ZplElements = elements.ToArray() };
 
                 if (rawLabelInfo.DownloadFormatName != null)
                 {
-                    templateFormats.Add(rawLabelInfo.DownloadFormatName, labelInfo);
+                    // A later ^DF to the same device and name replaces the stored format
+                    templateFormats[GetFormatKey(rawLabelInfo.DownloadFormatName)] = labelInfo;
                 }
                 else
                 {
@@ -41,7 +59,8 @@ namespace Bitbeans.Zpl.Viewer
 
         private static List<ZplElementBase> GetMergedElements(
             LabelInfo rawLabelInfo,
-            Dictionary<string, LabelInfo> templateFormats)
+            Dictionary<string, LabelInfo> templateFormats,
+            ICollection<string> errors)
         {
             List<ZplElementBase> elements = [];
 
@@ -49,8 +68,15 @@ namespace Bitbeans.Zpl.Viewer
             {
                 if (zplElement is ZplRecallFormat recallFormat)
                 {
-                    LabelInfo formatLabelInfo = GetFormatLabelInfo(recallFormat, templateFormats);
-                    elements.AddRange(GetMergedElements(rawLabelInfo, formatLabelInfo));
+                    if (templateFormats.TryGetValue(GetFormatKey(recallFormat.FormatName), out LabelInfo formatLabelInfo))
+                    {
+                        elements.AddRange(GetMergedElements(rawLabelInfo, formatLabelInfo));
+                    }
+                    else
+                    {
+                        // The label keeps its own elements
+                        errors.Add($"Could not find format {recallFormat.FormatName}");
+                    }
                 }
                 else if (zplElement is ZplRecallFieldNumber recallFieldNumber)
                 {
@@ -68,7 +94,50 @@ namespace Bitbeans.Zpl.Viewer
                 }
             }
 
+            if (rawLabelInfo.DownloadFormatName == null)
+            {
+                ApplyFieldNumberData(rawLabelInfo, elements);
+            }
+
             return elements;
+        }
+
+        /// <summary>
+        /// Fields of a label that define their own field number and data (<c>^FO..^FN1^FDdata^FS</c>) are printed,
+        /// as the data is provided to all fields with this number. A format keeps its fields as templates.
+        /// </summary>
+        private static void ApplyFieldNumberData(LabelInfo rawLabelInfo, List<ZplElementBase> elements)
+        {
+            for (int i = 0; i < elements.Count; i++)
+            {
+                if (elements[i] is ZplFieldNumber fieldNumber)
+                {
+                    ZplRecallFieldNumber recallFieldNumber = rawLabelInfo.ZplElements
+                        .OfType<ZplRecallFieldNumber>()
+                        .LastOrDefault(r => r.Number == fieldNumber.Number);
+                    if (recallFieldNumber != null)
+                    {
+                        elements[i] = CreateElementWithContent(fieldNumber.FormatElement, recallFieldNumber.Text);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Key of a stored format: storage device (default <c>R:</c>) and upper case name without extension.
+        /// </summary>
+        internal static string GetFormatKey(string formatName)
+        {
+            string name = formatName.Trim();
+            char device = 'R';
+            // Strip the optional storage device ("R:FORMAT.ZPL"), Path does not treat ':' as separator on all platforms
+            if (name.Length > 1 && name[1] == ':')
+            {
+                device = char.ToUpperInvariant(name[0]);
+                name = name.Substring(2);
+            }
+
+            return device + ":" + Path.GetFileNameWithoutExtension(name).ToUpperInvariant();
         }
 
         private static readonly MethodInfo memberwiseCloneMethod =
@@ -83,23 +152,6 @@ namespace Bitbeans.Zpl.Viewer
             ZplElementBase copy = (ZplElementBase)memberwiseCloneMethod.Invoke(formatElement, null);
             ((IFormatElement)copy).SetTemplateContent(content);
             return copy;
-        }
-
-        private static LabelInfo GetFormatLabelInfo(
-            ZplRecallFormat recallFormat,
-            Dictionary<string, LabelInfo> templateFormats)
-        {
-            // Strip the optional storage device ("R:FORMAT.ZPL"), Path does not treat ':' as separator on all platforms
-            string fileName = recallFormat.FormatName.Length > 1 && recallFormat.FormatName[1] == ':'
-                ? recallFormat.FormatName.Substring(2)
-                : recallFormat.FormatName;
-            string formatName = Path.GetFileNameWithoutExtension(fileName);
-            if (!templateFormats.TryGetValue(formatName, out LabelInfo value))
-            {
-                throw new InvalidOperationException($"Could not find format {recallFormat.FormatName}");
-            }
-
-            return value;
         }
 
         /// <summary>

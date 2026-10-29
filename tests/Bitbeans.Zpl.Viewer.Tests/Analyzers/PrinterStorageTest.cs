@@ -44,14 +44,14 @@ namespace Bitbeans.Zpl.Viewer.Tests.Analyzers
         }
 
         [TestMethod]
-        public void SecondFileWithTheSameNameDoesNotReplaceTheFirst()
+        public void SecondFileWithTheSameNameReplacesTheFirst()
         {
             PrinterStorage storage = new();
 
             storage.AddFile('R', "A.GRF", [1]);
             storage.AddFile('R', "A.GRF", [2]);
 
-            CollectionAssert.AreEqual(new byte[] { 1 }, storage.GetFile('R', "A.GRF"));
+            CollectionAssert.AreEqual(new byte[] { 2 }, storage.GetFile('R', "A.GRF"));
         }
 
         [TestMethod]

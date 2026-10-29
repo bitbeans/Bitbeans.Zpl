@@ -130,7 +130,7 @@ namespace Bitbeans.Zpl.Viewer
                 }
             }
 
-            labelInfos = this.formatMerger.MergeFormats(labelInfos);
+            labelInfos = this.formatMerger.MergeFormats(labelInfos, errors);
 
             AnalyzeInfo analyzeInfo = new()
             {
@@ -172,11 +172,14 @@ namespace Bitbeans.Zpl.Viewer
             char caret = '^';
             char tilde = '~';
             List<string> results = new(200);
+            // Escape character of the Data Matrix field that is currently being read (^BX parameter g)
+            char? dataMatrixEscape = null;
             StringBuilder buffer = new(2000);
             for (int i = 0; i < cleanZpl.Length; i++)
             {
                 char c = cleanZpl[i];
-                bool isDataMatrixEscapeCharacter = c == tilde && IsDataMatrixCommandBuffer(buffer, caret);
+                bool isDataMatrixEscapeCharacter = (c == tilde && IsDataMatrixCommandBuffer(buffer, caret))
+                    || (c == dataMatrixEscape && IsFieldDataBuffer(buffer, caret));
                 if ((c == caret || c == tilde) && !isDataMatrixEscapeCharacter)
                 {
                     string command = buffer.ToString();
@@ -199,6 +202,7 @@ namespace Bitbeans.Zpl.Viewer
                         }
                         else
                         {
+                            dataMatrixEscape = GetDataMatrixEscape(command, commandLetters, dataMatrixEscape);
                             results.Add(command);
                         }
                     }
@@ -219,6 +223,28 @@ namespace Bitbeans.Zpl.Viewer
             results.Add(lastCommand);
 
             return results.ToArray();
+        }
+
+        /// <summary>
+        /// Tracks the escape character of the current Data Matrix field: set by ^BX, reset at the end of the field.
+        /// </summary>
+        private static char? GetDataMatrixEscape(string command, string commandLetters, char? current)
+        {
+            if (commandLetters == "BX")
+            {
+                string[] parameters = command.Substring(3).Trim().Split(',');
+                return parameters.Length > 6 && parameters[6].Length > 0 ? parameters[6][0] : '~';
+            }
+
+            return commandLetters is "FS" or "XA" or "XZ" ? null : current;
+        }
+
+        private static bool IsFieldDataBuffer(StringBuilder buffer, char caret)
+        {
+            return buffer.Length >= 3
+                && (buffer[0] == '^' || buffer[0] == caret)
+                && char.ToUpperInvariant(buffer[1]) == 'F'
+                && char.ToUpperInvariant(buffer[2]) is 'D' or 'V';
         }
 
         private static bool IsDataMatrixCommandBuffer(StringBuilder buffer, char caret)

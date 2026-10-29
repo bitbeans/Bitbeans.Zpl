@@ -249,9 +249,11 @@ namespace Bitbeans.Zpl.Viewer.Tests.Analyzers
         }
 
         [TestMethod]
-        public void RecallOfUnknownFormatIsAnException()
+        public void RecallOfUnknownFormatIsAnError()
         {
-            Assert.ThrowsExactly<System.InvalidOperationException>(() => AnalyzerTestHelper.Analyze("^XA^XFR:NONE.ZPL^XZ"));
+            AnalyzeInfo info = AnalyzerTestHelper.Analyze("^XA^XFR:NONE.ZPL^XZ");
+
+            Assert.HasCount(1, info.Errors);
         }
 
         [TestMethod]
@@ -272,7 +274,7 @@ namespace Bitbeans.Zpl.Viewer.Tests.Analyzers
             AnalyzeInfo info = new ZplAnalyzer(new PrinterStorage(), merger).Analyze("^XA^FO1,1^FDa^FS^XZ^XA^DFR:B.ZPL^FS^XZ");
 
             Assert.HasCount(2, merger.Received);
-            Assert.AreEqual("B", merger.Received[1].DownloadFormatName);
+            Assert.AreEqual("R:B", merger.Received[1].DownloadFormatName);
             Assert.IsEmpty(info.LabelInfos);
         }
 
