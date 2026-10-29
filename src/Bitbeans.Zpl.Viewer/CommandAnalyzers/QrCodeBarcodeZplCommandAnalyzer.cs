@@ -2,6 +2,8 @@
 using Bitbeans.Zpl.Elements;
 using Bitbeans.Zpl.Viewer.Models;
 
+using System;
+
 namespace Bitbeans.Zpl.Viewer.CommandAnalyzers
 {
     public class QrCodeBarcodeZplCommandAnalyzer : ZplCommandAnalyzerBase
@@ -28,13 +30,8 @@ namespace Bitbeans.Zpl.Viewer.CommandAnalyzers
 
             if (zplDataParts.Length > 2 && int.TryParse(zplDataParts[2], out tmpint))
             {
-                magnificationFactor = tmpint;
-
-                if (magnificationFactor > 100)
-                {
-                    // TODO: Add validation message max value is 100
-                    magnificationFactor = 100;
-                }
+                // ZPL II allows 1 to 10; the printer clamps values outside that range
+                magnificationFactor = Math.Clamp(tmpint, 1, 10);
             }
 
             if (zplDataParts.Length > 3)

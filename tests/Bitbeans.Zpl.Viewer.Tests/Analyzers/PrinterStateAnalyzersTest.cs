@@ -242,6 +242,16 @@ namespace Bitbeans.Zpl.Viewer.Tests.Analyzers
             Assert.AreEqual('\\', Run(new FieldHexadecimalZplCommandAnalyzer(), "^FH\\").NextElementFieldHexadecimalIndicator);
         }
 
+        [TestMethod]
+        [DataRow("^FH ")]
+        [DataRow("^FH~")]
+        [DataRow("^FH\u007F")]
+        [DataRow("^FHä")]
+        public void FieldHexadecimal_InvalidIndicator_FallsBackToDefault(string command)
+        {
+            Assert.AreEqual('_', Run(new FieldHexadecimalZplCommandAnalyzer(), command).NextElementFieldHexadecimalIndicator);
+        }
+
         // ^FN n
         [TestMethod]
         public void FieldNumber_Parameters()

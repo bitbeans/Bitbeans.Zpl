@@ -1,4 +1,4 @@
-using Bitbeans.Zpl.Elements;
+﻿using Bitbeans.Zpl.Elements;
 using Bitbeans.Zpl.Viewer.CommandAnalyzers;
 using Bitbeans.Zpl.Viewer.Models;
 
@@ -681,10 +681,11 @@ namespace Bitbeans.Zpl.Viewer.Tests.Analyzers
         }
 
         [TestMethod]
-        public void QrCode_MagnificationIsCappedAt100()
+        public void QrCode_MagnificationIsClampedTo1To10()
         {
-            Assert.AreEqual(100, AnalyzerTestHelper.FieldData<QrCodeBarcodeFieldData>(new QrCodeBarcodeZplCommandAnalyzer(), "^BQN,2,250").MagnificationFactor);
-            Assert.AreEqual(100, AnalyzerTestHelper.FieldData<QrCodeBarcodeFieldData>(new QrCodeBarcodeZplCommandAnalyzer(), "^BQN,2,100").MagnificationFactor);
+            Assert.AreEqual(10, AnalyzerTestHelper.FieldData<QrCodeBarcodeFieldData>(new QrCodeBarcodeZplCommandAnalyzer(), "^BQN,2,250").MagnificationFactor);
+            Assert.AreEqual(10, AnalyzerTestHelper.FieldData<QrCodeBarcodeFieldData>(new QrCodeBarcodeZplCommandAnalyzer(), "^BQN,2,10").MagnificationFactor);
+            Assert.AreEqual(1, AnalyzerTestHelper.FieldData<QrCodeBarcodeFieldData>(new QrCodeBarcodeZplCommandAnalyzer(), "^BQN,2,0").MagnificationFactor);
         }
 
         [TestMethod]
