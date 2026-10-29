@@ -17,11 +17,11 @@ fixes from open upstream pull requests. See [credits](#credits).
 
 ## Packages
 
-| Package | Purpose | Dependencies |
+| Package | Purpose | Main libraries |
 | --- | --- | --- |
 | [`Bitbeans.Zpl`](src/Bitbeans.Zpl/README.md) | Create ZPL labels with typed elements | **none** |
-| [`Bitbeans.Zpl.SkiaSharp`](src/Bitbeans.Zpl.SkiaSharp/README.md) | Image conversion for `~DG` / `~DY` graphics | SkiaSharp |
-| [`Bitbeans.Zpl.Viewer`](src/Bitbeans.Zpl.Viewer/README.md) | Parse ZPL and render it to PNG/JPEG/WebP | SkiaSharp, HarfBuzz, ZXing.Net |
+| [`Bitbeans.Zpl.SkiaSharp`](src/Bitbeans.Zpl.SkiaSharp/README.md) | Image conversion for `~DG` / `~DY` graphics | SkiaSharp (+ Linux native assets) |
+| [`Bitbeans.Zpl.Viewer`](src/Bitbeans.Zpl.Viewer/README.md) | Parse ZPL and render it to PNG/JPEG/WebP | SkiaSharp, HarfBuzz, ZXing.Net, Microsoft.Extensions.Logging.Abstractions |
 
 All packages target **.NET 10**.
 
@@ -53,6 +53,7 @@ string zpl = new ZplEngine(elements).ToZplString(new ZplRenderOptions());
 
 ```csharp
 using Bitbeans.Zpl.Viewer;
+using Bitbeans.Zpl.Viewer.Models;
 
 IPrinterStorage printerStorage = new PrinterStorage();
 var analyzer = new ZplAnalyzer(printerStorage);

@@ -1,6 +1,7 @@
 # Viewer: supported commands
 
-Commands that are not listed are reported in `AnalyzeInfo.UnknownCommands` and ignored.
+`^XA` and `^XZ` delimit labels. Other commands that are not listed are reported in
+`AnalyzeInfo.UnknownCommands` and ignored.
 
 ## Barcodes
 
@@ -24,7 +25,7 @@ Commands that are not listed are reported in `AnalyzeInfo.UnknownCommands` and i
 | `^BQ` | QR Code | model 2, error correction, mask, mixed mode data |
 | `^BS` | UPC/EAN extension (2 and 5 digits) | |
 | `^BU` | UPC-A | |
-| `^BX` | Data Matrix | ECC 200, rows/columns, format, escape sequence, aspect ratio |
+| `^BX` | Data Matrix | ECC 200, module size, rows and columns (when both are set); format, escape character and aspect ratio are parsed but not used for drawing |
 | `^BY` | Barcode field defaults | module width, ratio, height |
 
 Not supported: Code 49 (`^B4`), Planet (`^B5`), Plessey (`^BP`), POSTNET (`^BZ`), GS1 DataBar (`^BR`),

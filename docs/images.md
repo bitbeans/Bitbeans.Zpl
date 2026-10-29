@@ -79,6 +79,8 @@ Implement `IImageConverter` to use another imaging library (System.Drawing, Magi
 or a custom dithering:
 
 ```csharp
+using Bitbeans.Zpl.ImageConverters;
+
 public sealed class MyConverter : IImageConverter
 {
     public ImageResult ConvertImage(byte[] imageData)

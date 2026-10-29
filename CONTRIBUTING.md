@@ -4,7 +4,7 @@ Thanks for helping to improve Bitbeans.Zpl! Issues and pull requests are welcome
 
 ## Prerequisites
 
-- .NET SDK 10 (the exact feature band is pinned in [`global.json`](global.json))
+- .NET SDK 10.0.400 or a later 10.0 feature band ([`global.json`](global.json) rolls forward with `latestFeature`)
 - PowerShell 7 for the coverage script
 
 ## Build and test

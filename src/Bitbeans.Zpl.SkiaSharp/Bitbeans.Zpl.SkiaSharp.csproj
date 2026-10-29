@@ -3,7 +3,7 @@
   <PropertyGroup>
     <IsPackable>true</IsPackable>
     <PackageId>Bitbeans.Zpl.SkiaSharp</PackageId>
-    <Description>SkiaSharp based image conversion for Bitbeans.Zpl (^GF, ~DG, ~DY graphics) without ImageSharp.</Description>
+    <Description>SkiaSharp based image conversion for Bitbeans.Zpl (~DG and ~DY graphics, GRF to PNG) without ImageSharp.</Description>
     <PackageTags>zebra;zpl;zpl2;label;printer;skiasharp;image</PackageTags>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>

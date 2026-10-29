@@ -55,7 +55,7 @@ string zpl = engine.ToZplString(new ZplRenderOptions { AddEmptyLineBeforeElement
 | `AddEmptyLineBeforeElementStart` | `false` | Blank line between elements (readability) |
 | `DisplayComments` | `false` | Emit element `Comments` in a `^FX` block |
 | `CompressedRendering` | `false` | Render every element on a single line |
-| `SourcePrintDpi` / `TargetPrintDpi` | `203` / `203` | Scale all coordinates and sizes by `Target / Source` |
+| `SourcePrintDpi` / `TargetPrintDpi` | `203` / `203` | Scale coordinates and sizes by `Target / Source` (see below) |
 
 ### Scaling for another printer resolution
 
@@ -65,6 +65,13 @@ Design the label once (for example at 203 dpi) and render it for a 300 dpi print
 var options = new ZplRenderOptions { SourcePrintDpi = 203, TargetPrintDpi = 300 };
 string zpl = new ZplEngine(elements).ToZplString(options);
 ```
+
+Positions, sizes, font sizes and line thicknesses are scaled and rounded to whole dots. Module widths
+(`^BY`) and QR/Aztec magnification are scaled and limited to 1 to 10. Exceptions:
+
+- `ZplGraphicField` (`^GF`) data is written unchanged, only its position is scaled. Use
+  `ZplDownloadGraphics`, which scales the image itself.
+- Box corner rounding (`^GB` parameter r, 0 to 8) is a ratio and is not scaled.
 
 ### Comments for debugging
 

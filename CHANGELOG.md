@@ -18,7 +18,7 @@ First release as **Bitbeans.Zpl**, a fork of [BinaryKits.Zpl](https://github.com
 - `SkiaImageConverter` threshold parameter.
 - Viewer improvements from [ivanjx/BinaryKits.Zpl](https://github.com/ivanjx/BinaryKits.Zpl):
   bitmap font rendering (`ZplTextRenderingMode.BitmapStrict`, `IZplBitmapFontProvider`), Code 11, Code 93
-  check digit, EAN-8, MSI, LOGMARS, Industrial 2 of 5, Aztec (`^B0`), MaxiCode, all Data Matrix parameters,
+  check digit, EAN-8, MSI, LOGMARS, Industrial 2 of 5, Aztec (`^B0`), MaxiCode, all Data Matrix parameters parsed,
   diagonal lines, ellipses, field block justification, background color option and more.
 
 ### Changed

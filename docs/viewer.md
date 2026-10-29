@@ -8,14 +8,20 @@ dotnet add package Bitbeans.Zpl.Viewer
 ```
 
 ```csharp
+using Bitbeans.Zpl;
 using Bitbeans.Zpl.Viewer;
+using Bitbeans.Zpl.Viewer.BitmapFonts;
 using Bitbeans.Zpl.Viewer.ElementDrawers;
 using Bitbeans.Zpl.Viewer.Models;
+using SkiaSharp;
 ```
+
+The examples on this page use these namespaces.
 
 ## Rendering
 
-Rendering is a two step process: `ZplAnalyzer` turns ZPL into elements (one `LabelInfo` per `^XA` ... `^XZ`),
+Rendering is a two step process: `ZplAnalyzer` turns ZPL into elements (one `LabelInfo` per printed label;
+formats stored with `^DF` are merged into the labels that recall them with `^XF` and are not returned),
 `ZplElementDrawer` draws the elements of a label.
 
 ```csharp
@@ -54,6 +60,8 @@ them escapes the indicator again (`_5F` becomes `_5F5F`); build new elements wit
 
 The `IPrinterStorage` shares downloaded graphics (`~DG`, `~DY`) and formats between the analyzer and
 the drawer. Reuse the same instance for both, and across calls if labels reference earlier downloads.
+Stored formats are not kept in `IPrinterStorage`: `^DF` and the `^XF` that recalls it must be passed to the
+same `Analyze` call.
 
 ## `DrawerOptions`
 
@@ -75,7 +83,7 @@ var drawer = new ZplElementDrawer(printerStorage, options);
 
 ## Fonts
 
-ZPL font `0` is mapped to a condensed bold sans serif, all other fonts to a monospace font. The viewer
+ZPL fonts `0` and `P` to `V` are mapped to a condensed bold sans serif, all other fonts to a monospace font. The viewer
 picks the first installed font of a font stack:
 
 | Font | Default stack (`FontManager`) |
