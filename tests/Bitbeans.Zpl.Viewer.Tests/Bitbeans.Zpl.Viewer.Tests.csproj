@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Bitbeans.Zpl.Viewer\Bitbeans.Zpl.Viewer.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Data\**" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+</Project>

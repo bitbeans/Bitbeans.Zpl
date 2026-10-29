@@ -1,0 +1,40 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <IsPackable>true</IsPackable>
+    <PackageId>Bitbeans.Zpl.Viewer</PackageId>
+    <Description>Render ZPL II labels to PNG/JPEG with SkiaSharp, an offline alternative to labelary.com. No ImageSharp dependency.</Description>
+    <PackageTags>zebra;zpl;zpl2;label;viewer;renderer;emulator;parser;skiasharp</PackageTags>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="HarfBuzzSharp.NativeAssets.Linux" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
+    <PackageReference Include="SkiaSharp.HarfBuzz" />
+    <PackageReference Include="ZXing.Net" />
+    <PackageReference Include="ZXing.Net.Bindings.SkiaSharp" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Bitbeans.Zpl.SkiaSharp\Bitbeans.Zpl.SkiaSharp.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Bitbeans.Zpl.Viewer.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+
+</Project>

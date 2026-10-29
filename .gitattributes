@@ -1,3 +1,5 @@
-* text=auto
-src/BinaryKits.Zpl.Label.UnitTest/ZplData/*.txt text eol=lf
+* text=auto eol=lf
+*.{cmd,bat,ps1} text eol=crlf
 *.png binary
+*.ttf binary
+*.snk binary

@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <IsPackable>true</IsPackable>
+    <PackageId>Bitbeans.Zpl.SkiaSharp</PackageId>
+    <Description>SkiaSharp based image conversion for Bitbeans.Zpl (^GF, ~DG, ~DY graphics) without ImageSharp.</Description>
+    <PackageTags>zebra;zpl;zpl2;label;printer;skiasharp;image</PackageTags>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="SkiaSharp" />
+    <PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Bitbeans.Zpl\Bitbeans.Zpl.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Bitbeans.Zpl.SkiaSharp.Tests" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,103 @@
+using Bitbeans.Zpl;
+using Bitbeans.Zpl.Elements;
+using Bitbeans.Zpl.Viewer.Helpers;
+using SkiaSharp;
+
+using System.Text.RegularExpressions;
+
+using ZXing;
+using ZXing.Common;
+using ZXing.Datamatrix;
+using ZXing.Datamatrix.Encoder;
+
+namespace Bitbeans.Zpl.Viewer.ElementDrawers
+{
+    /// <summary>
+    /// Drawer for Data Matrix Barcode elements
+    /// </summary>
+    public class DataMatrixElementDrawer : BarcodeDrawerBase
+    {
+        private static readonly Regex gs1Regex = new(@"^_1(.+)$", RegexOptions.Compiled);
+
+        ///<inheritdoc/>
+        public override bool CanDraw(ZplElementBase element)
+        {
+            return element is ZplDataMatrix;
+        }
+
+        ///<inheritdoc/>
+        public override SKPoint Draw(ZplElementBase element, DrawerOptions options, SKPoint currentPosition, InternationalFont internationalFont)
+        {
+            if (element is ZplDataMatrix dataMatrix)
+            {
+                if (dataMatrix.Height == 0)
+                    return currentPosition;
+
+                if (string.IsNullOrWhiteSpace(dataMatrix.Content))
+                    return currentPosition;
+
+                float x = dataMatrix.PositionX;
+                float y = dataMatrix.PositionY;
+
+                if (dataMatrix.UseDefaultPosition)
+                {
+                    x = currentPosition.X;
+                    y = currentPosition.Y;
+                }
+
+                string content = dataMatrix.Content;
+                if (dataMatrix.HexadecimalIndicator is char hexIndicator)
+                {
+                    content = content.ReplaceHexEscapes(hexIndicator, internationalFont);
+                }
+
+                // support hand-rolled GS1
+                bool gs1Mode = false;
+                Match gs1Match = gs1Regex.Match(content);
+                if (gs1Match.Success)
+                {
+                    content = gs1Match.Groups[1].Value;
+                    gs1Mode = true;
+                }
+
+                DataMatrixWriter writer = new();
+                DatamatrixEncodingOptions encodingOptions = new()
+                {
+                    SymbolShape = ResolveSymbolShape(dataMatrix),
+                    CompactEncoding = gs1Mode,
+                    GS1Format = gs1Mode
+                };
+
+                if (dataMatrix.Columns.HasValue && dataMatrix.Rows.HasValue)
+                {
+                    Dimension exactSize = new(dataMatrix.Columns.Value, dataMatrix.Rows.Value);
+                    encodingOptions.MinSize = exactSize;
+                    encodingOptions.MaxSize = exactSize;
+                }
+
+                BitMatrix result = writer.encode(content, BarcodeFormat.DATA_MATRIX, 0, 0, encodingOptions.Hints);
+
+                using SKBitmap resizedImage = BitMatrixToSKBitmap(result, dataMatrix.Height);
+                {
+                    byte[] png = resizedImage.Encode(SKEncodedImageFormat.Png, 100).ToArray();
+                    this.DrawBarcode(png, x, y, resizedImage.Width, resizedImage.Height, dataMatrix.FieldOrigin != null, dataMatrix.FieldOrientation);
+                }
+
+                return this.CalculateNextDefaultPosition(x, y, resizedImage.Width, resizedImage.Height, dataMatrix.FieldOrigin != null, dataMatrix.FieldOrientation, currentPosition);
+            }
+
+            return currentPosition;
+        }
+
+        private static SymbolShapeHint ResolveSymbolShape(ZplDataMatrix dataMatrix)
+        {
+            return dataMatrix.AspectRatio switch
+            {
+                1 => SymbolShapeHint.FORCE_SQUARE,
+                2 => SymbolShapeHint.FORCE_RECTANGLE,
+                _ when dataMatrix.Columns.HasValue && dataMatrix.Rows.HasValue && dataMatrix.Columns != dataMatrix.Rows => SymbolShapeHint.FORCE_RECTANGLE,
+                _ => SymbolShapeHint.FORCE_NONE
+            };
+        }
+    }
+}

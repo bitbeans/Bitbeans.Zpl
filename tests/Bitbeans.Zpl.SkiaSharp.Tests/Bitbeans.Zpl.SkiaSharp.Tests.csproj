@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Bitbeans.Zpl.SkiaSharp\Bitbeans.Zpl.SkiaSharp.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\Bitbeans.Zpl.Tests\ZplData\**" LinkBase="ZplData" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+</Project>

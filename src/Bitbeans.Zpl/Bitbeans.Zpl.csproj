@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <IsPackable>true</IsPackable>
+    <PackageId>Bitbeans.Zpl</PackageId>
+    <Description>Create Zebra ZPL II labels with strongly typed elements. Dependency-free: image conversion is pluggable via IImageConverter (see Bitbeans.Zpl.SkiaSharp).</Description>
+    <PackageTags>zebra;zpl;zpl2;label;printer;barcode</PackageTags>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Bitbeans.Zpl.Tests" />
+  </ItemGroup>
+
+</Project>

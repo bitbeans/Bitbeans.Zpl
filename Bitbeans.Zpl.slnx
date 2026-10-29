@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Bitbeans.Zpl.SkiaSharp/Bitbeans.Zpl.SkiaSharp.csproj" />
+    <Project Path="src/Bitbeans.Zpl.Viewer/Bitbeans.Zpl.Viewer.csproj" />
+    <Project Path="src/Bitbeans.Zpl/Bitbeans.Zpl.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Bitbeans.Zpl.SkiaSharp.Tests/Bitbeans.Zpl.SkiaSharp.Tests.csproj" />
+    <Project Path="tests/Bitbeans.Zpl.Tests/Bitbeans.Zpl.Tests.csproj" />
+    <Project Path="tests/Bitbeans.Zpl.Viewer.Tests/Bitbeans.Zpl.Viewer.Tests.csproj" />
+  </Folder>
+</Solution>
