@@ -16,7 +16,7 @@ public class LogmarsZplCommandAnalyzer : ZplCommandAnalyzerBase
 
         // ^BLN,100,N
         FieldOrientation fieldOrientation = this.ConvertFieldOrientation(zplDataParts[0], virtualPrinter);
-        int height = virtualPrinter.BarcodeInfo.Height;
+        int? height = null;
 
         if (zplDataParts.Length > 1 && int.TryParse(zplDataParts[1], out int tmpint))
         {

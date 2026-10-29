@@ -23,7 +23,7 @@ public class MsiBarcodeZplCommandAnalyzer : ZplCommandAnalyzerBase
             checkDigitSelection = this.ConvertCheckDigitSelection(zplDataParts[1]);
         }
 
-        int height = virtualPrinter.BarcodeInfo.Height;
+        int? height = null;
 
         if (zplDataParts.Length > 2 && int.TryParse(zplDataParts[2], out int tmpint))
         {

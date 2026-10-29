@@ -22,7 +22,7 @@ public class Code11BarcodeZplCommandAnalyzer : ZplCommandAnalyzerBase
             checkDigitCount = this.ConvertCode11CheckDigitCount(zplDataParts[1]);
         }
 
-        int height = virtualPrinter.BarcodeInfo.Height;
+        int? height = null;
 
         if (zplDataParts.Length > 2 && int.TryParse(zplDataParts[2], out int tmpint))
         {
