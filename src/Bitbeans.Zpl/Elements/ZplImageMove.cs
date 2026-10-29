@@ -1,3 +1,4 @@
+using Bitbeans.Zpl.Helpers;
 using System.Collections.Generic;
 
 namespace Bitbeans.Zpl.Elements
@@ -8,7 +9,7 @@ namespace Bitbeans.Zpl.Elements
     /// </remarks>
     public class ZplImageMove : ZplPositionedElementBase
     {
-        /// <summary>Storage device of the object (<c>R</c>, <c>E</c>, <c>B</c> or <c>A</c>).</summary>
+        /// <summary>Storage device of the object (<c>R</c>, <c>E</c>, <c>B</c>, <c>A</c> or <c>Z</c>).</summary>
         public char StorageDevice { get; private set; }
         /// <summary>Name of the stored object (without extension).</summary>
         public string ObjectName { get; private set; }
@@ -19,11 +20,13 @@ namespace Bitbeans.Zpl.Elements
         /// <param name="positionX">X position of the field in dots, relative to the label home (<c>^LH</c>); scaled by <see cref="ZplRenderOptions.ScaleFactor"/> when rendered.</param>
         /// <param name="positionY">Y position of the field in dots, relative to the label home (<c>^LH</c>); scaled by <see cref="ZplRenderOptions.ScaleFactor"/> when rendered.</param>
         /// <param name="storageDevice">Storage device of the object (<c>R</c>, <c>E</c>, <c>B</c> or <c>A</c>).</param>
-        /// <param name="objectName">Object name without extension.</param>
-        /// <param name="extension">Object extension, e.g. <c>GRF</c>.</param>
+        /// <param name="objectName">Object name; normally without extension.</param>
+        /// <param name="extension">Object extension without dot, e.g. <c>GRF</c>; may be empty if <paramref name="objectName"/> already contains it.</param>
         /// <param name="bottomToTop"><see langword="true"/> to position the field with <c>^FT</c> (<see cref="ZplFieldTypeset"/>) instead of <c>^FO</c> (<see cref="ZplFieldOrigin"/>).</param>
         /// <param name="useDefaultPosition">Only evaluated together with <paramref name="bottomToTop"/>: <see langword="true"/> renders <c>^FT</c> without coordinates so the printer continues at its default position. Ignored for <c>^FO</c>.</param>
         /// <param name="fieldJustification">Field justification passed to the position command (<c>^FO</c>/<c>^FT</c>, third parameter); <see cref="FieldJustification.None"/> omits it. <see cref="FieldJustification.Right"/> makes the position the right edge of the element.</param>
+        /// <exception cref="System.ArgumentNullException"><paramref name="objectName"/> or <paramref name="extension"/> is <see langword="null"/>.</exception>
+        /// <exception cref="System.ArgumentException"><paramref name="storageDevice"/> is not one of <c>R</c>, <c>E</c>, <c>B</c>, <c>A</c>, <c>Z</c>; <paramref name="objectName"/> is empty or <paramref name="objectName"/>/<paramref name="extension"/> contains <c>^</c>, <c>~</c>, comma, colon, whitespace or control characters (the extension also no dot, but it may be empty).</exception>
         public ZplImageMove(
             int positionX, 
             int positionY, 
@@ -35,9 +38,9 @@ namespace Bitbeans.Zpl.Elements
             FieldJustification fieldJustification = FieldJustification.None)
             : base(positionX, positionY, bottomToTop, useDefaultPosition, fieldJustification)
         {
-            StorageDevice = storageDevice;
-            ObjectName = objectName;
-            Extension = extension;
+            StorageDevice = ZplIdentifier.Device(storageDevice, nameof(storageDevice));
+            ObjectName = ZplIdentifier.Name(objectName, nameof(objectName), allowDot: true);
+            Extension = ZplIdentifier.Name(extension, nameof(extension), allowDot: false, allowEmpty: true);
         }
 
         ///<inheritdoc/>

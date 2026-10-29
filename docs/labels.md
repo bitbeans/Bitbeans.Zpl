@@ -144,5 +144,6 @@ var data = new ZplEngine
 string zpl = template.ToZplString(new ZplRenderOptions()) + data.ToZplString(new ZplRenderOptions());
 ```
 
-`ZplRecallFormat` is produced by the [viewer](viewer.md) when it parses `^XF`; it cannot be rendered
-back to ZPL. The viewer merges stored formats with their data when rendering.
+`ZplRecallFormat` renders `^XF` (for example `^XFR:LABEL.ZPL^FS`); the [viewer](viewer.md) also produces it
+when it parses `^XF` and merges the stored format with its data when rendering. The format name is validated
+(optional device letter and colon, no `^`, `~`, comma, further colon, whitespace or control characters).

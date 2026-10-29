@@ -35,6 +35,7 @@ namespace Bitbeans.Zpl.Elements
         /// <param name="verticalQuietZone">The vertical quiet zone in dots; only used by the viewer (taken from the <c>^BY</c> height), not written to ZPL.</param>
         /// <param name="reversePrint"><see langword="true"/> to emit <c>^FR</c> so the field is printed in reverse (bars/modules and interpretation line invert the underlying image).</param>
         /// <param name="fieldJustification">Field justification rendered as the third parameter of <c>^FO</c>/<c>^FT</c> (<c>0</c> left, <c>1</c> right, <c>2</c> auto); <see cref="FieldJustification.None"/> omits it. A right justified field ends at the position.</param>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="model"/> is not 1 or 2, <paramref name="magnificationFactor"/> is not 1 to 10, or <paramref name="maskValue"/> is not 0 to 7.</exception>
         public ZplQrCode(
             string content,
             int positionX,
@@ -59,6 +60,11 @@ namespace Bitbeans.Zpl.Elements
 
             ArgumentOutOfRangeException.ThrowIfLessThan(magnificationFactor, 1);
             ArgumentOutOfRangeException.ThrowIfGreaterThan(magnificationFactor, 10);
+
+            ArgumentOutOfRangeException.ThrowIfLessThan(model, 1);
+            ArgumentOutOfRangeException.ThrowIfGreaterThan(model, 2);
+            ArgumentOutOfRangeException.ThrowIfLessThan(maskValue, 0);
+            ArgumentOutOfRangeException.ThrowIfGreaterThan(maskValue, 7);
 
             Model = model;
             MagnificationFactor = magnificationFactor;

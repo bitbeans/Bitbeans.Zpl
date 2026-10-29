@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Bitbeans.Zpl.Helpers;
+using System.Collections.Generic;
 
 namespace Bitbeans.Zpl.Elements
 {
@@ -13,14 +14,16 @@ namespace Bitbeans.Zpl.Elements
         public string FontFileName { get; private set; }
 
         /// <summary>Creates a font identifier.</summary>
-        /// <param name="fontReplaceLetter">The letter or digit that will refer to the font.</param>
+        /// <param name="fontReplaceLetter">The ASCII letter or digit that will refer to the font.</param>
         /// <param name="device">Storage device letter without colon, e.g. <c>E</c>.</param>
         /// <param name="fontFileName">Font file name including extension.</param>
+        /// <exception cref="System.ArgumentNullException"><paramref name="device"/> or <paramref name="fontFileName"/> is <see langword="null"/>.</exception>
+        /// <exception cref="System.ArgumentException"><paramref name="fontReplaceLetter"/> is not an ASCII letter or digit, <paramref name="device"/> is not a single device letter (<c>R</c>, <c>E</c>, <c>B</c>, <c>A</c>, <c>Z</c>), or <paramref name="fontFileName"/> is empty or contains <c>^</c>, <c>~</c>, comma, colon, whitespace or control characters.</exception>
         public ZplFontIdentifier(char fontReplaceLetter, string device, string fontFileName)
         {
-            FontReplaceLetter = fontReplaceLetter;
-            Device = device;
-            FontFileName = fontFileName;
+            FontReplaceLetter = ZplIdentifier.LetterOrDigit(fontReplaceLetter, nameof(fontReplaceLetter));
+            Device = ZplIdentifier.Device(device, nameof(device));
+            FontFileName = ZplIdentifier.Name(fontFileName, nameof(fontFileName), allowDot: true);
         }
 
         ///<inheritdoc/>
