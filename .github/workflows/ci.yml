@@ -40,7 +40,7 @@ jobs:
 
       - name: Install fonts
         if: runner.os == 'Linux'
-        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends fonts-dejavu-core fonts-roboto
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends fontconfig fonts-dejavu-core fonts-roboto
 
       - name: Restore
         run: dotnet restore Bitbeans.Zpl.slnx

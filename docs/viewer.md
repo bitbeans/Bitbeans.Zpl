@@ -147,8 +147,10 @@ asked for that font, then for font `A`; if neither is available the text is rend
 
 ## Platform notes
 
-- Windows, Linux (x64/arm64, no system dependencies) and macOS are supported. The Linux native assets
-  of SkiaSharp and HarfBuzzSharp are referenced by the packages.
+- Windows, Linux (x64/arm64) and macOS are supported. The Linux native assets of SkiaSharp and HarfBuzzSharp
+  are referenced by the packages. On Linux, system fonts are found through fontconfig, so `libfontconfig1` and
+  at least one font must be installed (for example `apt-get install fontconfig fonts-dejavu-core`); minimal
+  container images often have neither. Without them, register fonts with `FontManager.RegisterTypeface`.
 - Text output depends on the installed fonts; register fonts explicitly for reproducible images.
 - PDF output is not supported.
 

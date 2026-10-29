@@ -160,6 +160,20 @@ namespace Bitbeans.Zpl.Viewer.Tests.Rendering
             Assert.AreEqual(new SKRectI(15, 25, 21, 29), RenderHelper.DarkBounds(bmp).Value);
         }
 
+        // ---------- system fonts ----------
+
+        [TestMethod]
+        public void SystemFontsAreFound()
+        {
+            // The Linux NoDependencies native assets have no fontconfig and found no font at all
+            using FontManager manager = new();
+
+            Assert.IsFalse(string.IsNullOrEmpty(manager.Typeface0.FamilyName));
+            Assert.IsFalse(string.IsNullOrEmpty(manager.TypefaceA.FamilyName));
+            using SKBitmap bmp = RenderHelper.Render("^XA^FO100,100^A0N,30,30^FDShort text^FS^XZ", null, 100, 100);
+            Assert.IsGreaterThan(0, RenderHelper.CountDark(bmp));
+        }
+
         // ---------- disposing during a draw ----------
 
         private static IEnumerable<ZplElementBase> DisposeAfterFirstField(ZplElementDrawer drawer)

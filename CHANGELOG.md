@@ -135,6 +135,9 @@ First release as **Bitbeans.Zpl**, a fork of [BinaryKits.Zpl](https://github.com
   caller-provided options); `FontManager.TypefaceGS` is created lazily and a disposed `FontManager` throws
   `ObjectDisposedException`. Disposing while a draw is running rejects new draws, lets the running draw finish and
   releases the font manager when the last draw ends.
+- Linux: the packages reference `SkiaSharp.NativeAssets.Linux` instead of the `NoDependencies` variant, which
+  has no fontconfig support. With it the viewer found no system font on Linux and drew outline text (font `0`,
+  `^A0`) blank. Linux now needs `libfontconfig1`.
 - Viewer: an omitted format name (`^DF^FS`, `^XF^FS`) is stored and recalled as `UNKNOWN`, like on the printer.
 - Viewer: `~DG` stores the graphic as `NAME.GRF` (an omitted name as `UNKNOWN.GRF`), and `^XG` accepts a name
   without extension or without name (`^XGR:LOGO`, `^XGR:`); an invalid magnification keeps 1.
