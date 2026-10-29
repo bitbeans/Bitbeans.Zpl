@@ -7,6 +7,7 @@ using System;
 
 namespace Bitbeans.Zpl.Viewer.ElementDrawers
 {
+    /// <summary>Draws graphic box (<c>^GB</c>) elements.</summary>
     public class GraphicBoxElementDrawer : ElementDrawerBase
     {
         ///<inheritdoc/>
@@ -15,6 +16,7 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
             return element is ZplGraphicBox;
         }
 
+        ///<inheritdoc/>
         public override bool IsReverseDraw(ZplElementBase element)
         {
             if (element is ZplGraphicBox graphicBox)
@@ -25,6 +27,7 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
             return false;
         }
 
+        ///<inheritdoc/>
         public override bool IsWhiteDraw(ZplElementBase element)
         {
             if (element is ZplGraphicBox graphicBox)
@@ -35,6 +38,7 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
             return false;
         }
 
+        ///<inheritdoc/>
         public override bool ForceBitmapDraw(ZplElementBase element)
         {
             if (element is ZplGraphicBox graphicBox && graphicBox.CornerRounding > 0)

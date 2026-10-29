@@ -6,7 +6,6 @@
     <Description>Render ZPL II labels to PNG/JPEG with SkiaSharp, an offline alternative to labelary.com. No ImageSharp dependency.</Description>
     <PackageTags>zebra;zpl;zpl2;label;viewer;renderer;emulator;parser;skiasharp</PackageTags>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <NoWarn>$(NoWarn);CS1591</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>

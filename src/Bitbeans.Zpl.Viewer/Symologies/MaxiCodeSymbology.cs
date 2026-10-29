@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 
 namespace Bitbeans.Zpl.Viewer.Symologies
 {
+    /// <summary>Encoder for MaxiCode symbols.</summary>
     public static class MaxiCodeSymbology
     {
         private static readonly Regex mode2Regex = new(@"^(?<preamble>)(?<service>\d{3})(?<country>\d{3})(?<zip>\d{1,9})", RegexOptions.Compiled);
@@ -336,11 +337,21 @@ namespace Bitbeans.Zpl.Viewer.Symologies
             codeEMap = codeSetTable.ToDictionary(item => item.E, item => item.Value);
         }
 
+        /// <summary>Encodes the content as a MaxiCode module matrix. Content without a valid mode 2 or 3 primary message is encoded in mode 4 instead of being rejected (see <see cref="EncodeExact"/>).</summary>
+        /// <param name="content">The data to encode.</param>
+        /// <param name="mode">The MaxiCode mode (2 to 6).</param>
+        /// <returns>The 974 modules of the symbol.</returns>
+        /// <exception cref="ArgumentException">The content cannot be encoded, for example because it contains characters outside ISO-8859-1 or exceeds the capacity.</exception>
         public static bool[] Encode(string content, int mode)
         {
             return EncodeInternal(content, mode, requireExactEncoding: false);
         }
 
+        /// <summary>Encodes the content as a MaxiCode module matrix like <see cref="Encode"/>, but rejects content that has no valid mode 2 or 3 primary message instead of falling back to mode 4.</summary>
+        /// <param name="content">The data to encode.</param>
+        /// <param name="mode">The MaxiCode mode (2 to 6).</param>
+        /// <returns>The 974 modules of the symbol.</returns>
+        /// <exception cref="ArgumentException">The content cannot be encoded: it has no valid primary message for mode 2 or 3, contains characters outside ISO-8859-1 or exceeds the capacity.</exception>
         public static bool[] EncodeExact(string content, int mode)
         {
             return EncodeInternal(content, mode, requireExactEncoding: true);

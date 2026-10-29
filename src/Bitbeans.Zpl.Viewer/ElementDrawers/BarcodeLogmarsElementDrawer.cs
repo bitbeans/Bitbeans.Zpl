@@ -7,18 +7,22 @@ using ZXing.OneD;
 
 namespace Bitbeans.Zpl.Viewer.ElementDrawers;
 
+/// <summary>Draws LOGMARS (<c>^BL</c>) barcode elements.</summary>
 public class BarcodeLogmarsElementDrawer : BarcodeDrawerBase
 {
+    ///<inheritdoc/>
     public override bool CanDraw(ZplElementBase element)
     {
         return element is ZplBarcodeLogmars;
     }
 
+    ///<inheritdoc/>
     public override SKPoint Draw(ZplElementBase element, DrawerOptions options, SKPoint currentPosition, InternationalFont internationalFont)
     {
         return this.Draw(element, options, currentPosition, internationalFont, 8);
     }
 
+    ///<inheritdoc/>
     public override SKPoint Draw(ZplElementBase element, DrawerOptions options, SKPoint currentPosition, InternationalFont internationalFont, int printDensityDpmm)
     {
         if (element is not ZplBarcodeLogmars barcode)

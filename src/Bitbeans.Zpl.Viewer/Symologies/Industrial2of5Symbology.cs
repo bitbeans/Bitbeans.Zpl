@@ -3,6 +3,7 @@ using System.Text;
 
 namespace Bitbeans.Zpl.Viewer.Symologies;
 
+/// <summary>Encoder for Industrial 2 of 5 barcodes.</summary>
 public static class Industrial2of5Symbology
 {
     private static readonly string[] digitPatterns =
@@ -19,6 +20,11 @@ public static class Industrial2of5Symbology
         "10111010111010"
     ];
 
+    /// <summary>Encodes digits as an Industrial 2 of 5 bar pattern including start and stop symbols.</summary>
+    /// <param name="content">The data to encode.</param>
+    /// <returns>The bar pattern (<see langword="true"/> is a bar).</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="content"/> is <see langword="null"/>.</exception>
+    /// <exception cref="ArgumentException"><paramref name="content"/> contains a character other than digits.</exception>
     public static bool[] Encode(string content)
     {
         if (content == null)

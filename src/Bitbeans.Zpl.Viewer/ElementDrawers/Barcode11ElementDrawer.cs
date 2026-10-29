@@ -9,13 +9,16 @@ using System;
 
 namespace Bitbeans.Zpl.Viewer.ElementDrawers;
 
+/// <summary>Draws Code 11 (<c>^B1</c>) barcode elements.</summary>
 public class Barcode11ElementDrawer : BarcodeDrawerBase
 {
+    ///<inheritdoc/>
     public override bool CanDraw(ZplElementBase element)
     {
         return element is ZplBarcode11;
     }
 
+    ///<inheritdoc/>
     public override SKPoint Draw(ZplElementBase element, DrawerOptions options, SKPoint currentPosition, InternationalFont internationalFont, int printDensityDpmm)
     {
         if (element is not ZplBarcode11 barcode)

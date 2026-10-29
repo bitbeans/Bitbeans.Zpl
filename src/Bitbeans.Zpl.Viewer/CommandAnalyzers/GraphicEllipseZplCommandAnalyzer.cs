@@ -3,8 +3,10 @@ using Bitbeans.Zpl.Elements;
 
 namespace Bitbeans.Zpl.Viewer.CommandAnalyzers
 {
+    /// <summary>Analyzes <c>^GE</c> (graphic ellipse) and returns an ellipse element at the pending field position.</summary>
     public class GraphicEllipseZplCommandAnalyzer : ZplCommandAnalyzerBase
     {
+        /// <summary>Initializes a new instance of the <see cref="GraphicEllipseZplCommandAnalyzer"/> class for the <c>^GE</c> command.</summary>
         public GraphicEllipseZplCommandAnalyzer() : base("^GE") { }
 
         ///<inheritdoc/>

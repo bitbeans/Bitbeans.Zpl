@@ -9,6 +9,7 @@ using ZXing.Common;
 
 namespace Bitbeans.Zpl.Viewer.ElementDrawers
 {
+    /// <summary>Draws Aztec Code (<c>^BO</c>) barcode elements.</summary>
     public class AztecBarcodeElementDrawer : BarcodeDrawerBase
     {
         ///<inheritdoc/>

@@ -13,6 +13,7 @@ using System.Linq;
 
 namespace Bitbeans.Zpl.Viewer
 {
+    /// <summary>Draws ZPL elements with the registered element drawers.</summary>
     public class ZplElementDrawer
     {
         /// <summary>
@@ -53,6 +54,9 @@ namespace Bitbeans.Zpl.Viewer
         private readonly DrawerOptions drawerOptions;
         private readonly IPrinterStorage printerStorage;
 
+        /// <summary>Initializes a new instance of the <see cref="ZplElementDrawer"/> class.</summary>
+        /// <param name="printerStorage">The printer storage with the downloaded objects.</param>
+        /// <param name="drawerOptions">The drawer options; default options if <see langword="null"/>.</param>
         public ZplElementDrawer(IPrinterStorage printerStorage, DrawerOptions drawerOptions = null)
         {
             this.drawerOptions = drawerOptions ?? new DrawerOptions();

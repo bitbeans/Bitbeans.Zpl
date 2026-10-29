@@ -4,12 +4,15 @@ using Bitbeans.Zpl.Viewer.Models;
 
 namespace Bitbeans.Zpl.Viewer.CommandAnalyzers;
 
+/// <summary>Analyzes <c>^B1</c> (Code 11) and stores the barcode parameters for the next field.</summary>
 public class Code11BarcodeZplCommandAnalyzer : ZplCommandAnalyzerBase
 {
+    /// <summary>Initializes a new instance of the <see cref="Code11BarcodeZplCommandAnalyzer"/> class for the <c>^B1</c> command.</summary>
     public Code11BarcodeZplCommandAnalyzer() : base("^B1")
     {
     }
 
+    ///<inheritdoc/>
     public override ZplElementBase Analyze(string zplCommand, VirtualPrinter virtualPrinter, IPrinterStorage printerStorage)
     {
         string[] zplDataParts = this.SplitCommand(zplCommand);

@@ -8,18 +8,22 @@ using ZXing.OneD;
 
 namespace Bitbeans.Zpl.Viewer.ElementDrawers;
 
+/// <summary>Draws MSI (<c>^BM</c>) barcode elements.</summary>
 public class BarcodeMsiElementDrawer : BarcodeDrawerBase
 {
+    ///<inheritdoc/>
     public override bool CanDraw(ZplElementBase element)
     {
         return element is ZplBarcodeMsi;
     }
 
+    ///<inheritdoc/>
     public override SKPoint Draw(ZplElementBase element, DrawerOptions options, SKPoint currentPosition, InternationalFont internationalFont)
     {
         return this.Draw(element, options, currentPosition, internationalFont, 8);
     }
 
+    ///<inheritdoc/>
     public override SKPoint Draw(ZplElementBase element, DrawerOptions options, SKPoint currentPosition, InternationalFont internationalFont, int printDensityDpmm)
     {
         if (element is not ZplBarcodeMsi msi)

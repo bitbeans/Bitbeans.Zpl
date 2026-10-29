@@ -4,12 +4,15 @@ using Bitbeans.Zpl.Viewer.Models;
 
 namespace Bitbeans.Zpl.Viewer.CommandAnalyzers;
 
+/// <summary>Analyzes <c>^BL</c> (LOGMARS) and stores the barcode parameters for the next field.</summary>
 public class LogmarsZplCommandAnalyzer : ZplCommandAnalyzerBase
 {
+    /// <summary>Initializes a new instance of the <see cref="LogmarsZplCommandAnalyzer"/> class for the <c>^BL</c> command.</summary>
     public LogmarsZplCommandAnalyzer() : base("^BL")
     {
     }
 
+    ///<inheritdoc/>
     public override ZplElementBase Analyze(string zplCommand, VirtualPrinter virtualPrinter, IPrinterStorage printerStorage)
     {
         string[] zplDataParts = this.SplitCommand(zplCommand);

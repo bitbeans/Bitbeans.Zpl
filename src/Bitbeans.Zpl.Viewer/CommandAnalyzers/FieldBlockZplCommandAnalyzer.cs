@@ -6,8 +6,10 @@ using System;
 
 namespace Bitbeans.Zpl.Viewer.CommandAnalyzers
 {
+    /// <summary>Analyzes <c>^FB</c> (field block) and stores the block width, maximum line count, line spacing, justification and hanging indent for the next text field.</summary>
     public class FieldBlockZplCommandAnalyzer : ZplCommandAnalyzerBase
     {
+        /// <summary>Initializes a new instance of the <see cref="FieldBlockZplCommandAnalyzer"/> class for the <c>^FB</c> command.</summary>
         public FieldBlockZplCommandAnalyzer() : base("^FB")        { }
 
         ///<inheritdoc/>

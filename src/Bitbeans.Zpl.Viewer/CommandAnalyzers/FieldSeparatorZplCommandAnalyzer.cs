@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 
 namespace Bitbeans.Zpl.Viewer.CommandAnalyzers
 {
+    /// <summary>Analyzes <c>^FS</c> (field separator), finalizes the pending field from the stored position, font, block and field data, returns the resulting element and clears the per-field state of the virtual printer.</summary>
     public class FieldSeparatorZplCommandAnalyzer : ZplCommandAnalyzerBase
     {
         private static readonly Regex qrCodeFieldDataNormalRegex = new(@"^(?<correction>[HQML])(?<input>[AM]),(?<data>.+)$", RegexOptions.Compiled);
@@ -15,6 +16,7 @@ namespace Bitbeans.Zpl.Viewer.CommandAnalyzers
 
         private static readonly FieldDataZplCommandAnalyzer fieldDataAnalyzer = new();
 
+        /// <summary>Initializes a new instance of the <see cref="FieldSeparatorZplCommandAnalyzer"/> class for the <c>^FS</c> command.</summary>
         public FieldSeparatorZplCommandAnalyzer() : base("^FS") { }
 
         ///<inheritdoc/>

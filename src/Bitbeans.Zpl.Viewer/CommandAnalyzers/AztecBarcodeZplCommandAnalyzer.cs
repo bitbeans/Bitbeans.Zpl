@@ -4,8 +4,10 @@ using Bitbeans.Zpl.Viewer.Models;
 
 namespace Bitbeans.Zpl.Viewer.CommandAnalyzers
 {
+    /// <summary>Analyzes <c>^BO</c> (Aztec Code) and stores the barcode parameters for the next field.</summary>
     public class AztecBarcodeZplCommandAnalyzer : ZplCommandAnalyzerBase
     {
+        /// <summary>Initializes a new instance of the <see cref="AztecBarcodeZplCommandAnalyzer"/> class for the <c>^BO</c> command.</summary>
         public AztecBarcodeZplCommandAnalyzer() : base("^BO") { }
 
         ///<inheritdoc/>

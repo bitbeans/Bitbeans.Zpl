@@ -2,9 +2,12 @@ using Bitbeans.Zpl.Elements;
 
 namespace Bitbeans.Zpl.Viewer.CommandAnalyzers
 {
+    /// <summary>Analyzes <c>^FD</c> (field data) and stores the text as content of the next field. If a field number (^FN) is pending, a recall element for that field number is returned.</summary>
     public class FieldDataZplCommandAnalyzer : ZplCommandAnalyzerBase
     {
 
+        /// <summary>Initializes a new instance of the <see cref="FieldDataZplCommandAnalyzer"/> class.</summary>
+        /// <param name="prefix">The command prefix to handle: <c>^FD</c> by default, <c>^FV</c> for the derived field variable analyzer.</param>
         public FieldDataZplCommandAnalyzer(string prefix = "^FD") : base(prefix) { }
 
         ///<inheritdoc/>

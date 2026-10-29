@@ -5,8 +5,10 @@ using Bitbeans.Zpl.Viewer.Helpers;
 
 namespace Bitbeans.Zpl.Viewer.CommandAnalyzers
 {
+    /// <summary>Analyzes <c>^GF</c> (graphic field), converts the GRF image data to a PNG image and returns a graphic field element at the pending field position.</summary>
     public class GraphicFieldZplCommandAnalyzer : ZplCommandAnalyzerBase
     {
+        /// <summary>Initializes a new instance of the <see cref="GraphicFieldZplCommandAnalyzer"/> class for the <c>^GF</c> command.</summary>
         public GraphicFieldZplCommandAnalyzer() : base("^GF") { }
 
         ///<inheritdoc/>

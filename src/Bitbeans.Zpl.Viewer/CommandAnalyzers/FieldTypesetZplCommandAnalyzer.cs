@@ -5,8 +5,10 @@ using System.Globalization;
 
 namespace Bitbeans.Zpl.Viewer.CommandAnalyzers
 {
+    /// <summary>Analyzes <c>^FT</c> (field typeset) and stores the baseline position (shifted by the label home ^LH) and optional justification of the next field. Missing coordinates select the default position.</summary>
     public class FieldTypesetZplCommandAnalyzer : ZplCommandAnalyzerBase
     {
+        /// <summary>Initializes a new instance of the <see cref="FieldTypesetZplCommandAnalyzer"/> class for the <c>^FT</c> command.</summary>
         public FieldTypesetZplCommandAnalyzer() : base("^FT") { }
 
         ///<inheritdoc/>

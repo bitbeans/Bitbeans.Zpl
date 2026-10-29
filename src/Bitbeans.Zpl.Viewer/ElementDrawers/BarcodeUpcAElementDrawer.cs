@@ -11,6 +11,7 @@ using ZXing.OneD;
 
 namespace Bitbeans.Zpl.Viewer.ElementDrawers
 {
+    /// <summary>Draws UPC-A (<c>^BU</c>) barcode elements.</summary>
     public class BarcodeUpcAElementDrawer : BarcodeDrawerBase
     {
         private static readonly bool[] guards = new bool[95];

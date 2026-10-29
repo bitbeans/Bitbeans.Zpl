@@ -6,8 +6,10 @@ using System;
 
 namespace Bitbeans.Zpl.Viewer.CommandAnalyzers
 {
+    /// <summary>Analyzes <c>^BQ</c> (QR Code) and stores the barcode parameters for the next field.</summary>
     public class QrCodeBarcodeZplCommandAnalyzer : ZplCommandAnalyzerBase
     {
+        /// <summary>Initializes a new instance of the <see cref="QrCodeBarcodeZplCommandAnalyzer"/> class for the <c>^BQ</c> command.</summary>
         public QrCodeBarcodeZplCommandAnalyzer() : base("^BQ") { }
 
         ///<inheritdoc/>

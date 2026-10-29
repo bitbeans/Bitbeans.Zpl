@@ -3,8 +3,10 @@ using Bitbeans.Zpl.Elements;
 
 namespace Bitbeans.Zpl.Viewer.CommandAnalyzers
 {
+    /// <summary>Analyzes <c>^FW</c> (field orientation) and stores the default field orientation and justification used by following fields.</summary>
     public class FieldOrientationZplCommandAnalyzer : ZplCommandAnalyzerBase
     {
+        /// <summary>Initializes a new instance of the <see cref="FieldOrientationZplCommandAnalyzer"/> class for the <c>^FW</c> command.</summary>
         public FieldOrientationZplCommandAnalyzer() : base("^FW") { }
 
         ///<inheritdoc/>

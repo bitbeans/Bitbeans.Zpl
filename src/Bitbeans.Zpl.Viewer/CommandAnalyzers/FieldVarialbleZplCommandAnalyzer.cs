@@ -7,8 +7,10 @@
     // The MC command allows us to "save" the first label as a template
     // using FDs as static elements of template and FVs as variable parts.
     // Subsequent labels only require FV to draw the variable parts.
+    /// <summary>Analyzes <c>^FV</c> (field variable). It behaves like <see cref="FieldDataZplCommandAnalyzer"/> (^FD) and does not implement the ^MC template handling.</summary>
     public class FieldVariableZplCommandAnalyzer : FieldDataZplCommandAnalyzer
     {
+        /// <summary>Initializes a new instance of the <see cref="FieldVariableZplCommandAnalyzer"/> class for the <c>^FV</c> command.</summary>
         public FieldVariableZplCommandAnalyzer() : base("^FV") { }
     }
 }

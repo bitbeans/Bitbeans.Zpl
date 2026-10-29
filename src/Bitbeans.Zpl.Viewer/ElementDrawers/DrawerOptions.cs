@@ -6,6 +6,7 @@ using System;
 
 namespace Bitbeans.Zpl.Viewer.ElementDrawers
 {
+    /// <summary>Options that control how labels are rendered: output format, background, text and font handling.</summary>
     public class DrawerOptions
     {
         /// <summary>
@@ -28,6 +29,7 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
         /// </summary>
         public SKColor BackgroundColor { get; set; } = SKColors.White;
 
+        /// <summary>Gets or sets a value indicating whether hyphens in text are replaced with en dashes. The default is <see langword="true"/>.</summary>
         public bool ReplaceDashWithEnDash { get; set; } = true;
 
         /// <summary>
@@ -50,10 +52,14 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
         /// </summary>
         public IZplBitmapFontProvider BitmapFontProvider { get; set; } = EmptyZplBitmapFontProvider.Instance;
 
+        /// <summary>Gets the font manager used to resolve typefaces.</summary>
         public FontManager FontManager { get; private set; }
 
+        /// <summary>Initializes a new instance of the <see cref="DrawerOptions"/> class.</summary>
         public DrawerOptions() : this(new FontManager()) { }
 
+        /// <summary>Initializes a new instance of the <see cref="DrawerOptions"/> class with the given font manager.</summary>
+        /// <param name="fontManager">The font manager used to resolve typefaces.</param>
         public DrawerOptions(FontManager fontManager)
         {
             this.FontManager = fontManager;

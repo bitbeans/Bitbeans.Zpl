@@ -4,8 +4,10 @@ using Bitbeans.Zpl.Viewer.Models;
 
 namespace Bitbeans.Zpl.Viewer.CommandAnalyzers
 {
+    /// <summary>Analyzes <c>^B2</c> (Interleaved 2 of 5) and stores the barcode parameters for the next field.</summary>
     public class Interleaved2of5BarcodeZplCommandAnalyzer : ZplCommandAnalyzerBase
     {
+        /// <summary>Initializes a new instance of the <see cref="Interleaved2of5BarcodeZplCommandAnalyzer"/> class for the <c>^B2</c> command.</summary>
         public Interleaved2of5BarcodeZplCommandAnalyzer() : base("^B2") { }
 
         ///<inheritdoc/>

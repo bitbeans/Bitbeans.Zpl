@@ -4,6 +4,7 @@ using System.Linq;
 
 namespace Bitbeans.Zpl.Viewer.Symologies
 {
+    /// <summary>Encoder for the two and five digit UPC/EAN extensions.</summary>
     public class UpcExtensionSymbology
     {
 
@@ -29,6 +30,11 @@ namespace Bitbeans.Zpl.Viewer.Symologies
             parity5Map = codeSetTable.ToDictionary(item => item.Value, item => item.Parity5);
         }
 
+        /// <summary>Encodes a two or five digit UPC/EAN extension as a bar pattern.</summary>
+        /// <param name="content">The data to encode.</param>
+        /// <returns>The bar pattern (<see langword="true"/> is a bar).</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="content"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentException"><paramref name="content"/> is not numeric or does not have 2 or 5 digits.</exception>
         public static bool[] Encode(string content)
         {
             if (content == null)

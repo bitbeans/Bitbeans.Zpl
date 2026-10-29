@@ -4,10 +4,12 @@ using System.Text.RegularExpressions;
 
 namespace Bitbeans.Zpl.Viewer.CommandAnalyzers
 {
+    /// <summary>Analyzes <c>^XG</c> (recall graphic) and returns an element that draws the stored graphic with the given magnification at the pending field position.</summary>
     public class RecallGraphicZplCommandAnalyzer : ZplCommandAnalyzerBase
     {
         private static readonly Regex commandRegex = new(@"^\^XG(\w:)?(.*?\..+?)(?:,(\d*))?(?:,(\d*))?$", RegexOptions.Compiled);
 
+        /// <summary>Initializes a new instance of the <see cref="RecallGraphicZplCommandAnalyzer"/> class for the <c>^XG</c> command.</summary>
         public RecallGraphicZplCommandAnalyzer() : base("^XG") { }
 
         ///<inheritdoc/>
