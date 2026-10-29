@@ -29,8 +29,9 @@ namespace Bitbeans.Zpl.Tests
             Assert.AreEqual("^XFLABEL.ZPL^FS", new ZplRecallFormat("LABEL.ZPL").ToZplString());
             Assert.AreEqual("Z", new ZplRecallFormat("Z:X.ZPL").FormatName.Substring(0, 1));
             Assert.ThrowsExactly<ArgumentNullException>(() => new ZplRecallFormat(null));
-            Assert.ThrowsExactly<ArgumentException>(() => new ZplRecallFormat(string.Empty));
-            Assert.ThrowsExactly<ArgumentException>(() => new ZplRecallFormat("R:"));
+            // An omitted name is valid ZPL; the printer then uses UNKNOWN
+            Assert.AreEqual("^XF^FS", new ZplRecallFormat(string.Empty).ToZplString());
+            Assert.AreEqual("^XFR:^FS", new ZplRecallFormat("R:").ToZplString());
             Assert.ThrowsExactly<ArgumentException>(() => new ZplRecallFormat("RR:X.ZPL"));
             Assert.ThrowsExactly<ArgumentException>(() => new ZplRecallFormat(":X.ZPL"));
             Assert.ThrowsExactly<ArgumentException>(() => new ZplRecallFormat("Q:X.ZPL"));
@@ -50,7 +51,7 @@ namespace Bitbeans.Zpl.Tests
             var ex = Assert.ThrowsExactly<ArgumentException>(() => new ZplDownloadGraphics('R', "A^FS", [1], Converter));
             Assert.AreEqual("imageName", ex.ParamName);
             Assert.ThrowsExactly<ArgumentException>(() => new ZplDownloadGraphics('R', "A.B", [1], Converter));
-            Assert.ThrowsExactly<ArgumentException>(() => new ZplDownloadGraphics('R', string.Empty, [1], Converter));
+            Assert.AreEqual("UNKNOWN", new ZplDownloadGraphics('R', string.Empty, [1], Converter).ImageName);
             foreach (string bad in BadNames)
             {
                 Assert.ThrowsExactly<ArgumentException>(() => new ZplDownloadGraphics('R', bad, [1], Converter), bad);
@@ -59,7 +60,9 @@ namespace Bitbeans.Zpl.Tests
             ex = Assert.ThrowsExactly<ArgumentException>(() => new ZplDownloadGraphics(':', "A", [1], Converter));
             Assert.AreEqual("storageDevice", ex.ParamName);
             Assert.ThrowsExactly<ArgumentException>(() => new ZplDownloadGraphics('r', "A", [1], Converter));
-            Assert.AreEqual('Z', new ZplDownloadGraphics('Z', "A", [1], Converter).StorageDevice);
+            ex = Assert.ThrowsExactly<ArgumentException>(() => new ZplDownloadGraphics('Z', "A", [1], Converter));
+            Assert.AreEqual("storageDevice", ex.ParamName);
+            Assert.ThrowsExactly<ArgumentException>(() => new ZplDownloadObjects('Z', "A.PNG", [1], Converter));
         }
 
         [TestMethod]
@@ -76,7 +79,7 @@ namespace Bitbeans.Zpl.Tests
         public void RecallGraphicValidatesNameAndDevice()
         {
             Assert.ThrowsExactly<ArgumentException>(() => new ZplRecallGraphic(0, 0, 'R', "A^FS"));
-            Assert.ThrowsExactly<ArgumentException>(() => new ZplRecallGraphic(0, 0, 'R', string.Empty));
+            Assert.AreEqual("UNKNOWN", new ZplRecallGraphic(0, 0, 'R', string.Empty).ImageName);
             Assert.ThrowsExactly<ArgumentNullException>(() => new ZplRecallGraphic(0, 0, 'R', null));
             var ex = Assert.ThrowsExactly<ArgumentException>(() => new ZplRecallGraphic(0, 0, '^', "A"));
             Assert.AreEqual("storageDevice", ex.ParamName);
@@ -88,7 +91,9 @@ namespace Bitbeans.Zpl.Tests
             Assert.AreEqual("^FO0,0\n^IMR:LOGO.GRF^FS", new ZplImageMove(0, 0, 'R', "LOGO", "GRF").ToZplString());
             Assert.AreEqual(string.Empty, new ZplImageMove(0, 0, 'R', "LOGO.GRF", string.Empty).Extension);
             Assert.ThrowsExactly<ArgumentException>(() => new ZplImageMove(0, 0, 'R', "A^FS", "GRF"));
-            Assert.ThrowsExactly<ArgumentException>(() => new ZplImageMove(0, 0, 'R', string.Empty, "GRF"));
+            Assert.AreEqual("^FO0,0\n^IMR:UNKNOWN.GRF^FS", new ZplImageMove(0, 0, 'R', string.Empty, "GRF").ToZplString());
+            Assert.AreEqual("^FO0,0\n^IMR:LOGO.GRF^FS", new ZplImageMove(0, 0, 'R', "LOGO.GRF", string.Empty).ToZplString());
+            Assert.AreEqual("LOGO.GRF", new ZplImageMove(0, 0, 'R', "LOGO", "GRF").FileName);
             Assert.ThrowsExactly<ArgumentException>(() => new ZplImageMove(0, 0, 'R', "A", "G^"));
             Assert.ThrowsExactly<ArgumentException>(() => new ZplImageMove(0, 0, 'R', "A", ".GRF"));
             Assert.ThrowsExactly<ArgumentNullException>(() => new ZplImageMove(0, 0, 'R', "A", null));

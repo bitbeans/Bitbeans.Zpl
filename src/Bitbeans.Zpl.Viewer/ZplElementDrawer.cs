@@ -35,7 +35,9 @@ namespace Bitbeans.Zpl.Viewer
 
         /// <summary>The font manager created by this drawer for default options, or <see langword="null"/> for caller-provided options.</summary>
         private readonly FontManager ownedFontManager;
+        private readonly object stateLock = new();
         private bool disposed;
+        private int activeDraws;
 
         /// <summary>Initializes a new instance of the <see cref="ZplElementDrawer"/> class.</summary>
         /// <param name="printerStorage">The printer storage with the downloaded objects.</param>
@@ -52,16 +54,55 @@ namespace Bitbeans.Zpl.Viewer
             this.printerStorage = printerStorage;
         }
 
-        /// <summary>Disposes the font manager that the drawer created for its default options. A font manager of caller-provided <see cref="DrawerOptions"/> is not disposed. The drawer must not be used afterwards. Calling <see cref="Dispose"/> again has no effect.</summary>
+        /// <summary>Disposes the font manager that the drawer created for its default options. A font manager of caller-provided <see cref="DrawerOptions"/> is not disposed. New draws are rejected afterwards; draws that are already running finish normally and the font manager is released when the last one ends. Calling <see cref="Dispose"/> again has no effect.</summary>
         public void Dispose()
         {
-            if (!this.disposed)
+            lock (this.stateLock)
             {
-                this.disposed = true;
-                this.ownedFontManager?.Dispose();
+                if (!this.disposed)
+                {
+                    this.disposed = true;
+
+                    // A draw that is still running releases the font manager when it finishes
+                    if (this.activeDraws == 0)
+                    {
+                        this.ownedFontManager?.Dispose();
+                    }
+                }
             }
 
             GC.SuppressFinalize(this);
+        }
+
+        private void DrawElementsWhileActive(
+            SKCanvas skCanvas,
+            IEnumerable<ZplElementBase> elements,
+            int labelImageWidth,
+            int labelImageHeight,
+            int printDensityDpmm,
+            ILogger logger)
+        {
+            lock (this.stateLock)
+            {
+                ObjectDisposedException.ThrowIf(this.disposed, this);
+                this.activeDraws++;
+            }
+
+            try
+            {
+                this.DrawElements(skCanvas, elements, labelImageWidth, labelImageHeight, printDensityDpmm, logger);
+            }
+            finally
+            {
+                lock (this.stateLock)
+                {
+                    this.activeDraws--;
+                    if (this.disposed && this.activeDraws == 0)
+                    {
+                        this.ownedFontManager?.Dispose();
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -93,7 +134,7 @@ namespace Bitbeans.Zpl.Viewer
 
             //make sure to have a transparent canvas for SKBlendMode.Xor to work properly
             skCanvas.Clear(SKColors.Transparent);
-            this.DrawElements(skCanvas, elements, labelImageWidth, labelImageHeight, printDensityDpmm, logger ?? NullLogger.Instance);
+            this.DrawElementsWhileActive(skCanvas, elements, labelImageWidth, labelImageHeight, printDensityDpmm, logger ?? NullLogger.Instance);
 
             using SKImage image = surface.Snapshot();
             SKData imageData;
@@ -141,14 +182,13 @@ namespace Bitbeans.Zpl.Viewer
         {
             ObjectDisposedException.ThrowIf(this.disposed, this);
             ArgumentNullException.ThrowIfNull(surface);
-            ObjectDisposedException.ThrowIf(this.disposed, this);
             ArgumentNullException.ThrowIfNull(elements);
             (int labelImageWidth, int labelImageHeight) = GetLabelPixelSize(labelWidth, labelHeight, printDensityDpmm);
 
             SKCanvas skCanvas = surface.Canvas;
             //This has an issue with AvaloniaUI making the window transparent.
             skCanvas.Clear(SKColors.Transparent);
-            this.DrawElements(skCanvas, elements, labelImageWidth, labelImageHeight, printDensityDpmm, logger ?? NullLogger.Instance);
+            this.DrawElementsWhileActive(skCanvas, elements, labelImageWidth, labelImageHeight, printDensityDpmm, logger ?? NullLogger.Instance);
         }
 
         private static (int Width, int Height) GetLabelPixelSize(double labelWidth, double labelHeight, int printDensityDpmm)

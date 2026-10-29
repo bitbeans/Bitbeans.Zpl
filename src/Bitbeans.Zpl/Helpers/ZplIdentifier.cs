@@ -19,6 +19,20 @@ namespace Bitbeans.Zpl.Helpers
             return device;
         }
 
+        /// <summary>The devices a download (<c>~DG</c>, <c>~DY</c>) can write to: <c>R</c>, <c>E</c>, <c>B</c> and <c>A</c>; <c>Z</c> is read-only firmware.</summary>
+        private const string DownloadDevices = "REBA";
+
+        /// <summary>Checks the storage device of a download; <c>Z</c> is not writable.</summary>
+        public static char DownloadDevice(char device, string paramName)
+        {
+            if (DownloadDevices.IndexOf(device) < 0)
+            {
+                throw new ArgumentException("The storage device of a download must be one of R, E, B or A.", paramName);
+            }
+
+            return device;
+        }
+
         /// <summary>Checks a device given as string (a single letter without colon).</summary>
         public static string Device(string device, string paramName)
         {
@@ -86,7 +100,30 @@ namespace Bitbeans.Zpl.Helpers
             return value;
         }
 
-        /// <summary>Checks a file name with optional device prefix (<c>R:NAME.EXT</c>).</summary>
+        /// <summary>The name the printer uses when the object name of a download or recall is omitted.</summary>
+        public const string UnknownName = "UNKNOWN";
+
+        /// <summary>Checks an object name like <see cref="Name"/>; an empty name becomes <c>UNKNOWN</c>, the name the printer uses when it is omitted.</summary>
+        public static string ObjectName(string value, string paramName, bool allowDot, int maxLength = int.MaxValue)
+        {
+            return Name(value, paramName, allowDot, maxLength, allowEmpty: true).Length == 0 ? UnknownName : value;
+        }
+
+        /// <summary>Checks a graphic name with an optional extension (<c>LOGO</c> or <c>LOGO.GRF</c>): 1 to 8 characters before the extension; an empty name becomes <c>UNKNOWN</c>.</summary>
+        public static string GraphicName(string value, string paramName)
+        {
+            string name = ObjectName(value, paramName, allowDot: true);
+            int dot = name.IndexOf('.');
+            int baseLength = dot < 0 ? name.Length : dot;
+            if (baseLength is 0 or > 8 || name.EndsWith('.') || name.IndexOf('.', dot + 1) >= 0)
+            {
+                throw new ArgumentException("The graphic name must have 1 to 8 characters, optionally followed by one extension (for example LOGO or LOGO.GRF).", paramName);
+            }
+
+            return name;
+        }
+
+        /// <summary>Checks a file name with optional device prefix (<c>R:NAME.EXT</c>). An empty name is allowed; the printer then uses <c>UNKNOWN</c>.</summary>
         public static string Path(string value, string paramName)
         {
             ArgumentNullException.ThrowIfNull(value, paramName);
@@ -99,11 +136,11 @@ namespace Bitbeans.Zpl.Helpers
                 }
 
                 Device(value[0], paramName);
-                Name(value.Substring(2), paramName, allowDot: true);
+                Name(value.Substring(2), paramName, allowDot: true, allowEmpty: true);
                 return value;
             }
 
-            return Name(value, paramName, allowDot: true);
+            return Name(value, paramName, allowDot: true, allowEmpty: true);
         }
     }
 }

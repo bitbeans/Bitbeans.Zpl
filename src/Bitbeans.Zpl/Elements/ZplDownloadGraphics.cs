@@ -21,7 +21,7 @@ namespace Bitbeans.Zpl.Elements
     /// </remarks>
     public class ZplDownloadGraphics : ZplDownload
     {
-        /// <summary>Name of the image on the printer, at most 8 characters; the extension is always <c>.GRF</c>.</summary>
+        /// <summary>Name of the image on the printer, at most 8 characters (<c>UNKNOWN</c> if an empty name was given); the extension is always <c>.GRF</c>.</summary>
         public string ImageName { get; private set; }
         private string _extension { get; set; }
         /// <summary>The encoded source image (PNG, JPEG, BMP, ...).</summary>
@@ -31,14 +31,14 @@ namespace Bitbeans.Zpl.Elements
         readonly ZplCompressionScheme _compressionScheme;
 
         /// <summary>Creates a graphic download.</summary>
-        /// <param name="storageDevice">Storage device (<c>R</c>, <c>E</c>, <c>B</c>, <c>A</c> or <c>Z</c>).</param>
-        /// <param name="imageName">Image name without extension, 1 to 8 characters; no <c>^ ~ , : .</c>, whitespace or control characters.</param>
+        /// <param name="storageDevice">Storage device (<c>R</c>, <c>E</c>, <c>B</c> or <c>A</c>).</param>
+        /// <param name="imageName">Image name without extension, at most 8 characters; no <c>^ ~ , : .</c>, whitespace or control characters. An empty name is replaced by <c>UNKNOWN</c>, the name the printer uses when it is omitted.</param>
         /// <param name="imageData">Encoded image data (PNG, JPEG, BMP, ...).</param>
         /// <param name="imageConverter">Converter used to create the bitonal image, e.g. <c>Bitbeans.Zpl.SkiaSharp.SkiaImageConverter</c>.</param>
         /// <param name="compressionScheme">Compression of the graphic data; default <see cref="ZplCompressionScheme.ACS"/>.</param>
         /// <exception cref="ArgumentNullException"><paramref name="imageName"/>, <paramref name="imageData"/> or <paramref name="imageConverter"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="compressionScheme"/> is not a defined <see cref="ZplCompressionScheme"/>.</exception>
-        /// <exception cref="ArgumentException"><paramref name="storageDevice"/> is not one of <c>R</c>, <c>E</c>, <c>B</c>, <c>A</c>, <c>Z</c>, or <paramref name="imageName"/> is empty, longer than 8 characters or contains <c>^</c>, <c>~</c>, comma, colon, dot, whitespace or control characters.</exception>
+        /// <exception cref="ArgumentException"><paramref name="storageDevice"/> is not one of <c>R</c>, <c>E</c>, <c>B</c>, <c>A</c>, or <paramref name="imageName"/> is longer than 8 characters or contains <c>^</c>, <c>~</c>, comma, colon, dot, whitespace or control characters.</exception>
         public ZplDownloadGraphics(
             char storageDevice,
             string imageName,
@@ -51,7 +51,7 @@ namespace Bitbeans.Zpl.Elements
             ArgumentNullException.ThrowIfNull(imageData);
             ArgumentNullException.ThrowIfNull(imageConverter);
 
-            ZplIdentifier.Name(imageName, nameof(imageName), allowDot: false, maxLength: 8);
+            imageName = ZplIdentifier.ObjectName(imageName, nameof(imageName), allowDot: false, maxLength: 8);
 
             if (!Enum.IsDefined(compressionScheme))
             {

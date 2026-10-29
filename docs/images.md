@@ -46,7 +46,9 @@ The graphic data can be compressed:
 new ZplDownloadGraphics('R', "SAMPLE", imageData, converter, ZplCompressionScheme.Z64);
 ```
 
-The image name is limited to 8 characters.
+The image name is limited to 8 characters (`ZplRecallGraphic` also accepts it with extension, `SAMPLE.GRF`). An empty
+name becomes `UNKNOWN`, the name the printer uses when it is omitted. Downloads accept the storage devices `R`, `E`,
+`B` and `A`; `Z` (firmware) is read-only.
 
 ## 2. `ZplDownloadObjects` (`~DY` + `^IM`)
 

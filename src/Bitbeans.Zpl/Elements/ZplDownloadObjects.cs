@@ -25,7 +25,7 @@ namespace Bitbeans.Zpl.Elements
     /// </remarks>
     public class ZplDownloadObjects : ZplDownload
     {
-        /// <summary>Name of the object on the printer, without device, e.g. <c>SAMPLE.PNG</c>. Must not contain <c>^</c>, <c>~</c>, comma, colon, whitespace or control characters.</summary>
+        /// <summary>Name of the object on the printer, without device, e.g. <c>SAMPLE.PNG</c> (<c>UNKNOWN</c> if an empty name was given). Must not contain <c>^</c>, <c>~</c>, comma, colon, whitespace or control characters.</summary>
         public string ObjectName { get; private set; }
         /// <summary>The encoded source image (PNG, JPEG, BMP, ...).</summary>
         public byte[] ImageData { get; private set; }
@@ -33,12 +33,12 @@ namespace Bitbeans.Zpl.Elements
         private readonly IImageConverter _imageConverter;
 
         /// <summary>Creates an object download.</summary>
-        /// <param name="storageDevice">Storage device (<c>R</c>, <c>E</c>, <c>B</c>, <c>A</c> or <c>Z</c>).</param>
-        /// <param name="imageName">Object name (may include an extension, see <see cref="ObjectName"/>).</param>
+        /// <param name="storageDevice">Storage device (<c>R</c>, <c>E</c>, <c>B</c> or <c>A</c>).</param>
+        /// <param name="imageName">Object name (may include an extension, see <see cref="ObjectName"/>); an empty name is replaced by <c>UNKNOWN</c>, the name the printer uses when it is omitted.</param>
         /// <param name="imageData">Encoded image data (PNG, JPEG, BMP, ...).</param>
         /// <param name="imageConverter">Converter used to create the PNG, e.g. <c>Bitbeans.Zpl.SkiaSharp.SkiaImageConverter</c>.</param>
         /// <exception cref="ArgumentNullException"><paramref name="imageName"/>, <paramref name="imageData"/> or <paramref name="imageConverter"/> is <see langword="null"/>.</exception>
-        /// <exception cref="ArgumentException"><paramref name="storageDevice"/> is not one of <c>R</c>, <c>E</c>, <c>B</c>, <c>A</c>, <c>Z</c>, or <paramref name="imageName"/> is empty or contains characters that are not allowed (see <see cref="ObjectName"/>).</exception>
+        /// <exception cref="ArgumentException"><paramref name="storageDevice"/> is not one of <c>R</c>, <c>E</c>, <c>B</c>, <c>A</c>, or <paramref name="imageName"/> contains characters that are not allowed (see <see cref="ObjectName"/>).</exception>
         public ZplDownloadObjects(char storageDevice, string imageName, byte[] imageData, IImageConverter imageConverter)
             : base(storageDevice)
         {
@@ -46,7 +46,7 @@ namespace Bitbeans.Zpl.Elements
             ArgumentNullException.ThrowIfNull(imageData);
             ArgumentNullException.ThrowIfNull(imageConverter);
 
-            ObjectName = ZplIdentifier.Name(imageName, nameof(imageName), allowDot: true);
+            ObjectName = ZplIdentifier.ObjectName(imageName, nameof(imageName), allowDot: true);
             ImageData = imageData;
             _imageConverter = imageConverter;
         }

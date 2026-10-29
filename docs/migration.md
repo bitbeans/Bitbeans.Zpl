@@ -48,6 +48,9 @@ new ZplDownloadObjects('R', "SAMPLE.PNG", imageData, converter);
 - `ZplDownloadGraphics` scales the image by `TargetPrintDpi / SourcePrintDpi`. BinaryKits always halved the
   image when the factor was not 1 ([upstream #346](https://github.com/BinaryKits/BinaryKits.Zpl/issues/346)).
 - Image names longer than 8 characters now throw an `ArgumentException` (the check existed but never threw).
+- `ZplDownloadGraphics` and `ZplDownloadObjects` reject the read-only storage device `Z`.
+- Viewer: `~DY` objects are stored under name and extension (`~DYR:LOGO,P,P,...` as `LOGO.PNG`); read them from
+  `IPrinterStorage` with the full file name.
 - Transparent image pixels are treated as white instead of black.
 - Z64 compressed data uses .NET's zlib and can differ byte-wise from older output; the decoded graphic is identical.
 - Viewer: fields are finalized at `^FS` instead of `^FD`

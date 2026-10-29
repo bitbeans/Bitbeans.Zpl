@@ -454,7 +454,7 @@ namespace Bitbeans.Zpl.Viewer.Tests.Analyzers
             Models.AnalyzeInfo info = AnalyzerTestHelper.Analyze("~DYE:OBJ,B,G,3,1,FF00AA", storage);
 
             Assert.IsEmpty(info.Errors);
-            CollectionAssert.AreEqual(new byte[] { 0xFF, 0x00, 0xAA }, storage.GetFile('E', "OBJ"));
+            CollectionAssert.AreEqual(new byte[] { 0xFF, 0x00, 0xAA }, storage.GetFile('E', "OBJ.GRF"));
         }
 
         [TestMethod]
@@ -472,7 +472,7 @@ namespace Bitbeans.Zpl.Viewer.Tests.Analyzers
 
             AnalyzerTestHelper.Analyze("~DYE:OBJ,B,G,x,y,0102", storage);
 
-            CollectionAssert.AreEqual(new byte[] { 1, 2 }, storage.GetFile('E', "OBJ"));
+            CollectionAssert.AreEqual(new byte[] { 1, 2 }, storage.GetFile('E', "OBJ.GRF"));
         }
 
         // ^CI

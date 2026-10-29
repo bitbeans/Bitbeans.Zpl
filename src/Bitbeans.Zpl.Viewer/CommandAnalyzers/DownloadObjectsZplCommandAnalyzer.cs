@@ -3,7 +3,7 @@ using Bitbeans.Zpl.Helpers;
 
 namespace Bitbeans.Zpl.Viewer.CommandAnalyzers
 {
-    /// <summary>Analyzes <c>~DY</c> (download objects) and stores the hexadecimal object data in the printer storage. Downloaded .GRF data is not converted.</summary>
+    /// <summary>Analyzes <c>~DY</c> (download objects) and stores the hexadecimal object data in the printer storage. The object is stored under its name and extension (<c>LOGO.PNG</c>); downloaded .GRF data is not converted.</summary>
     public class DownloadObjectsZplCommandAnalyzer : ZplCommandAnalyzerBase
     {
         /// <summary>Initializes a new instance of the <see cref="DownloadObjectsZplCommandAnalyzer"/> class for the <c>~DY</c> command.</summary>
@@ -25,9 +25,41 @@ namespace Bitbeans.Zpl.Viewer.CommandAnalyzers
             // TODO: Handle case when .GRF data is downloaded using the ~DY command
             string dataHex = zplDataParts[5];
 
-            printerStorage.AddFile(storageDevice, objectName, ByteHelper.HexToBytes(dataHex));
+            printerStorage.AddFile(storageDevice, GetFileName(objectName, extensionOfStoredFile), ByteHelper.HexToBytes(dataHex));
 
             return null;
+        }
+
+        /// <summary>
+        /// The printer stores the object under its name and the extension given by the <c>x</c> parameter
+        /// (<c>~DYR:LOGO,P,P,...</c> becomes <c>LOGO.PNG</c>), so <c>^IM</c> and <c>^XG</c> find it by its full name.
+        /// A name that already has an extension and an omitted name (<c>UNKNOWN</c>) are handled like the printer does.
+        /// </summary>
+        private static string GetFileName(string objectName, string extensionCode)
+        {
+            if (objectName.Length == 0)
+            {
+                objectName = "UNKNOWN";
+            }
+
+            if (objectName.Contains('.'))
+            {
+                return objectName;
+            }
+
+            string code = extensionCode.Trim().ToUpperInvariant();
+            string extension = code switch
+            {
+                "B" => "BMP",
+                "E" => "TTE",
+                "G" => "GRF",
+                "P" => "PNG",
+                "T" => "TTF",
+                "X" => "PCX",
+                _ => code,
+            };
+
+            return extension.Length == 0 ? objectName : objectName + "." + extension;
         }
     }
 }

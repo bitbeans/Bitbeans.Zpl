@@ -7,11 +7,11 @@
         public char StorageDevice { get; private set; }
 
         /// <summary>Initializes the download command.</summary>
-        /// <param name="storageDevice">Storage device: <c>R</c>, <c>E</c>, <c>B</c>, <c>A</c> or <c>Z</c>.</param>
-        /// <exception cref="System.ArgumentException"><paramref name="storageDevice"/> is not one of the ZPL device letters.</exception>
+        /// <param name="storageDevice">Storage device: <c>R</c>, <c>E</c>, <c>B</c> or <c>A</c>; <c>Z</c> (firmware) is read-only.</param>
+        /// <exception cref="System.ArgumentException"><paramref name="storageDevice"/> is not one of <c>R</c>, <c>E</c>, <c>B</c>, <c>A</c>.</exception>
         public ZplDownload(char storageDevice)
         {
-            StorageDevice = Helpers.ZplIdentifier.Device(storageDevice, nameof(storageDevice));
+            StorageDevice = Helpers.ZplIdentifier.DownloadDevice(storageDevice, nameof(storageDevice));
         }
     }
 }

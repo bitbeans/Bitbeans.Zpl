@@ -22,7 +22,7 @@
 | `^BK` | ANSI Codabar | start and stop characters |
 | `^BL` | LOGMARS | |
 | `^BM` | MSI | check digit modes |
-| `^BQ` | QR Code | model 1 or 2, error correction, mask, mixed mode data; a model other than 1 or 2 falls back to 2 and a mask value outside 0 - 7 to 7 (the defaults) |
+| `^BQ` | QR Code | model 2, error correction, mask, mixed mode data; model 1 is parsed but drawn as model 2 (no model 1 encoder); any other model falls back to 2 and a mask value outside 0 - 7 to 7 (the defaults) |
 | `^BS` | UPC/EAN extension (2 and 5 digits) | |
 | `^BU` | UPC-A | |
 | `^BX` | Data Matrix | ECC 200, module size, rows and columns (when both are set); format, escape character and aspect ratio are parsed but not used for drawing |
@@ -74,7 +74,7 @@ CODABLOCK (`^BB`), TLC39 (`^BT`), Micro PDF417 (`^BF`), Micro QR.
 | Command | Description |
 | --- | --- |
 | `~DG` | Download graphic (GRF) |
-| `~DY` | Download object (PNG; GRF objects are not decoded yet) |
+| `~DY` | Download object, stored under name and extension (`~DYR:LOGO,P,P,...` as `LOGO.PNG`); PNG only, GRF objects are not decoded yet |
 | `^DF` | Store format |
 | `^XF` | Recall format |
 | `^FN` | Field number |

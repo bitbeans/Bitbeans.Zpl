@@ -290,7 +290,7 @@ namespace Bitbeans.Zpl.Viewer.Tests.Analyzers
             AnalyzerTestHelper.Analyze("~DYE:OBJ,B,G,3,1,FF00AA", storage);
             AnalyzerTestHelper.Analyze("~DYE:OBJ,B,G,3,1,010203", storage);
 
-            CollectionAssert.AreEqual(new byte[] { 1, 2, 3 }, storage.GetFile('E', "OBJ"));
+            CollectionAssert.AreEqual(new byte[] { 1, 2, 3 }, storage.GetFile('E', "OBJ.GRF"));
         }
 
         // 7: ^CF keeps the last dimensions

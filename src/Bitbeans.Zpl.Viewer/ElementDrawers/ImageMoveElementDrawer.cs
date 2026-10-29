@@ -21,7 +21,7 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
         {
             if (element is ZplImageMove imageMove)
             {
-                byte[] imageData = this.printerStorage.GetFile(imageMove.StorageDevice, imageMove.ObjectName);
+                byte[] imageData = this.printerStorage.GetFile(imageMove.StorageDevice, imageMove.FileName);
                 if (imageData.Length == 0)
                 {
                     return currentPosition;

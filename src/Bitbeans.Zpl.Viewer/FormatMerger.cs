@@ -132,7 +132,7 @@ namespace Bitbeans.Zpl.Viewer
         }
 
         /// <summary>
-        /// Key of a stored format: storage device (default <c>R:</c>) and upper case name without extension.
+        /// Key of a stored format: storage device (default <c>R:</c>) and upper case name without extension (<c>UNKNOWN</c> if empty).
         /// </summary>
         internal static string GetFormatKey(string formatName)
         {
@@ -145,7 +145,9 @@ namespace Bitbeans.Zpl.Viewer
                 name = name.Substring(2);
             }
 
-            return device + ":" + Path.GetFileNameWithoutExtension(name).ToUpperInvariant();
+            name = Path.GetFileNameWithoutExtension(name);
+            // The printer stores and recalls a format without name as UNKNOWN
+            return device + ":" + (name.Length == 0 ? "UNKNOWN" : name.ToUpperInvariant());
         }
 
         private static readonly MethodInfo memberwiseCloneMethod =

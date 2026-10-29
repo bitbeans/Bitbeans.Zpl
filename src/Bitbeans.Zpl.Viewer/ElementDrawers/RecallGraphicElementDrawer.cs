@@ -21,7 +21,7 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
         {
             if (element is ZplRecallGraphic recallGraphic)
             {
-                byte[] imageData = this.printerStorage.GetFile(recallGraphic.StorageDevice, recallGraphic.ImageName);
+                byte[] imageData = this.printerStorage.GetFile(recallGraphic.StorageDevice, recallGraphic.FileName);
 
                 if (imageData.Length == 0)
                 {

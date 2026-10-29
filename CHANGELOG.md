@@ -63,7 +63,14 @@ First release as **Bitbeans.Zpl**, a fork of [BinaryKits.Zpl](https://github.com
 - ZPL injection through names: `ZplRecallFormat`, `ZplDownloadGraphics`, `ZplDownloadObjects`, `ZplRecallGraphic`,
   `ZplImageMove`, `ZplFontIdentifier` and `ZplFont` validate device letters (`R`, `E`, `B`, `A`, `Z`), file names, extensions
   and font identifiers in the constructor (`ArgumentException`; no `^`, `~`, comma, colon, whitespace or control characters).
-  `ZplRecallGraphic` and `ZplRecallFormat` throw `ArgumentNullException` for a `null` name.
+  `ZplRecallGraphic` and `ZplRecallFormat` throw `ArgumentNullException` for a `null` name. Downloads
+  (`ZplDownloadGraphics`, `ZplDownloadObjects`) accept only the writable devices `R`, `E`, `B` and `A`.
+- An omitted object name is valid ZPL (the printer uses `UNKNOWN`): `ZplRecallFormat` accepts an empty name, and
+  `ZplDownloadGraphics`, `ZplDownloadObjects`, `ZplRecallGraphic` and `ZplImageMove` replace an empty name by `UNKNOWN`.
+- `ZplRecallGraphic` accepts a name with extension (`SAMPLE.GRF`); the 8 character limit applies to the name before the
+  extension, and `.GRF` is only added when there is no extension (new property `FileName`). Before, the viewer could
+  not recall `^XGR:SAMPLE.GRF` because the name including the extension was longer than 8 characters.
+- `ZplImageMove` with an empty extension no longer renders a trailing dot (`^IMR:LOGO.GRF^FS`, new property `FileName`).
 - `ZplQrCode` rejects a model other than 1 or 2 and a mask value outside 0 to 7 (`ArgumentOutOfRangeException`).
 - `ZplGraphicField` XML docs: `b` is the binary byte count and `c` the graphic field count (they were swapped); the rendered order `^GFa,b,c,d` was already correct.
 - NuGet packages are reproducible: CI and release set `SOURCE_DATE_EPOCH` to the commit time for `dotnet pack`.
@@ -125,7 +132,12 @@ First release as **Bitbeans.Zpl**, a fork of [BinaryKits.Zpl](https://github.com
   other out; the other reverse drawers follow the same rule.
 - Viewer: `ZplElementDrawer` is `IDisposable` and disposes the `FontManager` of the default options it creates (not of
   caller-provided options); `FontManager.TypefaceGS` is created lazily and a disposed `FontManager` throws
-  `ObjectDisposedException`.
+  `ObjectDisposedException`. Disposing while a draw is running rejects new draws, lets the running draw finish and
+  releases the font manager when the last draw ends.
+- Viewer: an omitted format name (`^DF^FS`, `^XF^FS`) is stored and recalled as `UNKNOWN`, like on the printer.
+- Viewer: `~DY` stores the object under its name and the extension of the `x` parameter (`~DYR:LOGO,P,P,...` as
+  `LOGO.PNG`), so `^IMR:LOGO.PNG` finds it; `^XG` and `^IM` elements created in code find parsed downloads by their
+  `FileName`.
 - Viewer: `^GF` defaults the format to A when omitted; format B (binary) is rejected with an error instead of being
   decoded as hexadecimal.
 - Viewer: centered, right aligned and justified `^FB` lines 2+ respect the hanging indent.

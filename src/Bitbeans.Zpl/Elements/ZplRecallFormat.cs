@@ -6,13 +6,13 @@ namespace Bitbeans.Zpl.Elements
     /// <summary>Recalls a stored format (<c>^XF</c>); the field data of the recalled format is provided by <see cref="ZplRecallFieldNumber"/> elements.</summary>
     public class ZplRecallFormat : ZplElementBase
     {
-        /// <summary>Name of the stored format to recall, written after <c>^XF</c>, e.g. <c>R:LABEL.ZPL</c>: an optional device letter (<c>R</c>, <c>E</c>, <c>B</c>, <c>A</c> or <c>Z</c>) and colon, then the file name (no <c>^</c>, <c>~</c>, comma, further colon, whitespace or control characters).</summary>
+        /// <summary>Name of the stored format to recall, written after <c>^XF</c>, e.g. <c>R:LABEL.ZPL</c>: an optional device letter (<c>R</c>, <c>E</c>, <c>B</c>, <c>A</c> or <c>Z</c>) and colon, then the file name (may be empty, the printer then uses <c>UNKNOWN</c>; no <c>^</c>, <c>~</c>, comma, further colon, whitespace or control characters).</summary>
         public string FormatName { get; private set; }
 
         /// <summary>Creates a recall format element.</summary>
         /// <param name="formatName">Name of the stored format, optionally with device prefix (<c>R:LABEL.ZPL</c>); see <see cref="FormatName"/> for the allowed characters.</param>
         /// <exception cref="System.ArgumentNullException"><paramref name="formatName"/> is <see langword="null"/>.</exception>
-        /// <exception cref="System.ArgumentException"><paramref name="formatName"/> is empty or contains characters that would be interpreted as ZPL commands or separators.</exception>
+        /// <exception cref="System.ArgumentException"><paramref name="formatName"/> contains characters that would be interpreted as ZPL commands or separators.</exception>
         public ZplRecallFormat(string formatName)
         {
             FormatName = ZplIdentifier.Path(formatName, nameof(formatName));
