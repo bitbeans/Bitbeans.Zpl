@@ -52,7 +52,11 @@ jobs:
       - name: Pack
         env:
           VERSION: ${{ steps.version.outputs.version }}
-        run: dotnet pack Bitbeans.Zpl.slnx --configuration Release --no-build --output artifacts/packages "-p:Version=$VERSION"
+        run: |
+          # Deterministic packages: fixed entry timestamps from the tagged commit
+          # (https://learn.microsoft.com/en-us/nuget/create-packages/deterministic-packages)
+          export SOURCE_DATE_EPOCH="$(git log -1 --pretty=%ct)"
+          dotnet pack Bitbeans.Zpl.slnx --configuration Release --no-build --output artifacts/packages "-p:Version=$VERSION"
 
       # Trusted publishing: nuget.org exchanges the GitHub OIDC token for a short-lived API key,
       # no long-lived secret is stored. Policy: nuget.org > Trusted Publishing (owner bitbeans,

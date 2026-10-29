@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Bitbeans.Zpl.Helpers;
+using System.Collections.Generic;
 
 namespace Bitbeans.Zpl.Elements
 {
@@ -22,13 +23,15 @@ namespace Bitbeans.Zpl.Elements
         /// <param name="fontHeight">Character height in dots; default 30.</param>
         /// <param name="fontName">Font identifier (<c>A</c>-<c>Z</c>, <c>0</c>-<c>9</c>); default <c>0</c>.</param>
         /// <param name="fieldOrientation">Orientation of the text; default <see cref="FieldOrientation.Normal"/>.</param>
+        /// <exception cref="System.ArgumentNullException"><paramref name="fontName"/> is <see langword="null"/>.</exception>
+        /// <exception cref="System.ArgumentException"><paramref name="fontName"/> is not a single ASCII letter or digit.</exception>
         public ZplFont(
             int fontWidth = 30,
             int fontHeight = 30,
             string fontName = "0",
             FieldOrientation fieldOrientation = FieldOrientation.Normal)
         {
-            FontName = fontName;
+            FontName = ZplIdentifier.FontName(fontName, nameof(fontName));
             FieldOrientation = fieldOrientation;
             FontWidth = fontWidth;
             FontHeight = fontHeight;

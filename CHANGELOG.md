@@ -23,6 +23,8 @@ First release as **Bitbeans.Zpl**, a fork of [BinaryKits.Zpl](https://github.com
 
 ### Changed
 
+- Viewer: the misspelled analyzer classes `DownloadObjectsZplCommandAnaylzer` and `FieldOriginZplCommandAnalzer` were renamed to
+  `DownloadObjectsZplCommandAnalyzer` and `FieldOriginZplCommandAnalyzer` (no aliases).
 - `Bitbeans.Zpl` has **no dependencies**; ImageSharp was removed from all packages.
 - Targets .NET 10 only.
 - `ZplDownloadGraphics` and `ZplDownloadObjects` require an `IImageConverter`.
@@ -58,6 +60,14 @@ First release as **Bitbeans.Zpl**, a fork of [BinaryKits.Zpl](https://github.com
 
 ### Fixed
 
+- ZPL injection through names: `ZplRecallFormat`, `ZplDownloadGraphics`, `ZplDownloadObjects`, `ZplRecallGraphic`,
+  `ZplImageMove`, `ZplFontIdentifier` and `ZplFont` validate device letters (`R`, `E`, `B`, `A`, `Z`), file names, extensions
+  and font identifiers in the constructor (`ArgumentException`; no `^`, `~`, comma, colon, whitespace or control characters).
+  `ZplRecallGraphic` and `ZplRecallFormat` throw `ArgumentNullException` for a `null` name.
+- `ZplQrCode` rejects a model other than 1 or 2 and a mask value outside 0 to 7 (`ArgumentOutOfRangeException`).
+- `ZplGraphicField` XML docs: `b` is the binary byte count and `c` the graphic field count (they were swapped); the rendered order `^GFa,b,c,d` was already correct.
+- NuGet packages are reproducible: CI and release set `SOURCE_DATE_EPOCH` to the commit time for `dotnet pack`.
+- docs: `ZplRecallFormat` renders `^XF`.
 - MSI Mod 11 check digit is `(11 - sum mod 11) mod 11` (IBM weights 2 to 7); a value of 10 is written as `10`.
 - `ZplGraphicSymbol` accepts a field justification; the viewer passes the `^FO`/`^FT`/`^FW` justification to `^GS`.
 - A space can be used as `^FH` indicator.

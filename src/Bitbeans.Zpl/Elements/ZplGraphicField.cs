@@ -7,9 +7,9 @@ namespace Bitbeans.Zpl.Elements
     {
         /// <summary>Compression type (<c>a</c> parameter): <c>A</c> ASCII hexadecimal, <c>B</c> binary, <c>C</c> compressed binary.</summary>
         public char CompressionType { get; private set; }
-        /// <summary>Total number of bytes of the graphic (<c>b</c> parameter).</summary>
+        /// <summary>Binary byte count (<c>b</c> parameter): total number of bytes to be transmitted for the graphic, i.e. the number of bytes that follow in the data (<see cref="Data"/>); for ASCII hexadecimal data it equals <see cref="GraphicFieldCount"/>.</summary>
         public int BinaryByteCount { get; private set; }
-        /// <summary>Total number of bytes sent in the data (<c>c</c> parameter); equal to <see cref="BinaryByteCount"/> for ASCII hexadecimal data.</summary>
+        /// <summary>Graphic field count (<c>c</c> parameter): total number of bytes comprising the graphic format (bytes per row times the number of rows, the size of the uncompressed image); divided by <see cref="BytesPerRow"/> it gives the number of image rows. For ASCII hexadecimal data it equals <see cref="BinaryByteCount"/>.</summary>
         public int GraphicFieldCount { get; private set; }
         /// <summary>Number of bytes per image row (<c>d</c> parameter).</summary>
         public int BytesPerRow { get; private set; }
@@ -19,8 +19,8 @@ namespace Bitbeans.Zpl.Elements
         /// <summary>Creates a graphic field.</summary>
         /// <param name="positionX">X position of the field in dots, relative to the label home (<c>^LH</c>); scaled by <see cref="ZplRenderOptions.ScaleFactor"/> when rendered.</param>
         /// <param name="positionY">Y position of the field in dots, relative to the label home (<c>^LH</c>); scaled by <see cref="ZplRenderOptions.ScaleFactor"/> when rendered.</param>
-        /// <param name="binaryByteCount">Total number of bytes of the graphic.</param>
-        /// <param name="graphicFieldCount">Total number of bytes sent in the data.</param>
+        /// <param name="binaryByteCount">Binary byte count (<c>b</c> parameter), see <see cref="BinaryByteCount"/>.</param>
+        /// <param name="graphicFieldCount">Graphic field count (<c>c</c> parameter), see <see cref="GraphicFieldCount"/>.</param>
         /// <param name="bytesPerRow">Number of bytes per image row.</param>
         /// <param name="data">The image data in the format given by <paramref name="compressionType"/>.</param>
         /// <param name="bottomToTop"><see langword="true"/> to position the field with <c>^FT</c> (<see cref="ZplFieldTypeset"/>) instead of <c>^FO</c> (<see cref="ZplFieldOrigin"/>).</param>

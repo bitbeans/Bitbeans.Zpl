@@ -419,7 +419,7 @@ namespace Bitbeans.Zpl.Viewer.Tests.Analyzers
         [TestMethod]
         public void FieldOrigin_Parameters()
         {
-            VirtualPrinter printer = Run(new FieldOriginZplCommandAnalzer(), "^FO10,20");
+            VirtualPrinter printer = Run(new FieldOriginZplCommandAnalyzer(), "^FO10,20");
 
             Assert.AreEqual(10, printer.NextElementPosition.X);
             Assert.AreEqual(20, printer.NextElementPosition.Y);
@@ -431,7 +431,7 @@ namespace Bitbeans.Zpl.Viewer.Tests.Analyzers
         [TestMethod]
         public void FieldOrigin_NoParametersMeansOrigin()
         {
-            VirtualPrinter printer = Run(new FieldOriginZplCommandAnalzer(), "^FO");
+            VirtualPrinter printer = Run(new FieldOriginZplCommandAnalyzer(), "^FO");
 
             Assert.AreEqual(0, printer.NextElementPosition.X);
             Assert.AreEqual(0, printer.NextElementPosition.Y);
@@ -440,7 +440,7 @@ namespace Bitbeans.Zpl.Viewer.Tests.Analyzers
         [TestMethod]
         public void FieldOrigin_DecimalsAreTruncated()
         {
-            VirtualPrinter printer = Run(new FieldOriginZplCommandAnalzer(), "^FO10.7,20.2");
+            VirtualPrinter printer = Run(new FieldOriginZplCommandAnalyzer(), "^FO10.7,20.2");
 
             Assert.AreEqual(10, printer.NextElementPosition.X);
             Assert.AreEqual(20, printer.NextElementPosition.Y);
@@ -454,7 +454,7 @@ namespace Bitbeans.Zpl.Viewer.Tests.Analyzers
             {
                 CultureInfo.CurrentCulture = new CultureInfo("de-DE");
 
-                VirtualPrinter printer = Run(new FieldOriginZplCommandAnalzer(), "^FO10.5,20.5");
+                VirtualPrinter printer = Run(new FieldOriginZplCommandAnalyzer(), "^FO10.5,20.5");
 
                 Assert.AreEqual(10, printer.NextElementPosition.X);
                 Assert.AreEqual(20, printer.NextElementPosition.Y);
@@ -471,7 +471,7 @@ namespace Bitbeans.Zpl.Viewer.Tests.Analyzers
         [DataRow("-99999999999", "99999999999")]
         public void FieldOrigin_InvalidOrOutOfRangeCoordinatesAreZero(string x, string y)
         {
-            VirtualPrinter printer = Run(new FieldOriginZplCommandAnalzer(), "^FO" + x + "," + y);
+            VirtualPrinter printer = Run(new FieldOriginZplCommandAnalyzer(), "^FO" + x + "," + y);
 
             Assert.AreEqual(0, printer.NextElementPosition.X);
             Assert.AreEqual(0, printer.NextElementPosition.Y);
@@ -480,7 +480,7 @@ namespace Bitbeans.Zpl.Viewer.Tests.Analyzers
         [TestMethod]
         public void FieldOrigin_NegativeCoordinates()
         {
-            VirtualPrinter printer = Run(new FieldOriginZplCommandAnalzer(), "^FO-5,-6");
+            VirtualPrinter printer = Run(new FieldOriginZplCommandAnalyzer(), "^FO-5,-6");
 
             Assert.AreEqual(-5, printer.NextElementPosition.X);
             Assert.AreEqual(-6, printer.NextElementPosition.Y);
@@ -492,7 +492,7 @@ namespace Bitbeans.Zpl.Viewer.Tests.Analyzers
             VirtualPrinter printer = new();
             printer.SetLabelHome(100, 200);
 
-            Run(new FieldOriginZplCommandAnalzer(), "^FO10,20", printer);
+            Run(new FieldOriginZplCommandAnalyzer(), "^FO10,20", printer);
 
             Assert.AreEqual(110, printer.NextElementPosition.X);
             Assert.AreEqual(220, printer.NextElementPosition.Y);
@@ -504,7 +504,7 @@ namespace Bitbeans.Zpl.Viewer.Tests.Analyzers
         [DataRow("2", FieldJustification.Auto)]
         public void FieldOrigin_Justification(string value, FieldJustification expected)
         {
-            VirtualPrinter printer = Run(new FieldOriginZplCommandAnalzer(), "^FO10,20," + value);
+            VirtualPrinter printer = Run(new FieldOriginZplCommandAnalyzer(), "^FO10,20," + value);
 
             Assert.AreEqual(expected, printer.NextElementFieldJustification);
         }
@@ -515,7 +515,7 @@ namespace Bitbeans.Zpl.Viewer.Tests.Analyzers
             VirtualPrinter printer = new();
             printer.SetFieldJustification(FieldJustification.Right);
 
-            Run(new FieldOriginZplCommandAnalzer(), "^FO10,20,", printer);
+            Run(new FieldOriginZplCommandAnalyzer(), "^FO10,20,", printer);
 
             Assert.AreEqual(FieldJustification.Right, printer.NextElementFieldJustification);
         }

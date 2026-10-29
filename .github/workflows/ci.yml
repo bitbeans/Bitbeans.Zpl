@@ -72,7 +72,10 @@ jobs:
 
       - name: Pack
         if: runner.os == 'Linux'
-        run: dotnet pack Bitbeans.Zpl.slnx --configuration Release --no-build --output artifacts/packages
+        run: |
+          # Deterministic packages: fixed entry timestamps from the commit
+          export SOURCE_DATE_EPOCH="$(git log -1 --pretty=%ct)"
+          dotnet pack Bitbeans.Zpl.slnx --configuration Release --no-build --output artifacts/packages
 
       - name: Upload packages
         if: runner.os == 'Linux'

@@ -4,10 +4,10 @@ using Bitbeans.Zpl.Helpers;
 namespace Bitbeans.Zpl.Viewer.CommandAnalyzers
 {
     /// <summary>Analyzes <c>~DY</c> (download objects) and stores the hexadecimal object data in the printer storage. Downloaded .GRF data is not converted.</summary>
-    public class DownloadObjectsZplCommandAnaylzer : ZplCommandAnalyzerBase
+    public class DownloadObjectsZplCommandAnalyzer : ZplCommandAnalyzerBase
     {
-        /// <summary>Initializes a new instance of the <see cref="DownloadObjectsZplCommandAnaylzer"/> class for the <c>~DY</c> command.</summary>
-        public DownloadObjectsZplCommandAnaylzer() : base("~DY") { }
+        /// <summary>Initializes a new instance of the <see cref="DownloadObjectsZplCommandAnalyzer"/> class for the <c>~DY</c> command.</summary>
+        public DownloadObjectsZplCommandAnalyzer() : base("~DY") { }
 
         ///<inheritdoc/>
         public override ZplElementBase Analyze(string zplCommand, VirtualPrinter virtualPrinter, IPrinterStorage printerStorage)
