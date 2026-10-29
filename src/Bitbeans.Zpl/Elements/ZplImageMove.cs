@@ -21,7 +21,7 @@ namespace Bitbeans.Zpl.Elements
         /// <summary>Creates an image move.</summary>
         /// <param name="positionX">X position of the field in dots, relative to the label home (<c>^LH</c>); scaled by <see cref="ZplRenderOptions.ScaleFactor"/> when rendered.</param>
         /// <param name="positionY">Y position of the field in dots, relative to the label home (<c>^LH</c>); scaled by <see cref="ZplRenderOptions.ScaleFactor"/> when rendered.</param>
-        /// <param name="storageDevice">Storage device of the object (<c>R</c>, <c>E</c>, <c>B</c> or <c>A</c>).</param>
+        /// <param name="storageDevice">Storage device of the object (<c>R</c>, <c>E</c>, <c>B</c>, <c>A</c> or <c>Z</c>).</param>
         /// <param name="objectName">Object name; normally without extension. An empty name is replaced by <c>UNKNOWN</c>, the name the printer uses when it is omitted.</param>
         /// <param name="extension">Object extension without dot, e.g. <c>GRF</c>; may be empty if <paramref name="objectName"/> already contains it.</param>
         /// <param name="bottomToTop"><see langword="true"/> to position the field with <c>^FT</c> (<see cref="ZplFieldTypeset"/>) instead of <c>^FO</c> (<see cref="ZplFieldOrigin"/>).</param>

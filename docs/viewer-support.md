@@ -73,7 +73,7 @@ CODABLOCK (`^BB`), TLC39 (`^BT`), Micro PDF417 (`^BF`), Micro QR.
 
 | Command | Description |
 | --- | --- |
-| `~DG` | Download graphic (GRF) |
+| `~DG` | Download graphic (GRF), stored as `NAME.GRF`; an omitted name is `UNKNOWN` |
 | `~DY` | Download object, stored under name and extension (`~DYR:LOGO,P,P,...` as `LOGO.PNG`); PNG only, GRF objects are not decoded yet |
 | `^DF` | Store format |
 | `^XF` | Recall format |

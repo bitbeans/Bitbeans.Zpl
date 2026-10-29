@@ -25,14 +25,14 @@ namespace Bitbeans.Zpl.Elements
         /// <param name="positionX">X position of the field in dots, relative to the label home (<c>^LH</c>); scaled by <see cref="ZplRenderOptions.ScaleFactor"/> when rendered.</param>
         /// <param name="positionY">Y position of the field in dots, relative to the label home (<c>^LH</c>); scaled by <see cref="ZplRenderOptions.ScaleFactor"/> when rendered.</param>
         /// <param name="storageDevice">Storage device letter: <c>R</c> (DRAM), <c>E</c> (flash), <c>B</c> (memory card), <c>A</c> (auto) or <c>Z</c> (firmware).</param>
-        /// <param name="imageName">Name of the stored graphic: 1 to 8 characters, optionally followed by an extension (<c>LOGO</c> or <c>LOGO.GRF</c>; <c>.GRF</c> is added if there is none); no <c>^ ~ , :</c>, whitespace or control characters. An empty name is replaced by <c>UNKNOWN</c>, the name the printer uses when it is omitted.</param>
+        /// <param name="imageName">Name of the stored graphic: 1 to 8 characters, optionally followed by an extension (<c>LOGO</c> or <c>LOGO.GRF</c>; <c>.GRF</c> is added if there is none); no <c>^ ~ , :</c>, whitespace or control characters. An empty name (also just <c>.GRF</c>) is replaced by <c>UNKNOWN</c>, the name the printer uses when it is omitted.</param>
         /// <param name="magnificationFactorX">Magnification in x direction, 1-10; default 1.</param>
         /// <param name="magnificationFactorY">Magnification in y direction, 1-10; default 1.</param>
         /// <param name="bottomToTop"><see langword="true"/> to position the field with <c>^FT</c> (<see cref="ZplFieldTypeset"/>) instead of <c>^FO</c> (<see cref="ZplFieldOrigin"/>).</param>
         /// <param name="useDefaultPosition">Only evaluated together with <paramref name="bottomToTop"/> (see <see cref="ZplFieldTypeset"/>).</param>
         /// <param name="fieldJustification">Field justification passed to the position command (<c>^FO</c>/<c>^FT</c>, third parameter); <see cref="FieldJustification.None"/> omits it. <see cref="FieldJustification.Right"/> makes the position the right edge of the element.</param>
         /// <exception cref="ArgumentNullException"><paramref name="imageName"/> is <see langword="null"/>.</exception>
-        /// <exception cref="ArgumentException"><paramref name="storageDevice"/> is not one of <c>R</c>, <c>E</c>, <c>B</c>, <c>A</c>, <c>Z</c>, or <paramref name="imageName"/> has more than 8 characters before the extension, an empty name before or after the dot, more than one dot, or contains <c>^</c>, <c>~</c>, comma, colon, whitespace or control characters.</exception>
+        /// <exception cref="ArgumentException"><paramref name="storageDevice"/> is not one of <c>R</c>, <c>E</c>, <c>B</c>, <c>A</c>, <c>Z</c>, or <paramref name="imageName"/> has more than 8 characters before the extension, nothing after the dot, more than one dot, or contains <c>^</c>, <c>~</c>, comma, colon, whitespace or control characters.</exception>
         public ZplRecallGraphic(
             int positionX,
             int positionY,

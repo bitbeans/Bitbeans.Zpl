@@ -74,33 +74,27 @@ namespace Bitbeans.Zpl.Viewer
             GC.SuppressFinalize(this);
         }
 
-        private void DrawElementsWhileActive(
-            SKCanvas skCanvas,
-            IEnumerable<ZplElementBase> elements,
-            int labelImageWidth,
-            int labelImageHeight,
-            int printDensityDpmm,
-            ILogger logger)
+        /// <summary>
+        /// Registers a running draw, so that <see cref="Dispose"/> keeps the font manager until it ends.
+        /// The whole draw (including clearing a caller's surface) runs between this call and <see cref="EndDraw"/>.
+        /// </summary>
+        private void BeginDraw()
         {
             lock (this.stateLock)
             {
                 ObjectDisposedException.ThrowIf(this.disposed, this);
                 this.activeDraws++;
             }
+        }
 
-            try
+        private void EndDraw()
+        {
+            lock (this.stateLock)
             {
-                this.DrawElements(skCanvas, elements, labelImageWidth, labelImageHeight, printDensityDpmm, logger);
-            }
-            finally
-            {
-                lock (this.stateLock)
+                this.activeDraws--;
+                if (this.disposed && this.activeDraws == 0)
                 {
-                    this.activeDraws--;
-                    if (this.disposed && this.activeDraws == 0)
-                    {
-                        this.ownedFontManager?.Dispose();
-                    }
+                    this.ownedFontManager?.Dispose();
                 }
             }
         }
@@ -124,7 +118,19 @@ namespace Bitbeans.Zpl.Viewer
             int printDensityDpmm = 8,
             ILogger logger = null)
         {
-            ObjectDisposedException.ThrowIf(this.disposed, this);
+            this.BeginDraw();
+            try
+            {
+                return this.DrawCore(elements, labelWidth, labelHeight, printDensityDpmm, logger);
+            }
+            finally
+            {
+                this.EndDraw();
+            }
+        }
+
+        private byte[] DrawCore(ZplElementBase[] elements, double labelWidth, double labelHeight, int printDensityDpmm, ILogger logger)
+        {
             ArgumentNullException.ThrowIfNull(elements);
             (int labelImageWidth, int labelImageHeight) = GetLabelPixelSize(labelWidth, labelHeight, printDensityDpmm);
 
@@ -134,7 +140,7 @@ namespace Bitbeans.Zpl.Viewer
 
             //make sure to have a transparent canvas for SKBlendMode.Xor to work properly
             skCanvas.Clear(SKColors.Transparent);
-            this.DrawElementsWhileActive(skCanvas, elements, labelImageWidth, labelImageHeight, printDensityDpmm, logger ?? NullLogger.Instance);
+            this.DrawElements(skCanvas, elements, labelImageWidth, labelImageHeight, printDensityDpmm, logger ?? NullLogger.Instance);
 
             using SKImage image = surface.Snapshot();
             SKData imageData;
@@ -180,7 +186,19 @@ namespace Bitbeans.Zpl.Viewer
             int printDensityDpmm = 8,
             ILogger logger = null)
         {
-            ObjectDisposedException.ThrowIf(this.disposed, this);
+            this.BeginDraw();
+            try
+            {
+                this.DrawSurfaceCore(surface, elements, labelWidth, labelHeight, printDensityDpmm, logger);
+            }
+            finally
+            {
+                this.EndDraw();
+            }
+        }
+
+        private void DrawSurfaceCore(SKSurface surface, IEnumerable<ZplElementBase> elements, double labelWidth, double labelHeight, int printDensityDpmm, ILogger logger)
+        {
             ArgumentNullException.ThrowIfNull(surface);
             ArgumentNullException.ThrowIfNull(elements);
             (int labelImageWidth, int labelImageHeight) = GetLabelPixelSize(labelWidth, labelHeight, printDensityDpmm);
@@ -188,7 +206,7 @@ namespace Bitbeans.Zpl.Viewer
             SKCanvas skCanvas = surface.Canvas;
             //This has an issue with AvaloniaUI making the window transparent.
             skCanvas.Clear(SKColors.Transparent);
-            this.DrawElementsWhileActive(skCanvas, elements, labelImageWidth, labelImageHeight, printDensityDpmm, logger ?? NullLogger.Instance);
+            this.DrawElements(skCanvas, elements, labelImageWidth, labelImageHeight, printDensityDpmm, logger ?? NullLogger.Instance);
         }
 
         private static (int Width, int Height) GetLabelPixelSize(double labelWidth, double labelHeight, int printDensityDpmm)

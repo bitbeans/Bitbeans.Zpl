@@ -32,6 +32,7 @@ namespace Bitbeans.Zpl.Tests
         [DataRow("SAMPLE.GRF", "SAMPLE.GRF", "SAMPLE.GRF")]
         [DataRow("ABCDEFGH.GRF", "ABCDEFGH.GRF", "ABCDEFGH.GRF")]
         [DataRow("", "UNKNOWN", "UNKNOWN.GRF")]
+        [DataRow(".GRF", "UNKNOWN.GRF", "UNKNOWN.GRF")]
         public void RecallGraphicAcceptsNamesWithAndWithoutExtension(string name, string imageName, string fileName)
         {
             ZplRecallGraphic recall = new(10, 20, 'R', name, 2, 3);
@@ -44,7 +45,6 @@ namespace Bitbeans.Zpl.Tests
         [TestMethod]
         [DataRow("ABCDEFGHI")]
         [DataRow("ABCDEFGHI.GRF")]
-        [DataRow(".GRF")]
         [DataRow("LOGO.")]
         [DataRow("A.B.GRF")]
         public void RecallGraphicRejectsInvalidGraphicNames(string name)

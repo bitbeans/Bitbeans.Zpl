@@ -109,13 +109,19 @@ namespace Bitbeans.Zpl.Helpers
             return Name(value, paramName, allowDot, maxLength, allowEmpty: true).Length == 0 ? UnknownName : value;
         }
 
-        /// <summary>Checks a graphic name with an optional extension (<c>LOGO</c> or <c>LOGO.GRF</c>): 1 to 8 characters before the extension; an empty name becomes <c>UNKNOWN</c>.</summary>
+        /// <summary>Checks a graphic name with an optional extension (<c>LOGO</c> or <c>LOGO.GRF</c>): 1 to 8 characters before the extension; an empty name (also <c>.GRF</c>) becomes <c>UNKNOWN</c>.</summary>
         public static string GraphicName(string value, string paramName)
         {
             string name = ObjectName(value, paramName, allowDot: true);
+            if (name[0] == '.')
+            {
+                // Only the extension is given (".GRF"): the printer uses UNKNOWN as name
+                name = UnknownName + name;
+            }
+
             int dot = name.IndexOf('.');
             int baseLength = dot < 0 ? name.Length : dot;
-            if (baseLength is 0 or > 8 || name.EndsWith('.') || name.IndexOf('.', dot + 1) >= 0)
+            if (baseLength > 8 || name.EndsWith('.') || name.IndexOf('.', dot + 1) >= 0)
             {
                 throw new ArgumentException("The graphic name must have 1 to 8 characters, optionally followed by one extension (for example LOGO or LOGO.GRF).", paramName);
             }

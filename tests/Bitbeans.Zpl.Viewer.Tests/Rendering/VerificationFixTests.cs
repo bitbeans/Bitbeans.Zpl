@@ -67,6 +67,21 @@ namespace Bitbeans.Zpl.Viewer.Tests.Rendering
         }
 
         [TestMethod]
+        [DataRow("~DGR:,8,1,{0}^XA^FO15,25^XGR:,1,1^FS^XZ")]
+        [DataRow("~DGR:.GRF,8,1,{0}^XA^FO15,25^XGR:UNKNOWN.GRF^FS^XZ")]
+        [DataRow("~DGLOGO,8,1,{0}^XA^FO15,25^XGR:LOGO.GRF^FS^XZ")]
+        [DataRow("~DGR:LOGO.XYZ,8,1,{0}^XA^FO15,25^XGLOGO^FS^XZ")]
+        [DataRow("~DGR:LOGO,8,1,{0}^XA^FO15,25^IMR:LOGO.GRF^FS^XZ")]
+        public void DownloadGraphicIsStoredAsGrfAndOmittedNamesAsUnknown(string format)
+        {
+            string zpl = string.Format(System.Globalization.CultureInfo.InvariantCulture, format, Frame8);
+
+            Assert.IsEmpty(AnalyzerTestHelper.Errors(zpl));
+            using SKBitmap bmp = RenderHelper.Render(zpl);
+            Assert.AreEqual(new SKRectI(15, 25, 23, 33), RenderHelper.DarkBounds(bmp).Value);
+        }
+
+        [TestMethod]
         public void RecallGraphicNameThatIsTooLongIsReported()
         {
             Assert.HasCount(1, AnalyzerTestHelper.Errors("^XA^FO0,0^XGR:ABCDEFGHI.GRF,1,1^FS^XZ"));

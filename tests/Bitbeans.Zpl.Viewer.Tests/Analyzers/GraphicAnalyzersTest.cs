@@ -405,9 +405,19 @@ namespace Bitbeans.Zpl.Viewer.Tests.Analyzers
         }
 
         [TestMethod]
-        public void RecallGraphic_NameWithoutExtensionIsIgnored()
+        public void RecallGraphic_InvalidMagnificationKeepsDefaultAndExtraParametersAreIgnored()
         {
-            Assert.IsEmpty(AnalyzerTestHelper.Elements("^XGLOGO"));
+            ZplRecallGraphic image = AnalyzerTestHelper.Single<ZplRecallGraphic>("^XGE:LOGO.GRF,x,2,9");
+
+            Assert.AreEqual('E', image.StorageDevice);
+            Assert.AreEqual(1, image.MagnificationFactorX);
+            Assert.AreEqual(2, image.MagnificationFactorY);
+        }
+
+        [TestMethod]
+        public void RecallGraphic_NameWithoutExtensionUsesGrf()
+        {
+            Assert.AreEqual("LOGO.GRF", AnalyzerTestHelper.Single<ZplRecallGraphic>("^XGLOGO").FileName);
         }
 
         // ~DG d:o.x,t,w,data

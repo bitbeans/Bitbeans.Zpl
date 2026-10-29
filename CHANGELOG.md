@@ -135,6 +135,8 @@ First release as **Bitbeans.Zpl**, a fork of [BinaryKits.Zpl](https://github.com
   `ObjectDisposedException`. Disposing while a draw is running rejects new draws, lets the running draw finish and
   releases the font manager when the last draw ends.
 - Viewer: an omitted format name (`^DF^FS`, `^XF^FS`) is stored and recalled as `UNKNOWN`, like on the printer.
+- Viewer: `~DG` stores the graphic as `NAME.GRF` (an omitted name as `UNKNOWN.GRF`), and `^XG` accepts a name
+  without extension or without name (`^XGR:LOGO`, `^XGR:`); an invalid magnification keeps 1.
 - Viewer: `~DY` stores the object under its name and the extension of the `x` parameter (`~DYR:LOGO,P,P,...` as
   `LOGO.PNG`), so `^IMR:LOGO.PNG` finds it; `^XG` and `^IM` elements created in code find parsed downloads by their
   `FileName`.
