@@ -1,21 +1,13 @@
 ﻿namespace Bitbeans.Zpl
 {
-    /// <summary>
-    /// NewLine Conversion Method
-    /// </summary>
+    /// <summary>Defines how line feed characters in text are converted when it is written to field data.</summary>
     public enum NewLineConversionMethod
     {
-        /// <summary>
-        /// To Space
-        /// </summary>
+        /// <summary>Replace each line feed by a space.</summary>
         ToSpace,
-        /// <summary>
-        /// To Empty
-        /// </summary>
+        /// <summary>Remove line feeds.</summary>
         ToEmpty,
-        /// <summary>
-        /// To Zpl NewLine
-        /// </summary>
+        /// <summary>Replace each line feed by the ZPL line break <c>\&amp;</c> (only effective inside a field block, <c>^FB</c>).</summary>
         ToZplNewLine,
     }
 }

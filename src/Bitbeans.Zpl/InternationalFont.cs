@@ -1,10 +1,9 @@
 ﻿namespace Bitbeans.Zpl
 {
+    /// <summary>Character set / encoding selectable with <c>^CI</c> (<see cref="Elements.ZplChangeInternationalFont"/>). The numeric value of each member is the <c>^CI</c> parameter.</summary>
     public enum InternationalFont
     {
-        /// <summary>
-        /// Zebra Code Page 850 - U.S.A. 1
-        /// </summary>
+        /// <summary>Zebra Code Page 850 - U.S.A. 1 (the printer default)</summary>
         ZCP850 = 0,
         /// <summary>
         /// Zebra Code Page 850 - U.S.A. 2
@@ -22,9 +21,7 @@
         /// Zebra Code Page 850 - Denmark/Norway
         /// </summary>
         ZCP850_4 = 4,
-        /// <summary>
-        /// Zebra code Page 850 - Sweden/Finland
-        /// </summary>
+        /// <summary>Zebra Code Page 850 - Sweden/Finland</summary>
         ZCP850_5 = 5,
         /// <summary>
         /// Zebra Code Page 850 - Germany
@@ -54,9 +51,7 @@
         /// Zebra Code Page 850 - Japan
         /// </summary>
         ZCP850_12 = 12,
-        /// <summary>
-        /// Zebra Code Page 850
-        /// </summary>
+        /// <summary>Zebra Code Page 850 - IBM Code Page 850</summary>
         ZCP850_13 = 13,
         /// <summary>
         /// Zebra Code Page 1252

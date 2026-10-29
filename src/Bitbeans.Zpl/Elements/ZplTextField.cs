@@ -5,34 +5,32 @@ using System.Text;
 
 namespace Bitbeans.Zpl.Elements
 {
-    //^FD – Field Data
+    /// <summary>Text field. Renders the font (<c>^A</c>), the position (<c>^FO</c> or <c>^FT</c>) and the field data (<c>^FD</c>/<c>^FS</c>, optionally with <c>^FH</c> and <c>^FR</c>).</summary>
     public class ZplTextField : ZplPositionedElementBase, IFormatElement
     {
-        //^A
+        /// <summary>Font (<c>^A</c>) of the text.</summary>
         public ZplFont Font { get; protected set; }
-        //^FH
+        /// <summary>Hexadecimal escape character of <c>^FH</c>, or <see langword="null"/> to not emit <c>^FH</c>. When set, <c>_</c>, <c>^</c> and <c>~</c> in the text are written as hexadecimal escapes.</summary>
         public char? HexadecimalIndicator { get; protected set; }
-        //^FR
+        /// <summary>Print the field in reverse (<c>^FR</c>), inverting the underlying image.</summary>
         public bool ReversePrint { get; protected set; }
 
+        /// <summary>How line feeds in <see cref="Text"/> are converted.</summary>
         public NewLineConversionMethod NewLineConversion { get; protected set; }
-        //^FD
+        /// <summary>The text printed in the field (<c>^FD</c>). The characters <c>^</c> and <c>~</c> cannot be part of field data and are replaced by a space, or, when <see cref="HexadecimalIndicator"/> is set, written as hexadecimal escapes (as is <c>_</c>). A backslash is always replaced by a space.</summary>
         public string Text { get; protected set; }
 
-        /// <summary>
-        /// Construct a ^FD (Field Data) element, together with the ^FO, ^A and ^FH.
-        /// Control character will be handled (Convert to Hex or replace with ' ')
-        /// </summary>
-        /// <param name="text">Original text content</param>
-        /// <param name="positionX"></param>
-        /// <param name="positionY"></param>
-        /// <param name="font"></param>
-        /// <param name="newLineConversion"></param>
-        /// <param name="hexadecimalIndicator"></param>
-        /// <param name="reversePrint"></param>
-        /// <param name="bottomToTop"></param>
-        /// <param name="fieldJustification"></param>
-        /// <param name="useDefaultPosition"></param>
+        /// <summary>Creates a text field, rendered as <c>^A</c>, <c>^FO</c>/<c>^FT</c>, optional <c>^FH</c>/<c>^FR</c> and <c>^FD</c>.</summary>
+        /// <param name="text">Original text content; control characters are converted.</param>
+        /// <param name="positionX">X position of the field in dots, relative to the label home (<c>^LH</c>); scaled by <see cref="ZplRenderOptions.ScaleFactor"/> when rendered.</param>
+        /// <param name="positionY">Y position of the field in dots, relative to the label home (<c>^LH</c>); scaled by <see cref="ZplRenderOptions.ScaleFactor"/> when rendered.</param>
+        /// <param name="font">Font of the text.</param>
+        /// <param name="newLineConversion">How line feeds are converted; default <see cref="NewLineConversionMethod.ToSpace"/>.</param>
+        /// <param name="hexadecimalIndicator">Hexadecimal escape character for <c>^FH</c>, or <see langword="null"/> to not emit <c>^FH</c>. The default indicator <c>_</c> is rendered as a plain <c>^FH</c>.</param>
+        /// <param name="reversePrint"><see langword="true"/> to emit <c>^FR</c> so the field is printed in reverse (inverts the underlying image).</param>
+        /// <param name="bottomToTop"><see langword="true"/> to position the field with <c>^FT</c> (<see cref="ZplFieldTypeset"/>) instead of <c>^FO</c> (<see cref="ZplFieldOrigin"/>).</param>
+        /// <param name="useDefaultPosition">Only evaluated together with <paramref name="bottomToTop"/>: <see langword="true"/> renders <c>^FT</c> without coordinates so the printer continues at its default position. Ignored for <c>^FO</c>.</param>
+        /// <param name="fieldJustification">Field justification rendered as the third parameter of <c>^FO</c>/<c>^FT</c>; <see cref="FieldJustification.None"/> omits it.</param>
         public ZplTextField(
             string text,
             int positionX,
@@ -64,6 +62,8 @@ namespace Bitbeans.Zpl.Elements
             return result;
         }
 
+        /// <summary>Renders the field data section: optional <c>^FH</c> and <c>^FR</c>, then <c>^FD</c>, the sanitized <see cref="Text"/> and <c>^FS</c>.</summary>
+        /// <returns>The field data section as a single line.</returns>
         protected string RenderFieldDataSection()
         {
             StringBuilder sb = new();

@@ -2,6 +2,7 @@
 
 namespace Bitbeans.Zpl.Elements
 {
+    /// <summary>Reference grid for layout work: 30 x 30 boxes (<c>^GB</c>) of 100 x 100 dots, each labeled with its x and y position.</summary>
     public class ZplReferenceGrid : ZplElementBase
     {
         ///<inheritdoc/>

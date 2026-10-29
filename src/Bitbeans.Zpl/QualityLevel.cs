@@ -1,33 +1,19 @@
 ﻿namespace Bitbeans.Zpl
 {
-    /// <summary>
-    /// Quality Level
-    /// </summary>
+    /// <summary>Quality level (error correction) of a Data Matrix symbol (<see cref="Elements.ZplDataMatrix"/>, <c>^BX</c>). The member name is the rendered value.</summary>
     public enum QualityLevel
     {
-        /// <summary>
-        /// ECC Value of 0
-        /// </summary>
+        /// <summary>ECC 0 (<c>0</c>), the legacy convolutional error correction level.</summary>
         ECC0,
-        /// <summary>
-        /// ECC Value of 50
-        /// </summary>
+        /// <summary>ECC 50 (<c>50</c>).</summary>
         ECC50,
-        /// <summary>
-        /// ECC Value of 80
-        /// </summary>
+        /// <summary>ECC 80 (<c>80</c>).</summary>
         ECC80,
-        /// <summary>
-        /// ECC Value of 100
-        /// </summary>
+        /// <summary>ECC 100 (<c>100</c>).</summary>
         ECC100,
-        /// <summary>
-        /// ECC Value of 140
-        /// </summary>
+        /// <summary>ECC 140 (<c>140</c>).</summary>
         ECC140,
-        /// <summary>
-        /// ECC Value of 200
-        /// </summary>
+        /// <summary>ECC 200 (<c>200</c>), Reed-Solomon error correction; the recommended level.</summary>
         ECC200
     }
 }

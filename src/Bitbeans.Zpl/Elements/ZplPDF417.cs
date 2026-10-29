@@ -3,34 +3,39 @@ using System.Collections.Generic;
 
 namespace Bitbeans.Zpl.Elements
 {
-    /// <summary>
-    /// PDF417 Barcode ^B7o,h,s,c,r,t
-    /// </summary>
+    /// <summary>PDF417 bar code (<c>^B7</c>) with the field position and field data.</summary>
+    /// <remarks>
+    /// Format: <c>^B7o,h,s,c,r,t</c>. Preceded by <c>^BYw</c> with the module width.
+    /// </remarks>
     public class ZplPDF417 : ZplFieldDataElementBase
     {
+        /// <summary>Height of the individual rows in dots (<c>h</c> parameter); scaled by <see cref="ZplRenderOptions.ScaleFactor"/> when rendered.</summary>
         public int Height { get; protected set; }
+        /// <summary>Module width in dots (<c>^BY</c> parameter <c>w</c>, 1 to 10); rendered as is, not scaled.</summary>
         public int ModuleWidth { get; protected set; }
+        /// <summary>Number of data columns to encode (<c>c</c> parameter, 1 to 30). <see langword="null"/> lets the printer balance rows and columns automatically.</summary>
         public int? Columns { get; protected set; }
+        /// <summary>Number of rows to encode (<c>r</c> parameter, 3 to 90). <see langword="null"/> lets the printer balance rows and columns automatically.</summary>
         public int? Rows { get; protected set; }
+        /// <summary>Truncate the right row indicators and the stop pattern (<c>t</c> parameter).</summary>
         public bool Compact { get; protected set; }
+        /// <summary>Security level (<c>s</c> parameter, 0 to 8): number of error detection and correction code words. 0 gives error detection only.</summary>
         public int SecurityLevel { get; protected set; }
 
-        /// <summary>
-        /// Zpl PDF417 barcode
-        /// </summary>
-        /// <param name="content"></param>
-        /// <param name="positionX"></param>
-        /// <param name="positionY"></param>
-        /// <param name="height"></param>
-        /// <param name="moduleWidth"></param>
-        /// <param name="columns">1-30: Number of data columns to encode. Default will auto balance 1:2 row to column</param>
-        /// <param name="rows">3-90. Number of data columns to encode. Default will auto balance 1:2 row to column</param>
-        /// <param name="compact">Truncate right row indicators and stop pattern</param>
-        /// <param name="securityLevel">1-8 This determines the number of error detection and correction code-words to be generated for the symbol.The default level (0) provides only error detection without correction.Increasing the security level adds increasing levels of error correction and increases the symbol size.</param>
-        /// <param name="fieldOrientation"></param>
-        /// <param name="hexadecimalIndicator"></param>
-        /// <param name="bottomToTop"></param>
-        /// <param name="useDefaultPosition"></param>
+        /// <summary>Creates a PDF417 bar code.</summary>
+        /// <param name="content">The data to encode, written to the <c>^FD</c> field data command.</param>
+        /// <param name="positionX">X position of the field in dots, relative to the label home (<c>^LH</c>); scaled by <see cref="ZplRenderOptions.ScaleFactor"/> when rendered.</param>
+        /// <param name="positionY">Y position of the field in dots, relative to the label home (<c>^LH</c>); scaled by <see cref="ZplRenderOptions.ScaleFactor"/> when rendered.</param>
+        /// <param name="height">Height of the individual rows in dots; default 8.</param>
+        /// <param name="moduleWidth">Module width in dots; default 2.</param>
+        /// <param name="columns">1-30: number of data columns to encode. <see langword="null"/> (default) balances rows and columns automatically.</param>
+        /// <param name="rows">3-90: number of rows to encode. <see langword="null"/> (default) balances rows and columns automatically.</param>
+        /// <param name="compact">Truncate the right row indicators and the stop pattern; default <see langword="false"/>.</param>
+        /// <param name="securityLevel">0-8: number of error detection and correction code words. The default (0) provides error detection only; higher levels add error correction and increase the symbol size.</param>
+        /// <param name="fieldOrientation">Field orientation: normal (<c>N</c>), rotated 90 degrees (<c>R</c>), inverted 180 degrees (<c>I</c>) or read from bottom up (<c>B</c>).</param>
+        /// <param name="hexadecimalIndicator">Hexadecimal escape character for <c>^FH</c>, or <see langword="null"/> to not emit <c>^FH</c>. The default indicator <c>_</c> is rendered as a plain <c>^FH</c>.</param>
+        /// <param name="bottomToTop"><see langword="true"/> to position the field with <c>^FT</c> (<see cref="ZplFieldTypeset"/>) instead of <c>^FO</c> (<see cref="ZplFieldOrigin"/>).</param>
+        /// <param name="useDefaultPosition">Only evaluated together with <paramref name="bottomToTop"/>: <see langword="true"/> renders <c>^FT</c> without coordinates so the printer continues at its default position. Ignored for <c>^FO</c>.</param>
         public ZplPDF417(
             string content,
             int positionX,
@@ -55,7 +60,9 @@ namespace Bitbeans.Zpl.Elements
             SecurityLevel = securityLevel;
         }
 
-        ///<inheritdoc/>
+        /// <summary>Renders the position, <c>^BYw</c>, <c>^B7o,h,s,c,r,t</c> and the field data.</summary>
+        /// <param name="context">Render options (scaling).</param>
+        /// <returns>The ZPL lines of the bar code.</returns>
         public override IEnumerable<string> Render(ZplRenderOptions context)
         {
             //^ FO100,100

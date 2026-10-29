@@ -3,29 +3,36 @@ using System.Text;
 
 namespace Bitbeans.Zpl.Elements
 {
+    /// <summary>QR Code bar code (<c>^BQ</c>) with the field position and field data.</summary>
+    /// <remarks>
+    /// The field data is rendered as <c>^FD</c> followed by the error correction level, <c>A</c> (automatic input mode), a comma and the content.
+    /// </remarks>
     public class ZplQrCode : ZplFieldDataElementBase
     {
+        /// <summary>QR Code model (<c>b</c> parameter): 1 (original) or 2 (enhanced, recommended).</summary>
         public int Model { get; private set; }
+        /// <summary>Magnification factor (<c>c</c> parameter, 1 to 10), the size of one module in dots; scaled by <see cref="ZplRenderOptions.ScaleFactor"/> when rendered.</summary>
         public int MagnificationFactor { get; private set; }
+        /// <summary>Error correction level, written as first character of the field data.</summary>
         public ErrorCorrectionLevel ErrorCorrectionLevel { get; private set; }
+        /// <summary>Mask value (<c>e</c> parameter), 0 to 7; default 7.</summary>
         public int MaskValue { get; private set; }
+        /// <summary>The vertical quiet zone in dots (usually set with <c>^BY,,X</c>). Currently not rendered.</summary>
         public int VerticalQuietZone { get; private set; }
 
-        /// <summary>
-        /// Zpl QrCode
-        /// </summary>
-        /// <param name="content"></param>
-        /// <param name="positionX"></param>
-        /// <param name="positionY"></param>
-        /// <param name="model">1 (original) and 2 (enhanced – recommended)</param>
-        /// <param name="magnificationFactor">Size of the QR code, 1 on 150 dpi printers, 2 on 200 dpi printers, 3 on 300 dpi printers, 6 on 600 dpi printers</param>
-        /// <param name="errorCorrectionLevel"></param>
-        /// <param name="maskValue">0-7, (default: 7)</param>
-        /// <param name="fieldOrientation"></param>
-        /// <param name="hexadecimalIndicator"></param>
-        /// <param name="bottomToTop"></param>
-        /// <param name="useDefaultPosition"></param>
-        /// <param name="verticalQuietZone">The vertical quiet zone (usually set with <c>^BY,,X</c>)</param>
+        /// <summary>Creates a QR Code.</summary>
+        /// <param name="content">The data to encode, written to the <c>^FD</c> field data command.</param>
+        /// <param name="positionX">X position of the field in dots, relative to the label home (<c>^LH</c>); scaled by <see cref="ZplRenderOptions.ScaleFactor"/> when rendered.</param>
+        /// <param name="positionY">Y position of the field in dots, relative to the label home (<c>^LH</c>); scaled by <see cref="ZplRenderOptions.ScaleFactor"/> when rendered.</param>
+        /// <param name="model">1 (original) or 2 (enhanced, recommended); default 2.</param>
+        /// <param name="magnificationFactor">Size of one module in dots, 1-10; default 2.</param>
+        /// <param name="errorCorrectionLevel">Error correction level; default <see cref="ErrorCorrectionLevel.HighReliability"/> (Q).</param>
+        /// <param name="maskValue">Mask value, 0-7; default 7.</param>
+        /// <param name="fieldOrientation">Field orientation: normal (<c>N</c>), rotated 90 degrees (<c>R</c>), inverted 180 degrees (<c>I</c>) or read from bottom up (<c>B</c>).</param>
+        /// <param name="hexadecimalIndicator">Hexadecimal escape character for <c>^FH</c>, or <see langword="null"/> to not emit <c>^FH</c>. The default indicator <c>_</c> is rendered as a plain <c>^FH</c>.</param>
+        /// <param name="bottomToTop"><see langword="true"/> to position the field with <c>^FT</c> (<see cref="ZplFieldTypeset"/>) instead of <c>^FO</c> (<see cref="ZplFieldOrigin"/>).</param>
+        /// <param name="useDefaultPosition">Only evaluated together with <paramref name="bottomToTop"/>: <see langword="true"/> renders <c>^FT</c> without coordinates so the printer continues at its default position. Ignored for <c>^FO</c>.</param>
+        /// <param name="verticalQuietZone">The vertical quiet zone (usually set with <c>^BY,,X</c>); stored but currently not rendered.</param>
         public ZplQrCode(
             string content,
             int positionX,
@@ -48,7 +55,9 @@ namespace Bitbeans.Zpl.Elements
             VerticalQuietZone = verticalQuietZone;
         }
 
-        ///<inheritdoc/>
+        /// <summary>Renders the position, <c>^BQo,model,magnification,ecc,mask</c> and the field data.</summary>
+        /// <param name="context">Render options (scaling).</param>
+        /// <returns>The ZPL lines of the bar code.</returns>
         public override IEnumerable<string> Render(ZplRenderOptions context)
         {
             //^ FO100,100
@@ -62,6 +71,8 @@ namespace Bitbeans.Zpl.Elements
             return result;
         }
 
+        /// <summary>Renders the field data section: optional <c>^FH</c>, then <c>^FD</c>, the error correction letter, <c>A,</c>, the content and <c>^FS</c>. Hides <see cref="ZplFieldDataElementBase.RenderFieldDataSection"/>.</summary>
+        /// <returns>The field data section as a single line.</returns>
         protected new string RenderFieldDataSection()
         {
             var sb = new StringBuilder();

@@ -2,38 +2,30 @@ using System.Collections.Generic;
 
 namespace Bitbeans.Zpl.Elements
 {
-    /// <summary>
-    /// Code 128 Barcode
-    /// </summary>
+    /// <summary>Code 128 bar code (<c>^BC</c>), rendered together with <c>^BY</c> and the field position.</summary>
     public class ZplBarcode128 : ZplBarcode
     {
-        /// <summary>
-        /// Code 128 mode: N (no selected mode), U (UCC case mode), A (automatic) or D (UCC/EAN mode)
-        /// </summary>
+        /// <summary>Code 128 mode (<c>m</c> parameter of <c>^BC</c>): <c>N</c> (no selected mode, default), <c>U</c> (UCC case mode), <c>A</c> (automatic mode) or <c>D</c> (UCC/EAN mode). Not validated.</summary>
         public string Mode { get; set; }
 
-        /// <summary>
-        /// Calculate and print the UCC check digit (mode U)
-        /// </summary>
+        /// <summary>Calculate and print the UCC check digit (<c>e</c> parameter of <c>^BC</c>, only used in mode <c>U</c>).</summary>
         public bool UccCheckDigit { get; set; }
 
-        /// <summary>
-        /// Code 128 Barcode
-        /// </summary>
-        /// <param name="content"></param>
-        /// <param name="positionX"></param>
-        /// <param name="positionY"></param>
-        /// <param name="height"></param>
-        /// <param name="moduleWidth"></param>
-        /// <param name="wideBarToNarrowBarWidthRatio"></param>
-        /// <param name="fieldOrientation"></param>
-        /// <param name="hexadecimalIndicator"></param>
-        /// <param name="printInterpretationLine"></param>
-        /// <param name="printInterpretationLineAboveCode"></param>
-        /// <param name="bottomToTop"></param>
-        /// <param name="useDefaultPosition"></param>
-        /// <param name="mode"></param>
-        /// <param name="uccCheckDigit"></param>
+        /// <summary>Creates a Code 128 bar code.</summary>
+        /// <param name="content">The data to encode, written to the <c>^FD</c> field data command.</param>
+        /// <param name="positionX">X position of the field in dots, relative to the label home (<c>^LH</c>); scaled by <see cref="ZplRenderOptions.ScaleFactor"/> when rendered.</param>
+        /// <param name="positionY">Y position of the field in dots, relative to the label home (<c>^LH</c>); scaled by <see cref="ZplRenderOptions.ScaleFactor"/> when rendered.</param>
+        /// <param name="height">Bar code height in dots; scaled by <see cref="ZplRenderOptions.ScaleFactor"/> when rendered.</param>
+        /// <param name="moduleWidth">Module width in dots, the width of the narrowest bar (<c>^BY</c> parameter <c>w</c>, 1 to 10).</param>
+        /// <param name="wideBarToNarrowBarWidthRatio">Ratio of wide bar to narrow bar width (<c>^BY</c> parameter <c>r</c>), 2.0 to 3.0 in steps of 0.1. Only evaluated by variable-ratio symbologies such as Code 39.</param>
+        /// <param name="fieldOrientation">Field orientation: normal (<c>N</c>), rotated 90 degrees (<c>R</c>), inverted 180 degrees (<c>I</c>) or read from bottom up (<c>B</c>).</param>
+        /// <param name="hexadecimalIndicator">Hexadecimal escape character for <c>^FH</c>, or <see langword="null"/> to not emit <c>^FH</c>. The default indicator <c>_</c> is rendered as a plain <c>^FH</c>.</param>
+        /// <param name="printInterpretationLine"><see langword="true"/> to print the human-readable interpretation line (<c>Y</c>), <see langword="false"/> to suppress it (<c>N</c>).</param>
+        /// <param name="printInterpretationLineAboveCode"><see langword="true"/> to print the interpretation line above the bar code instead of below it.</param>
+        /// <param name="bottomToTop"><see langword="true"/> to position the field with <c>^FT</c> (<see cref="ZplFieldTypeset"/>) instead of <c>^FO</c> (<see cref="ZplFieldOrigin"/>).</param>
+        /// <param name="useDefaultPosition">Only evaluated together with <paramref name="bottomToTop"/>: <see langword="true"/> renders <c>^FT</c> without coordinates so the printer continues at its default position. Ignored for <c>^FO</c>.</param>
+        /// <param name="mode">Code 128 mode: <c>N</c> (default), <c>U</c>, <c>A</c> or <c>D</c>. The <c>e</c> and <c>m</c> parameters of <c>^BC</c> are only rendered when this is not <c>N</c> or <paramref name="uccCheckDigit"/> is set.</param>
+        /// <param name="uccCheckDigit">Calculate and print the UCC check digit (mode <c>U</c>); default <see langword="false"/>.</param>
         public ZplBarcode128(
             string content,
             int positionX,
@@ -66,7 +58,9 @@ namespace Bitbeans.Zpl.Elements
             this.UccCheckDigit = uccCheckDigit;
         }
 
-        ///<inheritdoc/>
+        /// <summary>Renders <c>^FO</c>/<c>^FT</c>, <c>^BY</c>, <c>^BCo,h,f,g[,e,m]</c> and the field data.</summary>
+        /// <param name="context">Render options (scaling).</param>
+        /// <returns>The ZPL lines of the bar code.</returns>
         public override IEnumerable<string> Render(ZplRenderOptions context)
         {
             //^BCo,h,f,g,e,m

@@ -4,26 +4,28 @@ using System.Text;
 
 namespace Bitbeans.Zpl.Elements
 {
+    /// <summary>MaxiCode bar code (<c>^BD</c>) with the field position and field data. The orientation is not rendered.</summary>
     public class ZplMaxiCode : ZplFieldDataElementBase
     {
+        /// <summary>MaxiCode mode (<c>m</c> parameter): 2 (numeric postal code), 3 (alphanumeric postal code), 4 (standard), 5 (full EEC) or 6 (reader programming).</summary>
         public int Mode { get; private set; }
 
+        /// <summary>Position of this symbol in a structured append sequence (<c>n</c> parameter), 1 to 8.</summary>
         public int Position { get; private set; }
 
+        /// <summary>Total number of symbols in a structured append sequence (<c>t</c> parameter), 1 to 8.</summary>
         public int Total { get; private set; }
 
-        /// <summary>
-        /// Zpl QrCode
-        /// </summary>
-        /// <param name="content"></param>
-        /// <param name="positionX"></param>
-        /// <param name="positionY"></param>
-        /// <param name="mode">2 (numeric postal code) Default, 3 (alphanumeric postal code), 4 (standard), 5 (full EEC), and 6 (reader programming)</param>
-        /// <param name="position">1-8, (default: 1)</param>
-        /// <param name="total">1-8, (default: 1)</param>
-        /// <param name="hexadecimalIndicator"></param>
-        /// <param name="bottomToTop"></param>
-        /// <param name="useDefaultPosition"></param>
+        /// <summary>Creates a MaxiCode bar code.</summary>
+        /// <param name="content">The data to encode, written to the <c>^FD</c> field data command.</param>
+        /// <param name="positionX">X position of the field in dots, relative to the label home (<c>^LH</c>); scaled by <see cref="ZplRenderOptions.ScaleFactor"/> when rendered.</param>
+        /// <param name="positionY">Y position of the field in dots, relative to the label home (<c>^LH</c>); scaled by <see cref="ZplRenderOptions.ScaleFactor"/> when rendered.</param>
+        /// <param name="mode">2 (numeric postal code, default), 3 (alphanumeric postal code), 4 (standard), 5 (full EEC) or 6 (reader programming).</param>
+        /// <param name="position">Position in a structured append sequence, 1-8; default 1.</param>
+        /// <param name="total">Total number of symbols in a structured append sequence, 1-8; default 1.</param>
+        /// <param name="hexadecimalIndicator">Hexadecimal escape character for <c>^FH</c>, or <see langword="null"/> to not emit <c>^FH</c>. The default indicator <c>_</c> is rendered as a plain <c>^FH</c>.</param>
+        /// <param name="bottomToTop"><see langword="true"/> to position the field with <c>^FT</c> (<see cref="ZplFieldTypeset"/>) instead of <c>^FO</c> (<see cref="ZplFieldOrigin"/>).</param>
+        /// <param name="useDefaultPosition">Only evaluated together with <paramref name="bottomToTop"/>: <see langword="true"/> renders <c>^FT</c> without coordinates so the printer continues at its default position. Ignored for <c>^FO</c>.</param>
         public ZplMaxiCode(
             string content,
             int positionX,
@@ -41,7 +43,9 @@ namespace Bitbeans.Zpl.Elements
             Total = total;
         }
 
-        ///<inheritdoc/>
+        /// <summary>Renders the position, <c>^BDm,n,t</c> and the field data.</summary>
+        /// <param name="context">Render options (scaling).</param>
+        /// <returns>The ZPL lines of the bar code.</returns>
         public override IEnumerable<string> Render(ZplRenderOptions context)
         {
             //^FO100,100
