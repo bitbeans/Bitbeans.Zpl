@@ -59,7 +59,7 @@ namespace Bitbeans.Zpl.Elements
         /// <returns></returns>
         public ZplFieldTypeset Offset(int offsetX, int offsetY)
         {
-            return new ZplFieldTypeset(this.PositionX + offsetX, this.PositionY + offsetY, this.FieldJustification);
+            return new ZplFieldTypeset(this.PositionX + offsetX, this.PositionY + offsetY, this.FieldJustification, this.UseDefaultPosition);
         }
     }
 }

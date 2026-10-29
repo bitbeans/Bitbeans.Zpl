@@ -38,7 +38,7 @@ public class ZplBarcodeLogmars : ZplBarcode
         result.AddRange(RenderPosition(context));
         result.Add(RenderModuleWidth());
         result.Add($"^BL{RenderFieldOrientation()},{context.Scale(Height)},{RenderPrintInterpretationLineAboveCode()}");
-        result.Add($"^FD{Content}^FS");
+        result.Add(RenderFieldDataSection());
         return result;
     }
 }

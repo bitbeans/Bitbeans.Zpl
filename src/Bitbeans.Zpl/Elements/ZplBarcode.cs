@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 
 using static System.Net.Mime.MediaTypeNames;
 
@@ -49,7 +50,7 @@ namespace Bitbeans.Zpl.Elements
 
         protected string RenderModuleWidth()
         {
-            return $"^BY{ModuleWidth},{WideBarToNarrowBarWidthRatio}";
+            return FormattableString.Invariant($"^BY{ModuleWidth},{WideBarToNarrowBarWidthRatio}");
         }
 
     }

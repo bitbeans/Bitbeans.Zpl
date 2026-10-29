@@ -32,9 +32,17 @@ namespace Bitbeans.Zpl.Elements
 
         public override IEnumerable<string> Render(ZplRenderOptions context)
         {
-            var result = new List<string>();
-            result.AddRange(FormatElement.Render(context));
-            result.Add($"^FN{Number}^FS");
+            var result = new List<string>(FormatElement.Render(context));
+
+            // ^FN replaces ^FD inside the field of the format element: ^FO..^A..^FN1^FS
+            var last = result[result.Count - 1];
+            var fieldDataStart = last.IndexOf("^FD", StringComparison.Ordinal);
+            if (fieldDataStart >= 0)
+            {
+                last = last.Substring(0, fieldDataStart);
+            }
+
+            result[result.Count - 1] = $"{last}^FN{Number}^FS";
             return result;
         }
     }

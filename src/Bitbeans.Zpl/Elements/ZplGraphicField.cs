@@ -41,7 +41,7 @@ namespace Bitbeans.Zpl.Elements
         {
             var result = new List<string>();
             result.AddRange(RenderPosition(context));
-            result.Add($"^GF{CompressionType},{BinaryByteCount},{GraphicFieldCount},{BytesPerRow},{Data}");
+            result.Add($"^GF{CompressionType},{BinaryByteCount},{GraphicFieldCount},{BytesPerRow},{Data}^FS");
 
             return result;
         }

@@ -46,7 +46,7 @@ public class ZplBarcodeMsi : ZplBarcode
         result.AddRange(RenderPosition(context));
         result.Add(RenderModuleWidth());
         result.Add($"^BM{RenderFieldOrientation()},{RenderPrintCheckDigitMode()},{context.Scale(Height)},{RenderPrintInterpretationLine()},{RenderPrintInterpretationLineAboveCode()},{RenderBoolean(PrintCheckDigit)}");
-        result.Add($"^FD{Content}^FS");
+        result.Add(RenderFieldDataSection());
         return result;
     }
 
