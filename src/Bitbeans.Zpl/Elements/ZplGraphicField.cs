@@ -13,7 +13,7 @@ namespace Bitbeans.Zpl.Elements
         public int GraphicFieldCount { get; private set; }
         /// <summary>Number of bytes per image row (<c>d</c> parameter).</summary>
         public int BytesPerRow { get; private set; }
-        /// <summary>The image data, rendered unchanged after the parameters.</summary>
+        /// <summary>The graphic data as sent with <c>^GF</c>, rendered unchanged after the parameters: ASCII hexadecimal (for example <c>FF00</c>, one row is <see cref="BytesPerRow"/> bytes), optionally compressed with the ZPL run-length scheme, or <c>:B64:</c> / <c>:Z64:</c> encoded data. The viewer converts it to an image when drawing.</summary>
         public string Data { get; private set; }
 
         /// <summary>Creates a graphic field.</summary>
@@ -26,6 +26,7 @@ namespace Bitbeans.Zpl.Elements
         /// <param name="bottomToTop"><see langword="true"/> to position the field with <c>^FT</c> (<see cref="ZplFieldTypeset"/>) instead of <c>^FO</c> (<see cref="ZplFieldOrigin"/>).</param>
         /// <param name="useDefaultPosition">Only evaluated together with <paramref name="bottomToTop"/>: <see langword="true"/> renders <c>^FT</c> without coordinates so the printer continues at its default position. Ignored for <c>^FO</c>.</param>
         /// <param name="compressionType"><c>A</c> (ASCII hexadecimal, default), <c>B</c> or <c>C</c>.</param>
+        /// <param name="fieldJustification">Field justification passed to the position command (<c>^FO</c>/<c>^FT</c>, third parameter); <see cref="FieldJustification.None"/> omits it. <see cref="FieldJustification.Right"/> makes the position the right edge of the element.</param>
         public ZplGraphicField(
             int positionX,
             int positionY,
@@ -35,8 +36,9 @@ namespace Bitbeans.Zpl.Elements
             string data,
             bool bottomToTop = false,
             bool useDefaultPosition = false,
-            char compressionType = 'A')
-            : base(positionX, positionY, bottomToTop, useDefaultPosition)
+            char compressionType = 'A',
+            FieldJustification fieldJustification = FieldJustification.None)
+            : base(positionX, positionY, bottomToTop, useDefaultPosition, fieldJustification)
         {
             CompressionType = compressionType;
             BinaryByteCount = binaryByteCount;

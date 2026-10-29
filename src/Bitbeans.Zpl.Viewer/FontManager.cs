@@ -10,8 +10,16 @@ using System.Linq;
 namespace Bitbeans.Zpl.Viewer
 {
     /// <summary>Resolves the typefaces used for text and interpretation lines from font stacks, registered typefaces and the system fonts.</summary>
-    public class FontManager
+    /// <remarks>
+    /// The manager owns and caches the typefaces it creates itself (the default typefaces matched in the system fonts and
+    /// <see cref="TypefaceGS"/>); they are shared by all draws and released by <see cref="Dispose"/>. Typefaces passed to
+    /// <see cref="RegisterTypeface"/> or returned by a custom <see cref="FontLoader"/> belong to the caller and are not disposed.
+    /// The lazily created typefaces are thread safe, so a manager can be used by concurrent draws.
+    /// </remarks>
+    public class FontManager : IDisposable
     {
+        private readonly object typefaceLock = new();
+        private readonly List<SKTypeface> ownedTypefaces = [];
         private readonly Dictionary<string, IList<SKTypeface>> registeredTypefaces = new(StringComparer.OrdinalIgnoreCase);
 
         private static readonly SKFontManager systemFontManager = SKFontManager.Default;
@@ -72,16 +80,22 @@ namespace Bitbeans.Zpl.Viewer
         private SKTypeface typeface0;
         internal SKTypeface Typeface0 {
             get {
-                this.typeface0 ??= this.GetDefaultTypeface(this.FontStack0, fontStyle0);
-                return this.typeface0;
+                lock (this.typefaceLock)
+                {
+                    this.typeface0 ??= this.GetDefaultTypeface(this.FontStack0, fontStyle0);
+                    return this.typeface0;
+                }
             }
         }
 
         private SKTypeface typefaceA;
         internal SKTypeface TypefaceA {
             get {
-                this.typefaceA ??= this.GetDefaultTypeface(this.FontStackA, fontStyleA);
-                return this.typefaceA;
+                lock (this.typefaceLock)
+                {
+                    this.typefaceA ??= this.GetDefaultTypeface(this.FontStackA, fontStyleA);
+                    return this.typefaceA;
+                }
             }
         }
 
@@ -108,6 +122,33 @@ namespace Bitbeans.Zpl.Viewer
         /// key for registration.</param>
         public void RegisterTypeface(SKTypeface typeface)
         {
+            lock (this.typefaceLock)
+            {
+                this.AddRegisteredTypeface(typeface);
+            }
+        }
+
+        /// <summary>Disposes the typefaces owned by the manager (the system default typefaces and <see cref="TypefaceGS"/>). Registered typefaces are not disposed. The manager must not be used for drawing afterwards.</summary>
+        public void Dispose()
+        {
+            lock (this.typefaceLock)
+            {
+                foreach (SKTypeface typeface in this.ownedTypefaces)
+                {
+                    typeface.Dispose();
+                }
+
+                this.ownedTypefaces.Clear();
+                this.typeface0 = null;
+                this.typefaceA = null;
+            }
+
+            this.TypefaceGS.Dispose();
+            GC.SuppressFinalize(this);
+        }
+
+        private void AddRegisteredTypeface(SKTypeface typeface)
+        {
             if (this.registeredTypefaces.TryGetValue(typeface.FamilyName, out IList<SKTypeface> typefaces))
             {
                 typefaces.Add(typeface);
@@ -127,7 +168,7 @@ namespace Bitbeans.Zpl.Viewer
                 }
             }
 
-            return this.SystemTypefaceMatcher(SKTypeface.Default.FamilyName, fontStyle) ?? SKTypeface.Default;
+            return this.MatchSystemTypeface(SKTypeface.Default.FamilyName, fontStyle) ?? SKTypeface.Default;
         }
 
         private SKTypeface GetTypeFaceByFamily(string familyName, SKFontStyle fontStyle)
@@ -142,7 +183,19 @@ namespace Bitbeans.Zpl.Viewer
                     .First();
             }
 
-            return this.SystemTypefaceMatcher(familyName, fontStyle);
+            return this.MatchSystemTypeface(familyName, fontStyle);
+        }
+
+        /// <summary>A typeface matched in the system fonts is a new object that the manager owns.</summary>
+        private SKTypeface MatchSystemTypeface(string familyName, SKFontStyle fontStyle)
+        {
+            SKTypeface typeface = this.SystemTypefaceMatcher(familyName, fontStyle);
+            if (typeface != null)
+            {
+                this.ownedTypefaces.Add(typeface);
+            }
+
+            return typeface;
         }
 
     }

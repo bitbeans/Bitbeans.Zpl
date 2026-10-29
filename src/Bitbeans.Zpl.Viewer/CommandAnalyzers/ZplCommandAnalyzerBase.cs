@@ -83,6 +83,20 @@ namespace Bitbeans.Zpl.Viewer.CommandAnalyzers
             };
         }
 
+        /// <summary>Gets the justification of the pending field: the justification given with <c>^FO</c>/<c>^FT</c>, otherwise the default justification set with <c>^FW</c>.</summary>
+        /// <param name="virtualPrinter">The virtual printer holding the current printer state.</param>
+        /// <returns>The justification, <see cref="FieldJustification.None"/> if none was set.</returns>
+        protected static FieldJustification ResolveFieldJustification(VirtualPrinter virtualPrinter)
+        {
+            FieldJustification fieldJustification = virtualPrinter.NextElementFieldJustification;
+            if (fieldJustification == FieldJustification.None)
+            {
+                fieldJustification = virtualPrinter.FieldJustification;
+            }
+
+            return fieldJustification;
+        }
+
         /// <summary>Converts an error correction parameter (<c>H</c>, <c>Q</c>, <c>M</c> or <c>L</c>) to an <see cref="ErrorCorrectionLevel"/>.</summary>
         /// <param name="errorCorrection">The error correction parameter.</param>
         /// <returns>The matching level; <see cref="ErrorCorrectionLevel.Standard"/> for any other value.</returns>

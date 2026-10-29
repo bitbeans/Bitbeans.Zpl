@@ -23,6 +23,7 @@ namespace Bitbeans.Zpl.Elements
         /// <param name="extension">Object extension, e.g. <c>GRF</c>.</param>
         /// <param name="bottomToTop"><see langword="true"/> to position the field with <c>^FT</c> (<see cref="ZplFieldTypeset"/>) instead of <c>^FO</c> (<see cref="ZplFieldOrigin"/>).</param>
         /// <param name="useDefaultPosition">Only evaluated together with <paramref name="bottomToTop"/>: <see langword="true"/> renders <c>^FT</c> without coordinates so the printer continues at its default position. Ignored for <c>^FO</c>.</param>
+        /// <param name="fieldJustification">Field justification passed to the position command (<c>^FO</c>/<c>^FT</c>, third parameter); <see cref="FieldJustification.None"/> omits it. <see cref="FieldJustification.Right"/> makes the position the right edge of the element.</param>
         public ZplImageMove(
             int positionX, 
             int positionY, 
@@ -30,8 +31,9 @@ namespace Bitbeans.Zpl.Elements
             string objectName, 
             string extension, 
             bool bottomToTop = false, 
-            bool useDefaultPosition = false)
-            : base(positionX, positionY, bottomToTop, useDefaultPosition)
+            bool useDefaultPosition = false,
+            FieldJustification fieldJustification = FieldJustification.None)
+            : base(positionX, positionY, bottomToTop, useDefaultPosition, fieldJustification)
         {
             StorageDevice = storageDevice;
             ObjectName = objectName;

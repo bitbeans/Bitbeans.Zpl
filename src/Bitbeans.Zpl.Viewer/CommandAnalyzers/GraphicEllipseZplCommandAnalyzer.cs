@@ -60,7 +60,7 @@ namespace Bitbeans.Zpl.Viewer.CommandAnalyzers
 
             bool reversePrint = virtualPrinter.NextElementFieldReverse || virtualPrinter.LabelReverse;
 
-            return new ZplGraphicEllipse(x, y, width, height, borderThickness, lineColor, reversePrint, bottomToTop, useDefaultPosition);
+            return new ZplGraphicEllipse(x, y, width, height, borderThickness, lineColor, reversePrint, bottomToTop, useDefaultPosition, ResolveFieldJustification(virtualPrinter));
         }
     }
 }

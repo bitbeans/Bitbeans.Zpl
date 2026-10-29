@@ -27,25 +27,17 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
                     return currentPosition;
                 }
 
-                SKBitmap image = SKBitmap.Decode(imageData);
+                using SKBitmap image = SKBitmap.Decode(imageData);
 
-                float x = imageMove.PositionX;
-                float y = imageMove.PositionY;
-
-                if (imageMove.UseDefaultPosition)
-                {
-                    x = currentPosition.X;
-                    y = currentPosition.Y;
-                }
+                SKPoint position = ResolvePosition(imageMove, currentPosition);
+                float x = JustifyX(imageMove, position.X, image.Width);
+                float y = position.Y;
 
                 bool useFieldTypeset = imageMove.FieldTypeset != null;
                 if (useFieldTypeset)
                 {
+                    // the position is the bottom left corner; an image above the label is clipped, not moved
                     y -= image.Height;
-                    if (y < 0)
-                    {
-                        y = 0;
-                    }
                 }
 
                 this.skCanvas.DrawBitmap(image, x, y, SKSamplingOptions.Default);

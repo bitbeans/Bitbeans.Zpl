@@ -28,6 +28,7 @@ namespace Bitbeans.Zpl.Elements
         /// <param name="magnificationFactorY">Magnification in y direction, 1-10; default 1.</param>
         /// <param name="bottomToTop"><see langword="true"/> to position the field with <c>^FT</c> (<see cref="ZplFieldTypeset"/>) instead of <c>^FO</c> (<see cref="ZplFieldOrigin"/>).</param>
         /// <param name="useDefaultPosition">Only evaluated together with <paramref name="bottomToTop"/> (see <see cref="ZplFieldTypeset"/>).</param>
+        /// <param name="fieldJustification">Field justification passed to the position command (<c>^FO</c>/<c>^FT</c>, third parameter); <see cref="FieldJustification.None"/> omits it. <see cref="FieldJustification.Right"/> makes the position the right edge of the element.</param>
         /// <exception cref="ArgumentException"><paramref name="imageName"/> is longer than 8 characters.</exception>
         public ZplRecallGraphic(
             int positionX,
@@ -37,8 +38,9 @@ namespace Bitbeans.Zpl.Elements
             int magnificationFactorX = 1,
             int magnificationFactorY = 1,
             bool bottomToTop = false,
-            bool useDefaultPosition = false)
-            : base(positionX, positionY, bottomToTop, useDefaultPosition)
+            bool useDefaultPosition = false,
+            FieldJustification fieldJustification = FieldJustification.None)
+            : base(positionX, positionY, bottomToTop, useDefaultPosition, fieldJustification)
         {
             if (imageName.Length > 8)
             {

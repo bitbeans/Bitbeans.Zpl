@@ -28,26 +28,19 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
                     return currentPosition;
                 }
 
-                float x = recallGraphic.PositionX;
-                float y = recallGraphic.PositionY;
+                SKPoint position = ResolvePosition(recallGraphic, currentPosition);
 
-                if (recallGraphic.UseDefaultPosition)
-                {
-                    x = currentPosition.X;
-                    y = currentPosition.Y;
-                }
-
-                SKBitmap bitmap = SKBitmap.Decode(imageData);
+                using SKBitmap bitmap = SKBitmap.Decode(imageData);
                 float width = bitmap.Width * recallGraphic.MagnificationFactorX;
                 float height = bitmap.Height * recallGraphic.MagnificationFactorY;
 
+                float x = JustifyX(recallGraphic, position.X, width);
+                float y = position.Y;
+
                 if (recallGraphic.FieldTypeset != null)
                 {
+                    // the position is the bottom left corner; an image above the label is clipped, not moved
                     y -= height;
-                    if (y < 0)
-                    {
-                        y = 0;
-                    }
                 }
 
                 this.skCanvas.DrawBitmap(bitmap, new SKRect(x, y, x + width, y + height), SKSamplingOptions.Default);

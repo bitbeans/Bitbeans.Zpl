@@ -37,6 +37,8 @@ namespace Bitbeans.Zpl.Elements
         /// <param name="reversePrint"><see langword="true"/> to emit <c>^FR</c> so the field is printed in reverse (inverts the underlying image).</param>
         /// <param name="bottomToTop"><see langword="true"/> to position the field with <c>^FT</c> (<see cref="ZplFieldTypeset"/>) instead of <c>^FO</c> (<see cref="ZplFieldOrigin"/>).</param>
         /// <param name="useDefaultPosition">Only evaluated together with <paramref name="bottomToTop"/>: <see langword="true"/> renders <c>^FT</c> without coordinates so the printer continues at its default position. Ignored for <c>^FO</c>.</param>
+        /// <param name="fieldJustification">Field justification passed to the position command (<c>^FO</c>/<c>^FT</c>, third parameter); <see cref="FieldJustification.None"/> omits it. <see cref="FieldJustification.Right"/> makes the position the right edge of the block.</param>
+        /// <param name="useDefaultPositionX">Only evaluated together with <paramref name="bottomToTop"/>: <see langword="true"/> renders <c>^FT,y</c> without the x coordinate so the block continues at the x position that follows the previous field. Ignored for <c>^FO</c> or if <paramref name="useDefaultPosition"/> is set.</param>
         public ZplFieldBlock(
             string text,
             int positionX,
@@ -51,8 +53,10 @@ namespace Bitbeans.Zpl.Elements
             char? hexadecimalIndicator = null,
             bool reversePrint = false,
             bool bottomToTop = false,
-            bool useDefaultPosition = false)
-            : base(text, positionX, positionY, font, newLineConversion, hexadecimalIndicator, reversePrint, bottomToTop, useDefaultPosition: useDefaultPosition)
+            bool useDefaultPosition = false,
+            FieldJustification fieldJustification = FieldJustification.None,
+            bool useDefaultPositionX = false)
+            : base(text, positionX, positionY, font, newLineConversion, hexadecimalIndicator, reversePrint, bottomToTop, useDefaultPosition: useDefaultPosition, fieldJustification: fieldJustification, useDefaultPositionX: useDefaultPositionX)
         {
             TextJustification = textJustification;
             Width = width;

@@ -1,11 +1,12 @@
 ﻿using Bitbeans.Zpl.Elements;
-using Bitbeans.Zpl.Helpers;
-using Bitbeans.Zpl.SkiaSharp;
 using Bitbeans.Zpl.Viewer.Helpers;
+
+using System;
+using System.IO;
 
 namespace Bitbeans.Zpl.Viewer.CommandAnalyzers
 {
-    /// <summary>Analyzes <c>^GF</c> (graphic field), converts the GRF image data to a PNG image and returns a graphic field element at the pending field position.</summary>
+    /// <summary>Analyzes <c>^GF</c> (graphic field), validates the graphic data and returns a graphic field element with the unchanged graphic data at the pending field position. The element converts the data to an image when it is drawn.</summary>
     public class GraphicFieldZplCommandAnalyzer : ZplCommandAnalyzerBase
     {
         /// <summary>Initializes a new instance of the <see cref="GraphicFieldZplCommandAnalyzer"/> class for the <c>^GF</c> command.</summary>
@@ -56,13 +57,14 @@ namespace Bitbeans.Zpl.Viewer.CommandAnalyzers
             int indexOfFourthComma = this.IndexOfNthCharacter(zplCommand, 4, ',');
             string dataHex = zplCommand.Substring(indexOfFourthComma + 1).TrimStart();
 
-            byte[] grfImageData = ImageHelper.GetImageBytes(dataHex, bytesPerRow);
+            // Reject data that cannot be drawn so that the problem is reported while analyzing
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(bytesPerRow);
+            if (ImageHelper.GetImageBytes(dataHex, bytesPerRow).Length < bytesPerRow)
+            {
+                throw new InvalidDataException("Graphic data is smaller than one row.");
+            }
 
-            SkiaImageConverter converter = new();
-            byte[] imageData = converter.ConvertGrfToPng(grfImageData, bytesPerRow);
-            dataHex = ByteHelper.BytesToHex(imageData);
-
-            return new ZplGraphicField(x, y, binaryByteCount, graphicFieldCount, bytesPerRow, dataHex, bottomToTop, useDefaultPosition, compressionType);
+            return new ZplGraphicField(x, y, binaryByteCount, graphicFieldCount, bytesPerRow, dataHex, bottomToTop, useDefaultPosition, compressionType, ResolveFieldJustification(virtualPrinter));
         }
     }
 }

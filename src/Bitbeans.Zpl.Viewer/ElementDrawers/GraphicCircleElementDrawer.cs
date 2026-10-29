@@ -66,27 +66,17 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
                 float radiusMinusBorder = radius - halfBorderThickness;
                 float offset = halfBorderThickness + radiusMinusBorder;
 
-                float baseX = graphicCircle.PositionX;
-                float baseY = graphicCircle.PositionY;
-
-                if (graphicCircle.UseDefaultPosition)
-                {
-                    baseX = currentPosition.X;
-                    baseY = currentPosition.Y;
-                }
+                SKPoint position = ResolvePosition(graphicCircle, currentPosition);
+                float baseX = JustifyX(graphicCircle, position.X, graphicCircle.Diameter);
+                float baseY = position.Y;
 
                 float x = baseX + offset;
                 float y = baseY + offset;
 
                 if (graphicCircle.FieldTypeset != null)
                 {
+                    // the position is the bottom left corner; a circle above the label is clipped, not moved
                     y -= graphicCircle.Diameter;
-
-                    //Fallback
-                    if (y < radius)
-                    {
-                        y = radius;
-                    }
                 }
 
                 if (graphicCircle.ReversePrint)
@@ -95,7 +85,7 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
                 }
 
                 this.skCanvas.DrawCircle(x, y, radiusMinusBorder, skPaint);
-                return this.CalculateNextDefaultPosition(baseX, baseY, graphicCircle.Diameter, graphicCircle.Diameter, graphicCircle.FieldOrigin != null, FieldOrientation.Normal, currentPosition);
+                return this.CalculateNextDefaultPosition(baseX, position.Y, graphicCircle.Diameter, graphicCircle.Diameter, graphicCircle.FieldOrigin != null, FieldOrientation.Normal, currentPosition);
             }
 
             return currentPosition;

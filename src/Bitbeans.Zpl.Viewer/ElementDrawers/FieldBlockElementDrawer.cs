@@ -77,7 +77,7 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
                     }
                 }
 
-                SKFont skFont = new(typeface, fontSize, scaleX);
+                using SKFont skFont = new(typeface, fontSize, scaleX);
                 using SKPaint skPaint = new()
                 {
                     IsAntialias = options.Antialias
@@ -85,16 +85,11 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
 
                 skFont.MeasureText("X", out SKRect textBoundBaseline);
 
-                float positionX = fieldBlock.PositionX;
-                float positionY = fieldBlock.PositionY;
+                SKPoint position = ResolvePosition(fieldBlock, currentPosition);
+                float positionX = JustifyX(fieldBlock, position.X, fieldBlock.Width);
+                float positionY = position.Y;
 
-                if (fieldBlock.UseDefaultPosition)
-                {
-                    positionX = currentPosition.X;
-                    positionY = currentPosition.Y;
-                }
-
-                List<WrappedTextLine> textLines = WordWrap(text, skFont, fieldBlock.Width);
+                List<WrappedTextLine> textLines = WordWrap(text, skFont, fieldBlock.Width, fieldBlock.HangingIndent);
                 int hangingIndent = 0;
                 float lineHeight = fontSize + fieldBlock.LineSpace;
                 float y = positionY + textBoundBaseline.Height;
@@ -250,17 +245,12 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
             }
 
             ZplBitmapFontMetrics metrics = CreateExpandedMetrics(fontData.Metrics, font.FontHeight, font.FontWidth, fieldBlock.LineSpace);
-            List<WrappedTextLine> textLines = WordWrap(displayText, metrics, fieldBlock.Width);
+            List<WrappedTextLine> textLines = WordWrap(displayText, metrics, fieldBlock.Width, fieldBlock.HangingIndent);
             int maxLineCount = Math.Max(fieldBlock.MaxLineCount, 1);
             int totalHeight = metrics.LineHeight * maxLineCount - fieldBlock.LineSpace;
-            float x = fieldBlock.PositionX;
-            float topY = fieldBlock.PositionY;
-
-            if (fieldBlock.UseDefaultPosition)
-            {
-                x = currentPosition.X;
-                topY = currentPosition.Y;
-            }
+            SKPoint position = ResolvePosition(fieldBlock, currentPosition);
+            float x = JustifyX(fieldBlock, position.X, fieldBlock.Width);
+            float topY = position.Y;
 
             if (fieldBlock.FieldTypeset != null)
             {
@@ -431,13 +421,8 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
             }
 
             int gapCount = words.Length - 1;
-            float gapWidth = (lineWidth - wordsWidth) / gapCount;
-
-            if (gapWidth <= 0)
-            {
-                renderer.DrawText(textLine, fontData, metrics, x, y, paint);
-                return;
-            }
+            // the words of a wrapped line always fit; a line that does not is drawn without gaps
+            float gapWidth = Math.Max((lineWidth - wordsWidth) / gapCount, 0);
 
             float currentX = x;
 
@@ -475,13 +460,8 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
             }
 
             int gapCount = words.Length - 1;
-            float gapWidth = (lineWidth - wordsWidth) / gapCount;
-
-            if (gapWidth <= 0)
-            {
-                this.skCanvas.DrawShapedTextSafe(textLine, x, y, SKTextAlign.Left, font, paint);
-                return;
-            }
+            // the words of a wrapped line always fit; a line that does not is drawn without gaps
+            float gapWidth = Math.Max((lineWidth - wordsWidth) / gapCount, 0);
 
             float currentX = x;
 
@@ -502,9 +482,16 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
             }
         }
 
-        private static List<WrappedTextLine> WordWrap(string text, SKFont font, int maxWidth)
+        /// <summary>The width available to the second and all following lines of a block with a hanging indent.</summary>
+        private static float GetFollowingLineWidth(int maxWidth, int hangingIndent)
+        {
+            return Math.Min(maxWidth, Math.Max(maxWidth - Math.Max(hangingIndent, 0), 1));
+        }
+
+        private static List<WrappedTextLine> WordWrap(string text, SKFont font, int maxWidth, int hangingIndent)
         {
             float spaceWidth = font.MeasureText(" ");
+            float followingWidth = GetFollowingLineWidth(maxWidth, hangingIndent);
             List<WrappedTextLine> lines = [];
 
             Stack<string> words = new(text.Split([' '], StringSplitOptions.None).AsEnumerable().Reverse());
@@ -512,6 +499,8 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
             float width = 0;
             while (words.Count != 0)
             {
+                // the first line has the full width, the following lines are shortened by the hanging indent
+                float lineWidth = lines.Count == 0 ? maxWidth : followingWidth;
                 string word = words.Pop();
                 if (word.Contains(@"\&"))
                 {
@@ -519,7 +508,7 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
                     word = subwords[0];
                     words.Push(subwords[1]);
                     float wordWidth = font.MeasureText(word);
-                    if (width + wordWidth <= maxWidth)
+                    if (width + wordWidth <= lineWidth)
                     {
                         line.Append(word);
                         lines.Add(new WrappedTextLine(line.ToString(), shouldJustify: false));
@@ -540,38 +529,28 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
                 else
                 {
                     float wordWidth = font.MeasureText(word);
-                    if (wordWidth > maxWidth)
+                    if (line.Length > 0 && width + wordWidth > lineWidth)
                     {
-                        if (line.Length > 0)
-                        {
-                            lines.Add(new WrappedTextLine(line.ToString().Trim(), shouldJustify: true));
-                            line = new StringBuilder();
-                            width = 0;
-                        }
+                        lines.Add(new WrappedTextLine(line.ToString().Trim(), shouldJustify: true));
+                        line = new StringBuilder();
+                        width = 0;
+                        lineWidth = followingWidth;
+                    }
 
+                    if (wordWidth > lineWidth)
+                    {
                         List<string> chunks = SplitLongWord(
                             word,
-                            maxWidth,
+                            lineWidth,
+                            followingWidth,
                             value => font.MeasureText(value));
 
                         AddLongWordChunks(chunks, lines, line, ref width, spaceWidth, value => font.MeasureText(value));
                         continue;
                     }
 
-                    if (width + wordWidth <= maxWidth)
-                    {
-                        line.Append(word + " ");
-                        width += wordWidth + spaceWidth;
-                    }
-                    else
-                    {
-                        // a word that does not fit is never the first one of a line (otherwise it would be a long word),
-                        // so the current line is not empty
-                        lines.Add(new WrappedTextLine(line.ToString().Trim(), shouldJustify: true));
-
-                        line = new StringBuilder(word + " ");
-                        width = wordWidth + spaceWidth;
-                    }
+                    line.Append(word + " ");
+                    width += wordWidth + spaceWidth;
                 }
             }
 
@@ -579,9 +558,10 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
             return lines;
         }
 
-        private static List<WrappedTextLine> WordWrap(string text, ZplBitmapFontMetrics metrics, int maxWidth)
+        private static List<WrappedTextLine> WordWrap(string text, ZplBitmapFontMetrics metrics, int maxWidth, int hangingIndent)
         {
             int spaceWidth = ZplBitmapFontRenderer.MeasureTextWidth(" ", metrics);
+            float followingWidth = GetFollowingLineWidth(maxWidth, hangingIndent);
             List<WrappedTextLine> lines = [];
 
             Stack<string> words = new(text.Split([' '], StringSplitOptions.None).AsEnumerable().Reverse());
@@ -589,6 +569,8 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
             float width = 0;
             while (words.Count != 0)
             {
+                // the first line has the full width, the following lines are shortened by the hanging indent
+                float lineWidth = lines.Count == 0 ? maxWidth : followingWidth;
                 string word = words.Pop();
                 if (word.Contains(@"\&"))
                 {
@@ -596,7 +578,7 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
                     word = subwords[0];
                     words.Push(subwords[1]);
                     int wordWidth = ZplBitmapFontRenderer.MeasureTextWidth(word, metrics);
-                    if (width + wordWidth <= maxWidth)
+                    if (width + wordWidth <= lineWidth)
                     {
                         line.Append(word);
                         lines.Add(new WrappedTextLine(line.ToString(), shouldJustify: false));
@@ -617,19 +599,21 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
                 }
                 else
                 {
-                    int wordWidth = MeasureRenderedBitmapTextWidth(word, metrics);
-                    if (wordWidth > maxWidth)
+                    int wordWidth = ZplBitmapFontRenderer.MeasureTextWidth(word, metrics);
+                    if (line.Length > 0 && width + wordWidth > lineWidth)
                     {
-                        if (line.Length > 0)
-                        {
-                            lines.Add(new WrappedTextLine(line.ToString().Trim(), shouldJustify: true));
-                            line = new StringBuilder();
-                            width = 0;
-                        }
+                        lines.Add(new WrappedTextLine(line.ToString().Trim(), shouldJustify: true));
+                        line = new StringBuilder();
+                        width = 0;
+                        lineWidth = followingWidth;
+                    }
 
+                    if (MeasureRenderedBitmapTextWidth(word, metrics) > lineWidth)
+                    {
                         List<string> chunks = SplitLongWord(
                             word,
-                            maxWidth,
+                            lineWidth,
+                            followingWidth,
                             value => MeasureRenderedBitmapTextWidth(value, metrics));
 
                         AddLongWordChunks(
@@ -642,22 +626,8 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
                         continue;
                     }
 
-                    wordWidth = ZplBitmapFontRenderer.MeasureTextWidth(word, metrics);
-                    if (width + wordWidth <= maxWidth)
-                    {
-                        line.Append(word + " ");
-                        width += wordWidth + spaceWidth;
-                    }
-                    else
-                    {
-                        if (line.Length > 0)
-                        {
-                            lines.Add(new WrappedTextLine(line.ToString().Trim(), shouldJustify: true));
-                        }
-
-                        line = new StringBuilder(word + " ");
-                        width = wordWidth + spaceWidth;
-                    }
+                    line.Append(word + " ");
+                    width += wordWidth + spaceWidth;
                 }
             }
 
@@ -667,6 +637,7 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
 
         private static List<string> SplitLongWord(
             string word,
+            float firstLineWidth,
             float maxWidth,
             Func<string, float> measureText)
         {
@@ -677,8 +648,9 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
             while (start < runes.Count)
             {
                 string remaining = CreateString(runes, start, runes.Count - start);
+                float lineWidth = chunks.Count == 0 ? firstLineWidth : maxWidth;
 
-                if (measureText(remaining) <= maxWidth)
+                if (measureText(remaining) <= lineWidth)
                 {
                     chunks.Add(remaining);
                     break;
@@ -687,7 +659,7 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
                 int runeCount = FindLongestPrefixThatFits(
                     runes,
                     start,
-                    maxWidth,
+                    lineWidth,
                     measureText,
                     appendHyphen: true);
 
@@ -698,7 +670,7 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
                         FindLongestPrefixThatFits(
                             runes,
                             start,
-                            maxWidth,
+                            lineWidth,
                             measureText,
                             appendHyphen: false));
                 }

@@ -48,6 +48,15 @@ namespace Bitbeans.Zpl.Tests
         }
 
         [TestMethod]
+        public void FieldTypesetWithoutX()
+        {
+            Assert.AreEqual("^FT,20", new ZplFieldTypeset(10, 20, useDefaultPositionX: true).ToZplString());
+            Assert.AreEqual("^FT,30,1", new ZplFieldTypeset(10, 20, FieldJustification.Right, useDefaultPositionX: true).ToZplString(Scaled));
+            Assert.IsTrue(new ZplFieldTypeset(10, 20, useDefaultPositionX: true).Offset(1, 1).UseDefaultPositionX);
+            Assert.IsFalse(new ZplFieldTypeset(10, 20, useDefaultPosition: true, useDefaultPositionX: true).UseDefaultPositionX);
+        }
+
+        [TestMethod]
         public void FieldTypesetOffsetKeepsAllSettings()
         {
             var typeset = new ZplFieldTypeset(10, 20, FieldJustification.Left, true);
