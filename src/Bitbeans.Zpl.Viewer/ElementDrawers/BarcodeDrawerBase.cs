@@ -1,4 +1,5 @@
 using Bitbeans.Zpl;
+using Bitbeans.Zpl.Elements;
 using Bitbeans.Zpl.Viewer.BitmapFonts;
 using Bitbeans.Zpl.Viewer.Helpers;
 
@@ -24,15 +25,84 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
         /// <summary>The ZPL font used for the interpretation line.</summary>
         protected const string INTERPRETATION_LINE_FONT_NAME = "A";
 
+        /// <inheritdoc/>
+        public override bool IsReverseDraw(ZplElementBase element)
+        {
+            return element is ZplFieldDataElementBase fieldData && fieldData.ReversePrint;
+        }
+
+        /// <summary>Calculates the GS1 mod 10 check digit (weights 3 and 1, starting with 3 at the rightmost payload digit) shared by EAN-8, EAN-13, UPC-A and UPC-E.</summary>
+        /// <param name="payload">The digits without the check digit.</param>
+        /// <returns>The check digit, 0 to 9.</returns>
+        protected static int CalculateGs1CheckDigit(string payload)
+        {
+            int sum = 0;
+            for (int i = 0; i < payload.Length; i++)
+            {
+                int weight = (payload.Length - i) % 2 == 1 ? 3 : 1;
+                sum += (payload[i] - '0') * weight;
+            }
+
+            return (10 - sum % 10) % 10;
+        }
+
+        /// <summary>Moves the field origin of a right justified field (<c>^FO</c>/<c>^FT</c> parameter <c>z</c> = 1) so that the symbol ends at the origin instead of starting there. Left, auto and unspecified justification keep the origin.</summary>
+        /// <remarks>An <c>^FO</c> field is anchored with its top-left corner, so it moves along the X axis (normal and inverted) or the Y axis (rotated 90 or 270 degrees). An <c>^FT</c> field moves against its reading direction.</remarks>
+        /// <param name="x">The X position of the field; updated.</param>
+        /// <param name="y">The Y position of the field; updated.</param>
+        /// <param name="barcodeWidth">The width of the symbol in pixels (its extent along the reading direction).</param>
+        /// <param name="useFieldOrigin"><see langword="true"/> if the field was positioned with <c>^FO</c>; <see langword="false"/> if it was positioned with <c>^FT</c> (bottom-left origin).</param>
+        /// <param name="fieldOrientation">The field orientation.</param>
+        /// <param name="fieldJustification">The field justification.</param>
+        protected void JustifyOrigin(ref float x, ref float y, int barcodeWidth, bool useFieldOrigin, Zpl.FieldOrientation fieldOrientation, FieldJustification fieldJustification)
+        {
+            if (fieldJustification != FieldJustification.Right)
+            {
+                return;
+            }
+
+            bool alongY = fieldOrientation == Zpl.FieldOrientation.Rotated90 || fieldOrientation == Zpl.FieldOrientation.Rotated270;
+            if (useFieldOrigin)
+            {
+                if (alongY)
+                {
+                    y -= barcodeWidth;
+                }
+                else
+                {
+                    x -= barcodeWidth;
+                }
+
+                return;
+            }
+
+            if (fieldOrientation == Zpl.FieldOrientation.Normal)
+            {
+                x -= barcodeWidth;
+            }
+            else if (fieldOrientation == Zpl.FieldOrientation.Rotated90)
+            {
+                y -= barcodeWidth;
+            }
+            else if (fieldOrientation == Zpl.FieldOrientation.Rotated180)
+            {
+                x += barcodeWidth;
+            }
+            else
+            {
+                y += barcodeWidth;
+            }
+        }
+
         /// <summary>Draws the barcode image, rotated according to the field orientation.</summary>
-        /// <param name="barcodeImageData">The encoded barcode image.</param>
+        /// <param name="barcodeImage">The barcode bitmap; it is drawn directly and stays owned by the caller.</param>
         /// <param name="x">The X position of the barcode.</param>
         /// <param name="y">The Y position of the barcode.</param>
         /// <param name="barcodeWidth">The width of the barcode in pixels.</param>
         /// <param name="barcodeHeight">The height of the barcode in pixels.</param>
         /// <param name="useFieldOrigin"><see langword="true"/> if the field was positioned with <c>^FO</c>; <see langword="false"/> if it was positioned with <c>^FT</c> (bottom-left origin).</param>
         /// <param name="fieldOrientation">The field orientation.</param>
-        protected void DrawBarcode(byte[] barcodeImageData, float x, float y, int barcodeWidth, int barcodeHeight, bool useFieldOrigin, Zpl.FieldOrientation fieldOrientation)
+        protected void DrawBarcode(SKBitmap barcodeImage, float x, float y, int barcodeWidth, int barcodeHeight, bool useFieldOrigin, Zpl.FieldOrientation fieldOrientation)
         {
             using (new SKAutoCanvasRestore(this.skCanvas))
             {
@@ -40,10 +110,6 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
                 if (!useFieldOrigin)
                 {
                     y -= barcodeHeight;
-                    if (y < 0)
-                    {
-                        y = 0;
-                    }
                 }
 
                 if (matrix != SKMatrix.Empty)
@@ -51,7 +117,7 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
                     this.skCanvas.Concat(matrix);
                 }
 
-                this.skCanvas.DrawBitmap(SKBitmap.Decode(barcodeImageData), x, y, SKSamplingOptions.Default);
+                this.skCanvas.DrawBitmap(barcodeImage, x, y, SKSamplingOptions.Default);
             }
         }
 
@@ -86,10 +152,6 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
                 if (!useFieldOrigin)
                 {
                     y -= barcodeHeight;
-                    if (y < 0)
-                    {
-                        y = 0;
-                    }
                 }
 
                 float margin = Math.Max((skFont.Spacing - textBounds.Height) / 2, MIN_LABEL_MARGIN);
@@ -160,10 +222,6 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
                 if (!useFieldOrigin)
                 {
                     y -= barcodeHeight;
-                    if (y < 0)
-                    {
-                        y = 0;
-                    }
                 }
 
                 float drawY = printInterpretationLineAboveCode ?

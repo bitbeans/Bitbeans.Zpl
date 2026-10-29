@@ -18,6 +18,12 @@ namespace Bitbeans.Zpl.Elements
         /// <summary>Hexadecimal escape character of <c>^FH</c>, or <see langword="null"/> if <c>^FH</c> is only emitted when the <see cref="Content"/> contains <c>^</c> or <c>~</c>. The default indicator <c>_</c> is rendered as a plain <c>^FH</c>. When set, the indicator character itself in the <see cref="Content"/> is escaped too.</summary>
         public char? HexadecimalIndicator { get; protected set; }
 
+        /// <summary>Print the field in reverse (<c>^FR</c>), inverting the underlying image.</summary>
+        public bool ReversePrint { get; protected set; }
+
+        /// <summary>The field justification of the position command (<c>^FO</c>/<c>^FT</c> parameter <c>z</c>); <see cref="FieldJustification.None"/> if none was given.</summary>
+        public FieldJustification FieldJustification => FieldOrigin?.FieldJustification ?? FieldTypeset.FieldJustification;
+
         /// <summary>Initializes the element.</summary>
         /// <param name="content">The data to encode, written to the <c>^FD</c> field data command.</param>
         /// <param name="positionX">X position of the field in dots, relative to the label home (<c>^LH</c>); scaled by <see cref="ZplRenderOptions.ScaleFactor"/> when rendered.</param>
@@ -27,6 +33,8 @@ namespace Bitbeans.Zpl.Elements
         /// <param name="bottomToTop"><see langword="true"/> to position the field with <c>^FT</c> (<see cref="ZplFieldTypeset"/>) instead of <c>^FO</c> (<see cref="ZplFieldOrigin"/>).</param>
         /// <param name="useDefaultPosition">Only evaluated together with <paramref name="bottomToTop"/>: <see langword="true"/> renders <c>^FT</c> without coordinates so the printer continues at its default position. Ignored for <c>^FO</c>.</param>
         /// <exception cref="System.ArgumentException"><paramref name="hexadecimalIndicator"/> is <c>^</c>, <c>~</c>, a control character or not printable ASCII.</exception>
+        /// <param name="reversePrint"><see langword="true"/> to emit <c>^FR</c> so the field is printed in reverse (bars/modules and interpretation line invert the underlying image).</param>
+        /// <param name="fieldJustification">Field justification rendered as the third parameter of <c>^FO</c>/<c>^FT</c> (<c>0</c> left, <c>1</c> right, <c>2</c> auto); <see cref="FieldJustification.None"/> omits it. A right justified field ends at the position.</param>
         public ZplFieldDataElementBase(
             string content,
             int positionX,
@@ -34,12 +42,15 @@ namespace Bitbeans.Zpl.Elements
             FieldOrientation fieldOrientation,
             char? hexadecimalIndicator,
             bool bottomToTop,
-            bool useDefaultPosition)
-            : base(positionX, positionY, bottomToTop, useDefaultPosition)
+            bool useDefaultPosition,
+            bool reversePrint = false,
+            FieldJustification fieldJustification = FieldJustification.None)
+            : base(positionX, positionY, bottomToTop, useDefaultPosition, fieldJustification)
         {
             Content = content;
             FieldOrientation = fieldOrientation;
             HexadecimalIndicator = ZplHexadecimal.Validate(hexadecimalIndicator, nameof(hexadecimalIndicator));
+            ReversePrint = reversePrint;
         }
 
         ///<inheritdoc/>
@@ -82,6 +93,7 @@ namespace Bitbeans.Zpl.Elements
             if (indicator is char hexIndicator)
             {
                 sb.Append(ZplHexadecimal.RenderCommand(hexIndicator));
+                sb.Append(ReversePrint ? "^FR" : string.Empty);
                 sb.Append("^FD").Append(dataPrefix);
                 foreach (char c in content)
                 {
@@ -90,6 +102,7 @@ namespace Bitbeans.Zpl.Elements
             }
             else
             {
+                sb.Append(ReversePrint ? "^FR" : string.Empty);
                 sb.Append("^FD").Append(dataPrefix).Append(content);
             }
 

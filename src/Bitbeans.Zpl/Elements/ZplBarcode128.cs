@@ -34,6 +34,8 @@ namespace Bitbeans.Zpl.Elements
         /// <param name="useDefaultPosition">Only evaluated together with <paramref name="bottomToTop"/>: <see langword="true"/> renders <c>^FT</c> without coordinates so the printer continues at its default position. Ignored for <c>^FO</c>.</param>
         /// <param name="mode">Code 128 mode: <c>N</c> (default), <c>U</c>, <c>A</c> or <c>D</c>. The <c>e</c> and <c>m</c> parameters of <c>^BC</c> are only rendered when this is not <c>N</c> or <paramref name="uccCheckDigit"/> is set.</param>
         /// <param name="uccCheckDigit">Calculate and print the UCC check digit (mode <c>U</c>); default <see langword="false"/>.</param>
+        /// <param name="reversePrint"><see langword="true"/> to emit <c>^FR</c> so the field is printed in reverse (bars/modules and interpretation line invert the underlying image).</param>
+        /// <param name="fieldJustification">Field justification rendered as the third parameter of <c>^FO</c>/<c>^FT</c> (<c>0</c> left, <c>1</c> right, <c>2</c> auto); <see cref="FieldJustification.None"/> omits it. A right justified field ends at the position.</param>
         public ZplBarcode128(
             string content,
             int positionX,
@@ -48,7 +50,9 @@ namespace Bitbeans.Zpl.Elements
             bool bottomToTop = false,
             bool useDefaultPosition = false,
             string mode = "N",
-            bool uccCheckDigit = false)
+            bool uccCheckDigit = false,
+            bool reversePrint = false,
+            FieldJustification fieldJustification = FieldJustification.None)
             : base(content,
                   positionX,
                   positionY,
@@ -60,7 +64,7 @@ namespace Bitbeans.Zpl.Elements
                   printInterpretationLine,
                   printInterpretationLineAboveCode,
                   bottomToTop,
-                  useDefaultPosition)
+                  useDefaultPosition, reversePrint, fieldJustification)
         {
             _mode = ValidateMode(mode, nameof(mode));
             this.UccCheckDigit = uccCheckDigit;

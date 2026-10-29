@@ -49,6 +49,8 @@ namespace Bitbeans.Zpl.Elements
         /// <param name="format">Format ID (0-6); default 6.</param>
         /// <param name="escapeSequence">Escape character; default <c>~</c>.</param>
         /// <param name="aspectRatio">1 for square, 2 for rectangular, <see langword="null"/> for the printer default.</param>
+        /// <param name="reversePrint"><see langword="true"/> to emit <c>^FR</c> so the field is printed in reverse (bars/modules and interpretation line invert the underlying image).</param>
+        /// <param name="fieldJustification">Field justification rendered as the third parameter of <c>^FO</c>/<c>^FT</c> (<c>0</c> left, <c>1</c> right, <c>2</c> auto); <see cref="FieldJustification.None"/> omits it. A right justified field ends at the position.</param>
         public ZplDataMatrix(
             string content,
             int positionX,
@@ -63,8 +65,10 @@ namespace Bitbeans.Zpl.Elements
             int? rows = null,
             int format = DefaultFormat,
             char escapeSequence = DefaultEscapeSequence,
-            int? aspectRatio = null)
-            : base(content, positionX, positionY, fieldOrientation, hexadecimalIndicator, bottomToTop, useDefaultPosition)
+            int? aspectRatio = null,
+            bool reversePrint = false,
+            FieldJustification fieldJustification = FieldJustification.None)
+            : base(content, positionX, positionY, fieldOrientation, hexadecimalIndicator, bottomToTop, useDefaultPosition, reversePrint, fieldJustification)
         {
             Height = height;
             QualityLevel = qualityLevel;

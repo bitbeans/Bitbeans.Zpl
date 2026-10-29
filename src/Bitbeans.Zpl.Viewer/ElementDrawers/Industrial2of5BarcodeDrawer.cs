@@ -63,8 +63,8 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
                 result = AdjustWidths(result, wide, narrow);
 
                 using SKBitmap resizedImage = BoolArrayToSKBitmap(result, barcode.Height);
-                byte[] png = resizedImage.Encode(SKEncodedImageFormat.Png, 100).ToArray();
-                this.DrawBarcode(png, x, y, resizedImage.Width, resizedImage.Height, barcode.FieldOrigin != null, barcode.FieldOrientation);
+                this.JustifyOrigin(ref x, ref y, resizedImage.Width, barcode.FieldOrigin != null, barcode.FieldOrientation, barcode.FieldJustification);
+                this.DrawBarcode(resizedImage, x, y, resizedImage.Width, resizedImage.Height, barcode.FieldOrigin != null, barcode.FieldOrientation);
 
                 if (barcode.PrintInterpretationLine)
                 {
