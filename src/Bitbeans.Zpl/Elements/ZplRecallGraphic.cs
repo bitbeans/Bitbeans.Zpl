@@ -27,7 +27,7 @@ namespace Bitbeans.Zpl.Elements
         {
             if (imageName.Length > 8)
             {
-                new ArgumentException("Maximum length of 8 characters exceeded", nameof(imageName));
+                throw new ArgumentException("Maximum length of 8 characters exceeded", nameof(imageName));
             }
 
             _extension = "GRF";

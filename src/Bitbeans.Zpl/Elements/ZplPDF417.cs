@@ -63,7 +63,8 @@ namespace Bitbeans.Zpl.Elements
             //^ FDMM,AAC - 42 ^ FS
             List<string> result = new List<string>();
             result.AddRange(RenderPosition(context));
-            result.Add($"^BX{RenderFieldOrientation()},{context.Scale(Height)}");
+            result.Add($"^BY{ModuleWidth}");
+            result.Add($"^B7{RenderFieldOrientation()},{context.Scale(Height)},{SecurityLevel},{Columns},{Rows},{RenderBoolean(Compact)}");
             result.Add(RenderFieldDataSection());
 
             return result;

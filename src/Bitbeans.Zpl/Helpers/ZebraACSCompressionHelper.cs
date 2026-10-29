@@ -196,7 +196,7 @@ namespace Bitbeans.Zpl.Helpers
             var multi20 = charRepeatCount / MinCompressionBlockCount * MinCompressionBlockCount;
             var remainder = charRepeatCount % multi20;
 
-            while (remainder > 0 || multi20 > 0)
+            while (true)
             {
                 if (multi20 > MaxCompressionRepeatCount)
                 {
@@ -204,12 +204,8 @@ namespace Bitbeans.Zpl.Helpers
                     multi20 = MaxCompressionRepeatCount;
                 }
 
-                if (!CompressionCountMapping.TryGetValue(multi20, out compressionKey))
-                {
-                    throw new Exception("Compression failure");
-                }
-
-                compressionKeys.Append(compressionKey);
+                // multi20 is always a multiple of 20 in 20..400 here, so it is always mapped
+                compressionKeys.Append(CompressionCountMapping[multi20]);
 
                 if (remainder == 0)
                 {
@@ -218,8 +214,7 @@ namespace Bitbeans.Zpl.Helpers
 
                 if (remainder <= 20)
                 {
-                    CompressionCountMapping.TryGetValue(remainder, out compressionKey);
-                    compressionKeys.Append(compressionKey);
+                    compressionKeys.Append(CompressionCountMapping[remainder]);
                     break;
                 }
 

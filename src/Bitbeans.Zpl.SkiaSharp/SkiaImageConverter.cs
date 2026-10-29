@@ -146,7 +146,11 @@ namespace Bitbeans.Zpl.SkiaSharp
         {
             ArgumentNullException.ThrowIfNull(imageData);
 
-            using SKBitmap decoded = SKBitmap.Decode(imageData)
+            // SKBitmap.Decode(byte[]) throws an ArgumentNullException for undecodable data instead of returning null
+            using SKData data = SKData.CreateCopy(imageData);
+            using SKCodec codec = SKCodec.Create(data)
+                ?? throw new InvalidDataException("Unable to decode image data.");
+            using SKBitmap decoded = SKBitmap.Decode(codec)
                 ?? throw new InvalidDataException("Unable to decode image data.");
 
             // Normalize to a known pixel layout so that the conversion can read raw bytes

@@ -47,6 +47,7 @@ namespace Bitbeans.Zpl.Elements
             this.MagnificationFactor = magnificationFactor;
             this.ExtendedChannel = extendedChannel;
             this.ErrorControl = errorControl;
+            this.MenuSymbol = menuSymbol;
             this.SymbolCount = symbolCount;
             this.IdField = idField;
         }
