@@ -40,10 +40,12 @@ namespace Bitbeans.Zpl.Viewer.Symologies
                 throw new ArgumentException("Barcode content length must be 2 or 5 for UPC Extension.");
             }
 
-            if (!int.TryParse(content, out int value))
+            if (!content.All(char.IsAsciiDigit))
             {
                 throw new ArgumentException("Barcode content must be numeric for UPC Extension.");
             }
+
+            int value = int.Parse(content);
 
             List<bool> result = [];
             int type = content.Length;

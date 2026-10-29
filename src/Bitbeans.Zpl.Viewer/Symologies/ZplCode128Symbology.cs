@@ -571,7 +571,7 @@ namespace Bitbeans.Zpl.Viewer.Symologies
                     if (field.ApplicationIdentifier == "00")
                     {
                         data = NormalizeAi00FieldData(field.Data);
-                        rawData = ApplyCheckDigitToRawData(field.RawData, data[data.Length - 1], field.Data.Length == 18);
+                        rawData = ApplyCheckDigitToRawData(field.RawData, data[data.Length - 1], true);
                     }
 
                     encodedContent.Append(field.ApplicationIdentifier);
@@ -682,20 +682,6 @@ namespace Bitbeans.Zpl.Viewer.Symologies
                 string rawData = content.Substring(rawDataStart, index - rawDataStart);
                 string data = cleanData.ToString();
                 if (string.IsNullOrEmpty(data) || data.Length > definition.MaxLength)
-                {
-                    fields.Clear();
-                    return false;
-                }
-
-                if (definition.NumericOnly)
-                {
-                    if (!data.All(char.IsDigit))
-                    {
-                        fields.Clear();
-                        return false;
-                    }
-                }
-                else if (!data.All(char.IsLetterOrDigit))
                 {
                     fields.Clear();
                     return false;
@@ -817,12 +803,8 @@ namespace Bitbeans.Zpl.Viewer.Symologies
 
         private static string NormalizeAi00FieldData(string data)
         {
-            if ((data.Length != 17 && data.Length != 18) || !data.All(char.IsDigit))
-            {
-                throw new Exception($"AI 00 field data must contain 17 or 18 digits: {data}");
-            }
-
-            string body = data.Length == 18 ? data.Substring(0, 17) : data;
+            // The field parser guarantees exactly 18 digits for AI 00.
+            string body = data.Substring(0, 17);
             return body + CalculateMod10CheckDigit($"00{body}");
         }
 
@@ -847,25 +829,11 @@ namespace Bitbeans.Zpl.Viewer.Symologies
 
             if (replaceExisting)
             {
-                return ReplaceLastMeaningfulCharacter(trimmedData, checkDigit) + trailingWhitespace;
+                // trimmedData is never empty and ends with a non-whitespace character
+                return trimmedData.Substring(0, trimmedLength - 1) + checkDigit + trailingWhitespace;
             }
 
             return trimmedData + checkDigit + trailingWhitespace;
-        }
-
-        private static string ReplaceLastMeaningfulCharacter(string content, char replacement)
-        {
-            char[] chars = content.ToCharArray();
-            for (int i = chars.Length - 1; i >= 0; i--)
-            {
-                if (!char.IsWhiteSpace(chars[i]))
-                {
-                    chars[i] = replacement;
-                    return new string(chars);
-                }
-            }
-
-            return content + replacement;
         }
 
         private static string RemoveWhitespace(string content)

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 
@@ -491,11 +490,15 @@ namespace Bitbeans.Zpl.Viewer.Symologies
                 eec = mode == 5;
             }
 
+            bool primaryCorrected = false;
             while (content.Length > 0)
             {
-                if (data.Count == 10)
+                // The primary message (10 codewords) is followed by its error correction. A single step may
+                // append several codewords, so the data can already be longer than 10 codewords here.
+                if (!primaryCorrected && data.Count >= 10)
                 {
-                    data.AddRange(ComputeReadSolomon(data, ec10Poly));
+                    data.InsertRange(10, ComputeReadSolomon(data.GetRange(0, 10), ec10Poly));
+                    primaryCorrected = true;
                 }
 
                 if (numericShiftRegex.IsMatch(content))
@@ -511,16 +514,8 @@ namespace Bitbeans.Zpl.Viewer.Symologies
                 else
                 {
                     int value;
-                    string c = StringInfo.GetNextTextElement(content);
-                    StringInfo stringInfo = new(content);
-                    if (stringInfo.LengthInTextElements > 1)
-                    {
-                        content = stringInfo.SubstringByTextElements(1);
-                    }
-                    else
-                    {
-                        content = string.Empty;
-                    }
+                    string c = content.Substring(0, 1);
+                    content = content.Substring(1);
 
                     if (codeMap.TryGetValue(c, out value))
                     {
@@ -561,7 +556,7 @@ namespace Bitbeans.Zpl.Viewer.Symologies
                                 data.Add(codeAMap[content.Substring(1, 1)]);
                                 content = content.Substring(2);
                             }
-                            else if (codeAMatch.Length == 1)
+                            else
                             {
                                 data.Add(codeMap[SHIFT_2A]);
                                 data.Add(codeAMap[c]);
@@ -602,10 +597,14 @@ namespace Bitbeans.Zpl.Viewer.Symologies
                 }
             }
 
-            if (data.Count <= 10)
+            if (!primaryCorrected)
             {
-                data.AddRange(Enumerable.Repeat(codeMap[PAD], 10 - data.Count));
-                data.AddRange(ComputeReadSolomon(data, ec10Poly));
+                while (data.Count < 10)
+                {
+                    data.Add(codeMap[PAD]);
+                }
+
+                data.InsertRange(10, ComputeReadSolomon(data.GetRange(0, 10), ec10Poly));
             }
 
             if (eec)
@@ -623,20 +622,11 @@ namespace Bitbeans.Zpl.Viewer.Symologies
                             nameof(content));
                     }
 
-                    // too much data for EEC
-                    // if mode 5, convert to mode 4, else truncate
-                    if (mode == 5)
-                    {
-                        mode = 4;
-                        eec = false;
-                        data[0] = mode;
-                        data.RemoveRange(10, 10);
-                        data.InsertRange(10, ComputeReadSolomon(data.GetRange(0, 10), ec10Poly));
-                    }
-                    else
-                    {
-                        data.RemoveRange(88, data.Count - 88);
-                    }
+                    // too much data for EEC (only used by mode 5): convert to mode 4
+                    eec = false;
+                    data[0] = 4;
+                    data.RemoveRange(10, 10);
+                    data.InsertRange(10, ComputeReadSolomon(data.GetRange(0, 10), ec10Poly));
                 }
             }
 
@@ -722,7 +712,7 @@ namespace Bitbeans.Zpl.Viewer.Symologies
         private static int GF64Multiply(int a, int b)
         {
             int product = 0;
-            while (a != 0 && b != 0)
+            while (b != 0)
             {
                 if ((b & 1) > 0)
                 {
