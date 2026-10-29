@@ -14,7 +14,12 @@ using System.Linq;
 namespace Bitbeans.Zpl.Viewer
 {
     /// <summary>Draws ZPL elements with the element drawers. The element drawers keep per-draw state, so every <c>Draw</c> call creates its own drawer instances; one <see cref="ZplElementDrawer"/> can be used by several threads at the same time (the <see cref="IPrinterStorage"/> and the <see cref="DrawerOptions"/> are shared and must not be modified while drawing).</summary>
-    public class ZplElementDrawer
+    /// <remarks>
+    /// Without <see cref="DrawerOptions"/> the drawer creates its own options with a <see cref="FontManager"/> that holds native typefaces; this
+    /// font manager is owned by the drawer and released by <see cref="Dispose"/>, so dispose the drawer (<c>using var drawer = ...</c>).
+    /// Caller-provided options and their font manager are never disposed by the drawer; the caller owns them.
+    /// </remarks>
+    public class ZplElementDrawer : IDisposable
     {
         /// <summary>The largest label side in pixels.</summary>
         private const int MaxLabelPixels = 16384;
@@ -28,13 +33,35 @@ namespace Bitbeans.Zpl.Viewer
         private readonly DrawerOptions drawerOptions;
         private readonly IPrinterStorage printerStorage;
 
+        /// <summary>The font manager created by this drawer for default options, or <see langword="null"/> for caller-provided options.</summary>
+        private readonly FontManager ownedFontManager;
+        private bool disposed;
+
         /// <summary>Initializes a new instance of the <see cref="ZplElementDrawer"/> class.</summary>
         /// <param name="printerStorage">The printer storage with the downloaded objects.</param>
-        /// <param name="drawerOptions">The drawer options; default options if <see langword="null"/>.</param>
+        /// <param name="drawerOptions">The drawer options, owned by the caller; if <see langword="null"/> the drawer creates default options with its own font manager, which <see cref="Dispose"/> releases.</param>
         public ZplElementDrawer(IPrinterStorage printerStorage, DrawerOptions drawerOptions = null)
         {
-            this.drawerOptions = drawerOptions ?? new DrawerOptions();
+            if (drawerOptions == null)
+            {
+                this.ownedFontManager = new FontManager();
+                drawerOptions = new DrawerOptions(this.ownedFontManager);
+            }
+
+            this.drawerOptions = drawerOptions;
             this.printerStorage = printerStorage;
+        }
+
+        /// <summary>Disposes the font manager that the drawer created for its default options. A font manager of caller-provided <see cref="DrawerOptions"/> is not disposed. The drawer must not be used afterwards. Calling <see cref="Dispose"/> again has no effect.</summary>
+        public void Dispose()
+        {
+            if (!this.disposed)
+            {
+                this.disposed = true;
+                this.ownedFontManager?.Dispose();
+            }
+
+            GC.SuppressFinalize(this);
         }
 
         /// <summary>
@@ -46,6 +73,7 @@ namespace Bitbeans.Zpl.Viewer
         /// <param name="printDensityDpmm">Dots per millimeter</param>
         /// <param name="logger">Receives the errors of elements that cannot be drawn; such elements are skipped.</param>
         /// <returns>The encoded label image.</returns>
+        /// <exception cref="ObjectDisposedException">The drawer is disposed.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="elements"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="labelWidth"/>, <paramref name="labelHeight"/> or <paramref name="printDensityDpmm"/> is not a positive number, or the label is smaller than one pixel or larger than 16384 pixels per side.</exception>
         public byte[] Draw(
@@ -55,6 +83,7 @@ namespace Bitbeans.Zpl.Viewer
             int printDensityDpmm = 8,
             ILogger logger = null)
         {
+            ObjectDisposedException.ThrowIf(this.disposed, this);
             ArgumentNullException.ThrowIfNull(elements);
             (int labelImageWidth, int labelImageHeight) = GetLabelPixelSize(labelWidth, labelHeight, printDensityDpmm);
 
@@ -100,6 +129,7 @@ namespace Bitbeans.Zpl.Viewer
         /// <param name="labelHeight">Label height in millimeter</param>
         /// <param name="printDensityDpmm">Dots per millimeter</param>
         /// <param name="logger">Receives the errors of elements that cannot be drawn; such elements are skipped.</param>
+        /// <exception cref="ObjectDisposedException">The drawer is disposed.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="surface"/> or <paramref name="elements"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="labelWidth"/>, <paramref name="labelHeight"/> or <paramref name="printDensityDpmm"/> is not a positive number, or the label is smaller than one pixel or larger than 16384 pixels per side.</exception>
         public void DrawSurface(SKSurface surface,
@@ -109,7 +139,9 @@ namespace Bitbeans.Zpl.Viewer
             int printDensityDpmm = 8,
             ILogger logger = null)
         {
+            ObjectDisposedException.ThrowIf(this.disposed, this);
             ArgumentNullException.ThrowIfNull(surface);
+            ObjectDisposedException.ThrowIf(this.disposed, this);
             ArgumentNullException.ThrowIfNull(elements);
             (int labelImageWidth, int labelImageHeight) = GetLabelPixelSize(labelWidth, labelHeight, printDensityDpmm);
 

@@ -27,7 +27,7 @@ formats stored with `^DF` are merged into the labels that recall them with `^XF`
 ```csharp
 IPrinterStorage printerStorage = new PrinterStorage();
 var analyzer = new ZplAnalyzer(printerStorage);
-var drawer = new ZplElementDrawer(printerStorage);
+using var drawer = new ZplElementDrawer(printerStorage);
 
 AnalyzeInfo analyzeInfo = analyzer.Analyze("^XA^FT100,100^A0N,67,0^FDTest label^FS^XZ");
 
@@ -45,6 +45,12 @@ foreach (LabelInfo label in analyzeInfo.LabelInfos)
 | `logger` | `null` | `Microsoft.Extensions.Logging.ILogger` for drawing problems (invalid barcode content, ...) |
 
 `DrawSurface(SKSurface, ...)` draws onto an existing Skia surface instead of encoding an image.
+
+`ZplElementDrawer` is `IDisposable`. Created without `DrawerOptions` it makes its own default options with a
+`FontManager` that holds native typefaces, and `Dispose` releases them, so use `using var drawer = ...`. Options that
+you pass in are owned by you: the drawer never disposes them or their `FontManager`; dispose `options.FontManager`
+yourself when you are done (a `FontManager` also releases the symbol typeface of `^GS`, which is created on first use).
+A disposed drawer or font manager throws `ObjectDisposedException`.
 
 ### Analyzer results
 

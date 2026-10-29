@@ -134,11 +134,6 @@ namespace Bitbeans.Zpl.Viewer.ElementDrawers
 
                     if (cornerRadius == 0)
                     {
-                        if (graphicBox.ReversePrint)
-                        {
-                            skPaint.BlendMode = SKBlendMode.Xor;
-                        }
-
                         this.skCanvas.DrawRect(x, y, width, height, skPaint);
                         // Calculate next position based on box dimensions
                         return this.CalculateNextDefaultPosition(baseX, position.Y, width1, height1, graphicBox.FieldOrigin != null, FieldOrientation.Normal, currentPosition);
