@@ -6,7 +6,24 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ## [Unreleased]
 
-## [1.0.0] - unreleased
+## [1.1.0] - 2026-10-30
+
+### Changed
+
+- Linux: `Bitbeans.Zpl.SkiaSharp` (and with it `Bitbeans.Zpl.Viewer`) no longer references
+  `SkiaSharp.NativeAssets.Linux`. Both SkiaSharp native packages for Linux ship the same `libSkiaSharp.so`, so the
+  dependency overrode the `NoDependencies` variant an application chose for a container without fontconfig, and
+  rendering failed there. **On Linux, add `SkiaSharp.NativeAssets.Linux` (needs `libfontconfig1`) or
+  `SkiaSharp.NativeAssets.Linux.NoDependencies` to the application**; see the
+  [Linux notes](docs/viewer.md#linux). `HarfBuzzSharp.NativeAssets.Linux` stays referenced, it has no
+  system dependencies. Windows and macOS are unchanged.
+
+### Fixed
+
+- Viewer: `FontManager` holds no SkiaSharp object in static fields, so a missing `libSkiaSharp` no longer fails its
+  type initializer; the error comes from the first SkiaSharp call.
+
+## [1.0.0] - 2026-10-30
 
 First release as **Bitbeans.Zpl**, a fork of [BinaryKits.Zpl](https://github.com/BinaryKits/BinaryKits.Zpl)
 3.3.1 / Viewer 1.3.1. See the [migration guide](docs/migration.md).
@@ -171,5 +188,6 @@ First release as **Bitbeans.Zpl**, a fork of [BinaryKits.Zpl](https://github.com
 - `ImageSharpImageConverter`, `DrawerOptions.FontLoader` (use `DrawerOptions.FontManager.FontLoader`).
 - .NET Framework / .NET Standard code paths.
 
-[Unreleased]: https://github.com/bitbeans/Bitbeans.Zpl/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/bitbeans/Bitbeans.Zpl/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/bitbeans/Bitbeans.Zpl/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/bitbeans/Bitbeans.Zpl/releases/tag/v1.0.0

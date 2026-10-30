@@ -23,4 +23,9 @@ Supports text (outline and bitmap fonts, field blocks, rotation, reverse print),
 images, stored formats (`^DF`/`^XF`) and the common 1D and 2D barcodes (Code 11/39/93/128, EAN, UPC,
 2 of 5, Codabar, MSI, LOGMARS, QR, Data Matrix, PDF417, Aztec, MaxiCode).
 
+On Linux, add a SkiaSharp native package to the application: `SkiaSharp.NativeAssets.Linux` (finds the system
+fonts, needs `libfontconfig1`) or `SkiaSharp.NativeAssets.Linux.NoDependencies` (minimal container images; register
+the fonts with `FontManager.RegisterTypeface`). Ubuntu/Docker examples:
+https://github.com/bitbeans/Bitbeans.Zpl/blob/main/docs/viewer.md#linux
+
 Documentation: https://github.com/bitbeans/Bitbeans.Zpl/blob/main/docs/viewer.md

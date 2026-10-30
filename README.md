@@ -44,7 +44,8 @@ dotnet add package Bitbeans.Zpl.SkiaSharp   # only if you embed images
 dotnet add package Bitbeans.Zpl.Viewer      # only if you render previews
 ```
 
-All packages target **.NET 10**.
+All packages target **.NET 10**. On Linux, the SkiaSharp based packages need a SkiaSharp native package in the
+application, see [Linux](docs/viewer.md#linux).
 
 ## Quick start
 

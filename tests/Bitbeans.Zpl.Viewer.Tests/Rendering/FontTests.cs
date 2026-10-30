@@ -4,6 +4,8 @@ using SkiaSharp;
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 
 namespace Bitbeans.Zpl.Viewer.Tests.Rendering
 {
@@ -235,6 +237,19 @@ namespace Bitbeans.Zpl.Viewer.Tests.Rendering
 
             Assert.AreSame(SKTypeface.Default, manager.Typeface0);
             Assert.AreSame(SKTypeface.Default, manager.TypefaceA);
+        }
+
+        [TestMethod]
+        public void FontManager_HasNoStaticSkiaState()
+        {
+            // A static SkiaSharp field loads libSkiaSharp in the type initializer; when that fails the type stays
+            // unusable and the cause is hidden in a TypeInitializationException
+            FieldInfo[] skiaFields = typeof(FontManager)
+                .GetFields(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)
+                .Where(f => f.FieldType.Namespace == typeof(SKObject).Namespace)
+                .ToArray();
+
+            Assert.IsEmpty(skiaFields);
         }
     }
 }

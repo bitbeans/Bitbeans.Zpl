@@ -22,12 +22,13 @@ namespace Bitbeans.Zpl.Viewer
         private readonly List<SKTypeface> ownedTypefaces = [];
         private readonly Dictionary<string, IList<SKTypeface>> registeredTypefaces = new(StringComparer.OrdinalIgnoreCase);
 
-        private static readonly SKFontManager systemFontManager = SKFontManager.Default;
-
         /// <summary>
         /// Looks a family up in the system fonts (replaceable for tests, e.g. to simulate a system without fonts).
         /// </summary>
-        internal Func<string, SKFontStyle, SKTypeface> SystemTypefaceMatcher { get; set; } = systemFontManager.MatchFamily;
+        /// <remarks>The native library is loaded on the first lookup, not in a static initializer, so a missing
+        /// <c>libSkiaSharp</c> does not fail the type initializer of <see cref="FontManager"/>.</remarks>
+        internal Func<string, SKFontStyle, SKTypeface> SystemTypefaceMatcher { get; set; } =
+            (familyName, fontStyle) => SKFontManager.Default.MatchFamily(familyName, fontStyle);
 
         /// <summary>
         /// Gets or sets the list of font family names used as the primary font stack for rendering text.
@@ -65,25 +66,18 @@ namespace Bitbeans.Zpl.Viewer
         /// resources or external files.</remarks>
         public Func<string, SKTypeface> FontLoader { get; set; }
 
-        private static readonly SKFontStyle fontStyle0 = new(
-            SKFontStyleWeight.Bold,
-            SKFontStyleWidth.SemiCondensed,
-            SKFontStyleSlant.Upright
-        );
-
-        private static readonly SKFontStyle fontStyleA = new(
-            SKFontStyleWeight.Normal,
-            SKFontStyleWidth.Normal,
-            SKFontStyleSlant.Upright
-        );
-
         private SKTypeface typeface0;
         internal SKTypeface Typeface0 {
             get {
                 lock (this.typefaceLock)
                 {
                     this.ThrowIfDisposed();
-                    this.typeface0 ??= this.GetDefaultTypeface(this.FontStack0, fontStyle0);
+                    if (this.typeface0 == null)
+                    {
+                        using SKFontStyle fontStyle0 = new(SKFontStyleWeight.Bold, SKFontStyleWidth.SemiCondensed, SKFontStyleSlant.Upright);
+                        this.typeface0 = this.GetDefaultTypeface(this.FontStack0, fontStyle0);
+                    }
+
                     return this.typeface0;
                 }
             }
@@ -95,7 +89,12 @@ namespace Bitbeans.Zpl.Viewer
                 lock (this.typefaceLock)
                 {
                     this.ThrowIfDisposed();
-                    this.typefaceA ??= this.GetDefaultTypeface(this.FontStackA, fontStyleA);
+                    if (this.typefaceA == null)
+                    {
+                        using SKFontStyle fontStyleA = new(SKFontStyleWeight.Normal, SKFontStyleWidth.Normal, SKFontStyleSlant.Upright);
+                        this.typefaceA = this.GetDefaultTypeface(this.FontStackA, fontStyleA);
+                    }
+
                     return this.typefaceA;
                 }
             }

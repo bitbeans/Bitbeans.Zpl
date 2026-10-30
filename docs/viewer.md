@@ -147,11 +147,59 @@ asked for that font, then for font `A`; if neither is available the text is rend
 
 ## Platform notes
 
-- Windows, Linux (x64/arm64) and macOS are supported. The Linux native assets of SkiaSharp and HarfBuzzSharp
-  are referenced by the packages. On Linux, system fonts are found through fontconfig, so `libfontconfig1` and
-  at least one font must be installed (for example `apt-get install fontconfig fonts-dejavu-core`); minimal
-  container images often have neither. Without them, register fonts with `FontManager.RegisterTypeface`.
+- Windows, Linux (x64/arm64) and macOS are supported. The packages bring the native SkiaSharp libraries for
+  Windows and macOS; on Linux the application adds one itself, see [Linux](#linux).
 - Text output depends on the installed fonts; register fonts explicitly for reproducible images.
 - PDF output is not supported.
+
+### Linux
+
+SkiaSharp has two native packages for Linux. They ship the same `libSkiaSharp.so`, so the application chooses one
+and the Bitbeans packages reference neither. Without one, or with `SkiaSharp.NativeAssets.Linux` but no
+`libfontconfig1`, the first drawing fails with a `TypeInitializationException` of a SkiaSharp type (for example
+`SkiaSharp.SKImageInfo`) whose innermost exception is a `DllNotFoundException` for `libSkiaSharp`. The HarfBuzz
+native library for Linux has no system dependencies and is referenced by the viewer.
+
+| Package | System fonts | Needs |
+| --- | --- | --- |
+| `SkiaSharp.NativeAssets.Linux` | found through fontconfig | `libfontconfig1` and at least one font |
+| `SkiaSharp.NativeAssets.Linux.NoDependencies` | none | nothing; register the fonts with `FontManager.RegisterTypeface` |
+
+With the `NoDependencies` package and no registered font, outline text (font `0`) is drawn blank.
+
+**System fonts (Ubuntu, Debian):**
+
+```shell
+dotnet add package SkiaSharp.NativeAssets.Linux
+sudo apt-get update
+sudo apt-get install -y --no-install-recommends fontconfig fonts-dejavu-core fonts-roboto
+```
+
+`fonts-roboto` provides Roboto Condensed for font `0`, `fonts-dejavu-core` DejaVu Sans Mono for the other fonts (see
+[Fonts](#fonts)). The `mcr.microsoft.com/dotnet/aspnet` and `runtime` images contain neither fontconfig nor fonts:
+
+```dockerfile
+FROM mcr.microsoft.com/dotnet/aspnet:10.0
+RUN apt-get update     && apt-get install -y --no-install-recommends fontconfig fonts-dejavu-core fonts-roboto     && rm -rf /var/lib/apt/lists/*
+```
+
+**Without system dependencies** (minimal images, `chiseled`):
+
+```shell
+dotnet add package SkiaSharp.NativeAssets.Linux.NoDependencies
+```
+
+```csharp
+options.FontManager.RegisterTypeface(SKTypeface.FromFile("fonts/RobotoCondensed-Bold.ttf"));
+options.FontManager.RegisterTypeface(SKTypeface.FromFile("fonts/DejaVuSansMono.ttf"));
+```
+
+Ship the font files with the application. If the project already gets `SkiaSharp.NativeAssets.Linux` from another
+package, exclude it so the `NoDependencies` file is published:
+
+```xml
+<PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="4.154.0" />
+<PackageReference Include="SkiaSharp.NativeAssets.Linux" Version="4.154.0" ExcludeAssets="all" />
+```
 
 See [supported commands](viewer-support.md) for the barcode and command matrix.

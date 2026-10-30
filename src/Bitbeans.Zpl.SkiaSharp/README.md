@@ -21,7 +21,8 @@ string zpl = engine.ToZplString(new ZplRenderOptions());
 
 - Transparent pixels are composed onto white
 - Images are scaled with a Mitchell cubic filter when source and target dpi differ
-- Linux native assets (`SkiaSharp.NativeAssets.Linux`) are included; they need `libfontconfig1`, which is
-  installed on most distributions
+- On Linux, add a SkiaSharp native package to the application: `SkiaSharp.NativeAssets.Linux` (needs
+  `libfontconfig1`) or `SkiaSharp.NativeAssets.Linux.NoDependencies` (minimal container images), see
+  https://github.com/bitbeans/Bitbeans.Zpl/blob/main/docs/viewer.md#linux
 
 Documentation: https://github.com/bitbeans/Bitbeans.Zpl/blob/main/docs/images.md

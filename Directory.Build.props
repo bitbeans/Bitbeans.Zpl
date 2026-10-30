@@ -19,7 +19,7 @@
   <!-- NuGet package metadata shared by all packable projects -->
   <PropertyGroup>
     <!-- Release builds override this with the git tag, see .github/workflows/release.yml -->
-    <VersionPrefix>1.0.0</VersionPrefix>
+    <VersionPrefix>1.1.0</VersionPrefix>
     <Authors>bitbeans</Authors>
     <Company>bitbeans</Company>
     <Copyright>Copyright (c) 2017 Binary Kits Pte. Ltd.; Copyright (c) 2026 bitbeans</Copyright>
